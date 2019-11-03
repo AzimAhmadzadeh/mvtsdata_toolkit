@@ -8,7 +8,10 @@ Multivariate Time Series Data Toolkit is a python package that works on multivar
  - an automated data analysis process that provides basic summary on both mvts data and the extracted features.
 
 ----
+[![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg)](https://pypi.org/project/TimeSeriesAnalyzer/)
+[![PyPI license](https://img.shields.io/badge/PiPY-0.0.1-orange)](https://pypi.org/project/TimeSeriesAnalyzer/)
 
+----
  
 #### Requirements
 * Python > 3.6
