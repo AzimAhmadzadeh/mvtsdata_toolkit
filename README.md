@@ -5,9 +5,11 @@
 
 ----
 #### Try it online:
-Click on the badge below to try the demo online:
+Click on the badge below to try the demo provided in the notebook `demo.ipynb`:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvts_data_toolkit/master)
+
+----
 
 ### Multivariate Timeseries (MVTS) Data
 ## Data Rules:
