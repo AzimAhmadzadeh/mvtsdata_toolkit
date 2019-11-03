@@ -64,13 +64,13 @@ This module provides:
 In the following, we briefly introduce the dataset, all the means provided by this module, and some snippets of code to showcase how the module can be used.
 
 
-### FEATURES PACKAGE [[features](features)]
+### FEATURES PACKAGE [[features](./features)]
 This package contains the statistical features that can be extracted from the time series, and the scripts needed to compute the features on the multivariate time series data.
 
-#### Features Collection [[features.feature_collection.py](features/feature_collection.py)]
+#### Features Collection [[features.feature_collection.py](./features/feature_collection.py)]
 
 
-#### Features Extractor (sequential) [[features.feature_extractor.py](features/feature_extractor.py)]
+#### Features Extractor (sequential) [[features.feature_extractor.py](./features/feature_extractor.py)]
 This extracts statistical features from the multivariate time series dataset. Using this script, any of the features mentioned above can be selected to be computed on any subset of the physical parameters in SWAN.
 
 The snippet below shows how to extract specified statistical features from specified physical parameters (declared in [CONSTANTS.py](CONSTANTS.py) file). The extracted features will be a `pandas.DataFrame` (stored as a csv file) with its shape being `N X M`, where `N` is the number of multivaraite time series available in `/path/to/FL/`, and `M` is the dimensionality of each extracted vector. In this exmaple, `M` equals the number of generated features (3*4), plus 4; four pieces of meta data, `NOAA_AR_NO`, `LABEL`, START_TIME`, and `END_TIME`.
@@ -95,9 +95,9 @@ pc.calculate_all(features_list=stat_features, params_name_list=phys_parameters)
 
 ```
 
-### UTIL PACKAGE [[utils](utils)]
+### UTIL PACKAGE [[utils](./utils)]
 This package serves five different functionality as helper methods to the overall tool:
-#### MVTS Data Analysis[[utils.mvts_data_analysis.py](data_analysis/mvts_data_analysis.py)]
+#### MVTS Data Analysis[[utils.mvts_data_analysis.py](./data_analysis/mvts_data_analysis.py)]
 This class takes the folder location(path) of the MVTS dataset in time of instance creation. By calling method compute_summary()
 it extracts each mvts(.csv) file and computes the statistical parameters of each numeric physical feature that belongs to the MVTS.
 TDigest module is used in order to calculate the statistical parameters(like percentile) in the accumulated data. This t-digest datastructure can also be used in distributed file system. 
@@ -129,7 +129,7 @@ print(null_count)
 mvts.get_five_num_summary() 
 ```
 
-#### Extracted Features Analysis[[utils.extracted_features_analysis.py](data_analysis/extracted_features_analysis.py)]
+#### Extracted Features Analysis[[utils.extracted_features_analysis.py](./data_analysis/extracted_features_analysis.py)]
 This analyses the dataset(extracted_features.csv) created by feature extractor module.
 
 Perform Exploratory Data Analysis(EDA) on extracted features  
@@ -165,12 +165,20 @@ print(miss_pop)
 print('Print Five Num Value:')
 print(five_num)
 ```
-#### Meta Data Getter[[utils.meta_data_getter.py](utils/meta_data_getter.py)]
+#### Meta Data Getter[[utils.meta_data_getter.py](./utils/meta_data_getter.py)]
 This section is responsible for extracting the embedded information from the raw MVTS file names. These helper methods are used
 to fill the first four columns of the extracted_features.csv file: `ID`,`LABEL`,`START_TIME`, and `END_TIME`
 
-#### MVTS Cleaner[[utils.mvts_cleaner.py](utils/mvts_cleaner.py)]
+#### MVTS Cleaner[[utils.mvts_cleaner.py](./utils/mvts_cleaner.py)]
 Responsible for cleaning the dataset by different methods like: interpolation.
 
-#### Normalizer [[utils.normalizer.py](utils/normalizer.py)]
-Uses different normalization techniques like: zero one normalization, -1 to 1 normalization, standardization and robust standardization. User can choose from these given options and implement on MVTS dataset. 
+#### Normalizer [[utils.normalizer.py](./utils/normalizer.py)]
+Uses different normalization techniques like: zero one normalization, -1 to 1 normalization, standardization and robust standardization. User can choose from these given options and implement on MVTS dataset.
+
+----
+#### Authors:
+
+|                 |               |       |
+| --------------- |:-------------:| -----:|
+| Kankana Sinha   | _ksinha3[AT]student[DOT]gsu[DOT]edu_  | [LinkedIn](https://www.linkedin.com/in/kankana-sinha-4b4b13131/) |
+| Azim Ahmadzadeh | _aahmadzadeh1[AT]cs[DOT]gsu[DOT]edu_  | [Website](https://grid.cs.gsu.edu/~aahmadzadeh1)   |
