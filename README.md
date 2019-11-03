@@ -1,7 +1,18 @@
-#### Requirements
+## MVTS Data Toolkit
+Multivariate Time Series Data Toolkit is a python package that works on multivariate time series datasets and provides: 
 
-* Python 3.6
-* For a list of all required packages, see [requirements.txt](requirements.txt). 
+ - over 50 time series statistical features collected from a number of research studies of different domains,
+ - an automated feature extraction process, provided in both sequential and parallel fashions,
+ - a set of generic sampling methodologies,
+ - a set of different normalization transformation on mvts data,
+ - an automated data analysis process that provides basic summary on both mvts data and the extracted features.
+
+----
+
+ 
+#### Requirements
+* Python > 3.6
+* For a list of all required packages, see [requirements.txt](./requirements.txt).
 
 ----
 #### Try it online:
@@ -10,7 +21,12 @@ Click on the badge below to try the demo provided in the notebook `demo.ipynb`:
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvts_data_toolkit/master)
 
 ----
+#### Install it from PyPI
+You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
 
+```pip install mvts_data_toolkit```
+
+----
 ### Multivariate Timeseries (MVTS) Data
 ## Data Rules:
 #### MVTS Files
