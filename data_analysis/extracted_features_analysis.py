@@ -177,7 +177,7 @@ class ExtractedFeaturesAnalysis:
 def main():
     import pandas as pd
     import CONSTANTS as CONST
-    from utils import normalizer
+    from normalizing import normalizer
 
     f_path = os.path.join(CONST.ROOT,
                           'pet_datasets/extracted_features/non_unittest_extracted_features.csv')

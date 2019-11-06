@@ -190,7 +190,7 @@ to fill the first four columns of the extracted_features.csv file: `ID`,`LABEL`,
 #### MVTS Cleaner[[utils.mvts_cleaner.py](./utils/mvts_cleaner.py)]
 Responsible for cleaning the dataset by different methods like: interpolation.
 
-#### Normalizer [[utils.normalizer.py](./utils/normalizer.py)]
+#### Normalizer [[utils.normalizer.py](normalizing/normalizer.py)]
 Uses different normalization techniques like: zero one normalization, -1 to 1 normalization, standardization and robust standardization. User can choose from these given options and implement on MVTS dataset.
 
 ----
