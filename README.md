@@ -20,7 +20,8 @@ Multivariate Time Series Data Toolkit is a python package that works on multivar
 #### Try it online:
 Click on the badge below to try the demo provided in the notebook `demo.ipynb`:
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvts_data_toolkit/master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvtsdata_toolkit%2Fsrc%2Fmaster/master)
+
 
 ----
 #### Install it from PyPI
