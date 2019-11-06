@@ -27,7 +27,7 @@ class FeatureExtractor:
 
     The resultant dataframe (i.e., the extracted features) will have T X F + x columns, where F is
     the total number of features (in , STATISTICAL_FEATURES), T is the total number of
-    time series parameters (in MVTS_PARAMETERS), and x is the number of __meta data extracted from
+    time series parameters (in MVTS_PARAMETERS), and x is the number of meta data extracted from
     the file names (i.e., number of tags in META_DATA_TAGS). In the extracted features dataframe,
     the column-name of the nominal attributes is of the structure
     <TIME_SERIES_NAME>_<statistic_name>. For instance, for a time series named 'DENSITY' and the
@@ -54,7 +54,7 @@ class FeatureExtractor:
 
     def calculate_all(self, params_index_list: list = None, need_interp: bool = True):
         """
-        Computes (based on the __meta data loaded in the constructor) all of the statistical
+        Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
         class-field `df_all_features`.
 
@@ -135,7 +135,7 @@ class FeatureExtractor:
                     extractor_utils.calculate_one_mvts(df_raw, self.statistical_features)
 
                 # -----------------------------------------
-                # Extract the given __meta data from this mvts name.
+                # Extract the given meta data from this mvts name.
                 # -----------------------------------------
                 tags_dict = dict()
                 for tag in self.metadata_tags:

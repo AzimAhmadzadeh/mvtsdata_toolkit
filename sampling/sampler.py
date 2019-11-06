@@ -1,4 +1,5 @@
 import pandas as pd
+from sampling.input_validator import validate_input,validate_sampling_input
 
 
 class Sampler:
@@ -105,35 +106,21 @@ class Sampler:
         class should remain unchanged.
         :return:
         """
+
         if not desired_populations:
-            desired_populations = {}
+            validate_input(self.class_population, desired_ratios=desired_ratios)
             total_population = sum(self.class_population.values())
-            # Check whether the argument passed by the user matches with the dataset
-            if set(self.class_population.keys()) != set(desired_ratios.keys()):
-                raise ValueError(
-                    """
-                    Please enter correct labels and desired ratio
-                    """
-                )
+            desired_populations = {}
+
             for label, value in desired_ratios.items():
                 if value == -1:
                     desired_populations[label] = self.class_population[label]
-                elif (value >= 0) & (value <= 1):
-                    desired_populations[label] = round(value * total_population)
                 else:
-                    raise ValueError(
-                        """
-                        Please enter values between 0 to 1 or -1 in desired ratios
-                        """
-                    )
+                    desired_populations[label] = round(value * total_population)
+
         else:
-            # Check whether the argument passed by the user matches with the dataset
-            if set(self.class_population.keys()) != set(desired_populations.keys()):
-                raise ValueError(
-                    """
-                    Please enter correct labels and desired population
-                    """
-                )
+
+            validate_input(self.class_population, desired_populations=desired_populations)
 
         for label in self.labels:
             if desired_populations[label] == -1:
@@ -171,6 +158,8 @@ class Sampler:
         :param base_minority:
         :return:
         """
+        validate_sampling_input(self.class_population,minority_labels= minority_labels, majority_labels= majority_labels
+                                , base= base_minority)
         if base_minority:
             base_count = self.dfs_dict[base_minority].shape[0]
             total_min_count = base_count * len(minority_labels)
@@ -213,6 +202,8 @@ class Sampler:
         :param base_majority:
         :return:
         """
+        validate_sampling_input(self.class_population, minority_labels=minority_labels, majority_labels=majority_labels,
+                                base=base_majority)
         if base_majority:
             base_count = self.dfs_dict[base_majority].shape[0]
             total_maj_count = base_count * len(majority_labels)
