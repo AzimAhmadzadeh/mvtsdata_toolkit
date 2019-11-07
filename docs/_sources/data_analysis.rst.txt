@@ -1,0 +1,30 @@
+data\_analysis package
+======================
+
+Submodules
+----------
+
+data\_analysis\.extracted\_features\_analysis module
+----------------------------------------------------
+
+.. automodule:: data_analysis.extracted_features_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+data\_analysis\.mvts\_data\_analysis module
+-------------------------------------------
+
+.. automodule:: data_analysis.mvts_data_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: data_analysis
+    :members:
+    :undoc-members:
+    :show-inheritance:

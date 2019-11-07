@@ -1,0 +1,14 @@
+mvtsdata_toolkit
+================
+
+.. toctree::
+   :maxdepth: 4
+
+   CONSTANTS
+   data_analysis
+   data_retriever
+   features
+   normalizing
+   sampling
+   setup
+   utils

@@ -1,0 +1,30 @@
+utils package
+=============
+
+Submodules
+----------
+
+utils\.meta\_data\_getter module
+--------------------------------
+
+.. automodule:: utils.meta_data_getter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+utils\.mvts\_cleaner module
+---------------------------
+
+.. automodule:: utils.mvts_cleaner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: utils
+    :members:
+    :undoc-members:
+    :show-inheritance:

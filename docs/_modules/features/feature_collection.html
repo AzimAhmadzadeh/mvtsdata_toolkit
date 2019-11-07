@@ -1,0 +1,630 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>features.feature_collection &mdash; mvtsdata_toolkit 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'1.0.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> mvtsdata_toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">mvtsdata_toolkit</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mvtsdata_toolkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>features.feature_collection</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for features.feature_collection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="k">import</span> <span class="n">argrelextrema</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is a collection of all time series features gathered</span>
+<span class="sd">    to be derived from the multivariate time series of SWAN data</span>
+<span class="sd">    benchmark.</span>
+<span class="sd">    NOTE: Each method name MUST start with the string &#39;get_&#39;.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="c1"># -----------------------------------------------------------</span>
+<span class="c1">#                   TIME SERIES FEATURES                    #</span>
+<span class="c1"># -----------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="get_min"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_min">[docs]</a><span class="k">def</span> <span class="nf">get_min</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the minimum value of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_max"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_max">[docs]</a><span class="k">def</span> <span class="nf">get_max</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the maximum value of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_median"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_median">[docs]</a><span class="k">def</span> <span class="nf">get_median</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the median value of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_mean"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_mean">[docs]</a><span class="k">def</span> <span class="nf">get_mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the arithmetic mean value of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_stddev"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_stddev">[docs]</a><span class="k">def</span> <span class="nf">get_stddev</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the standard deviation of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_var"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_var">[docs]</a><span class="k">def</span> <span class="nf">get_var</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the variance of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_skewness"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_skewness">[docs]</a><span class="k">def</span> <span class="nf">get_skewness</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the skewness of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">skew</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_kurtosis"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_kurtosis">[docs]</a><span class="k">def</span> <span class="nf">get_kurtosis</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the kurtosis of a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">sp</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kurtosis</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_no_local_maxima"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_no_local_maxima">[docs]</a><span class="k">def</span> <span class="nf">get_no_local_maxima</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the numer of local maxima in a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">argrelextrema</span><span class="p">(</span><span class="n">uni_ts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_no_local_minima"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_no_local_minima">[docs]</a><span class="k">def</span> <span class="nf">get_no_local_minima</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the number of local minima in a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">argrelextrema</span><span class="p">(</span><span class="n">uni_ts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_no_local_extrema"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_no_local_extrema">[docs]</a><span class="k">def</span> <span class="nf">get_no_local_extrema</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the number of local extrema in a given univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_no_local_minima</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_no_local_maxima</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_no_zero_crossings"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_no_zero_crossings">[docs]</a><span class="k">def</span> <span class="nf">get_no_zero_crossings</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the number of zero-crossings in a given univariate time series &quot;&quot;&quot;</span>
+    <span class="n">zero_crossings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">zero_crossings</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_mean_local_maxima_value"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_mean_local_maxima_value">[docs]</a><span class="k">def</span> <span class="nf">get_mean_local_maxima_value</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">only_positive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the mean of local maxima values</span>
+<span class="sd">    Args:</span>
+<span class="sd">        uni_ts (numpy.ndarray): Univariate time series.</span>
+<span class="sd">        only_positive (bool): Only positive flag for local maxima.</span>
+<span class="sd">            When True only positive local maxima are considered. Default is False</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        float: mean of local maxima values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_maxima</span> <span class="o">=</span> <span class="n">argrelextrema</span><span class="p">(</span><span class="n">uni_ts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">greater</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">maxima_values</span> <span class="o">=</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">local_maxima</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">only_positive</span><span class="p">:</span>
+        <span class="n">pos_maxima_values</span> <span class="o">=</span> <span class="n">maxima_values</span><span class="p">[</span><span class="n">maxima_values</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">pos_maxima_values</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">maxima_values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_mean_local_minima_value"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_mean_local_minima_value">[docs]</a><span class="k">def</span> <span class="nf">get_mean_local_minima_value</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">only_negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the mean of local minima values</span>
+<span class="sd">    Args:</span>
+<span class="sd">        uni_ts (numpy.ndarray): Univariate time series.</span>
+<span class="sd">        only_negative (bool): Only negative flag for local minima.</span>
+<span class="sd">            When True only negative local minima are considered. Default is False</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        float: mean of local minima values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">local_minima</span> <span class="o">=</span> <span class="n">argrelextrema</span><span class="p">(</span><span class="n">uni_ts</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">minima_values</span> <span class="o">=</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">local_minima</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">only_negative</span><span class="p">:</span>
+        <span class="n">neg_minima_values</span> <span class="o">=</span> <span class="n">minima_values</span><span class="p">[</span><span class="n">minima_values</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">neg_minima_values</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">minima_values</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_no_mean_local_maxima_upsurges"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_no_mean_local_maxima_upsurges">[docs]</a><span class="k">def</span> <span class="nf">get_no_mean_local_maxima_upsurges</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">only_positive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of values in a given time series whose value</span>
+<span class="sd">        is greater than the mean of local maxima values (# of upserges).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        uni_ts (numpy.ndarray): Univariate time series.</span>
+<span class="sd">        only_positive (bool): Only positive flag for mean local maxima.</span>
+<span class="sd">            When True only positive local maxima are considered. Default is False</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        int: number of points whose value is greater than mean local maxima.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean_local_maxima</span> <span class="o">=</span> <span class="n">get_mean_local_maxima_value</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="n">only_positive</span><span class="p">)</span>
+    <span class="n">upsurging</span> <span class="o">=</span> <span class="n">uni_ts</span> <span class="o">&gt;</span> <span class="n">mean_local_maxima</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">upsurging</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_no_mean_local_minima_downslides"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_no_mean_local_minima_downslides">[docs]</a><span class="k">def</span> <span class="nf">get_no_mean_local_minima_downslides</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">only_negative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the number of values in a given time series whose value</span>
+<span class="sd">        is less than the mean of local minima values (# of downslides).</span>
+<span class="sd">    Args:</span>
+<span class="sd">        uni_ts (numpy.ndarray): Univariate time series.</span>
+<span class="sd">        only_negative (bool): Only negative flag for mean local minima.</span>
+<span class="sd">            When True only negative local minima are considered. Default is False</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        int: number of points whose value is less than mean local minima.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean_local_minima</span> <span class="o">=</span> <span class="n">get_mean_local_minima_value</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="n">only_negative</span><span class="p">)</span>
+    <span class="n">downslides</span> <span class="o">=</span> <span class="n">uni_ts</span> <span class="o">&lt;</span> <span class="n">mean_local_minima</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">downslides</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_difference_of_mins"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_difference_of_mins">[docs]</a><span class="k">def</span> <span class="nf">get_difference_of_mins</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the absolute difference between the minimums of the first and the</span>
+<span class="sd">        second halves of a given univariate time series&quot;&quot;&quot;</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">get_min</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[:</span><span class="n">mid</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_min</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">mid</span><span class="p">:]))</span></div>
+
+
+<div class="viewcode-block" id="get_difference_of_maxs"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_difference_of_maxs">[docs]</a><span class="k">def</span> <span class="nf">get_difference_of_maxs</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the absolute difference between the maximums of the first and the</span>
+<span class="sd">        second halves of a given univariate time series&quot;&quot;&quot;</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">get_max</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[:</span><span class="n">mid</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_max</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">mid</span><span class="p">:]))</span></div>
+
+
+<div class="viewcode-block" id="get_difference_of_means"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_difference_of_means">[docs]</a><span class="k">def</span> <span class="nf">get_difference_of_means</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the absolute difference between the means of the first and the</span>
+<span class="sd">        second halves of a given univariate time series&quot;&quot;&quot;</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">get_mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[:</span><span class="n">mid</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">mid</span><span class="p">:]))</span></div>
+
+
+<div class="viewcode-block" id="get_difference_of_stds"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_difference_of_stds">[docs]</a><span class="k">def</span> <span class="nf">get_difference_of_stds</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the absolute difference between the standard dev. of the first</span>
+<span class="sd">        and the second halves of a given univariate time series&quot;&quot;&quot;</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">get_stddev</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[:</span><span class="n">mid</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_stddev</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">mid</span><span class="p">:]))</span></div>
+
+
+<div class="viewcode-block" id="get_difference_of_vars"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_difference_of_vars">[docs]</a><span class="k">def</span> <span class="nf">get_difference_of_vars</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the absolute difference between the variances of the first</span>
+<span class="sd">        and the second halves of a given univariate time series&quot;&quot;&quot;</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">get_var</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[:</span><span class="n">mid</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_var</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">mid</span><span class="p">:]))</span></div>
+
+
+<div class="viewcode-block" id="get_difference_of_medians"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_difference_of_medians">[docs]</a><span class="k">def</span> <span class="nf">get_difference_of_medians</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the absolute difference between the medians of the first</span>
+<span class="sd">        and the second halves of a given univariate time series&quot;&quot;&quot;</span>
+    <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">get_median</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[:</span><span class="n">mid</span><span class="p">])</span> <span class="o">-</span> <span class="n">get_median</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">mid</span><span class="p">:]))</span></div>
+
+
+<div class="viewcode-block" id="get_dderivative_mean"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_dderivative_mean">[docs]</a><span class="k">def</span> <span class="nf">get_dderivative_mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the mean of the difference derivative of univariate time series</span>
+<span class="sd">        -- within the function we use step_size to find derivative</span>
+<span class="sd">        (default value of step_size is 1&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_mean</span><span class="p">(</span><span class="n">difference_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="n">step_size</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_gderivative_mean"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_gderivative_mean">[docs]</a><span class="k">def</span> <span class="nf">get_gderivative_mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the mean of the gradient derivative of univariate time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_mean</span><span class="p">(</span><span class="n">gradient_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_dderivative_stddev"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_dderivative_stddev">[docs]</a><span class="k">def</span> <span class="nf">get_dderivative_stddev</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the std.dev of the difference derivative of univariate time series</span>
+<span class="sd">        -- within the function we use step_size to find derivative</span>
+<span class="sd">        (default value of step_size is 1&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_stddev</span><span class="p">(</span><span class="n">difference_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="n">step_size</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_gderivative_stddev"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_gderivative_stddev">[docs]</a><span class="k">def</span> <span class="nf">get_gderivative_stddev</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the std.dev of the gradient derivative of univariate time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_stddev</span><span class="p">(</span><span class="n">gradient_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_dderivative_skewness"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_dderivative_skewness">[docs]</a><span class="k">def</span> <span class="nf">get_dderivative_skewness</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the skewness of the difference derivative of univariate time series</span>
+<span class="sd">        -- within the function we use step_size to find derivative</span>
+<span class="sd">        (default value of step_size is 1&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_skewness</span><span class="p">(</span><span class="n">difference_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="n">step_size</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_gderivative_skewness"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_gderivative_skewness">[docs]</a><span class="k">def</span> <span class="nf">get_gderivative_skewness</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the skewness of the gradient derivative of univariate time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_skewness</span><span class="p">(</span><span class="n">gradient_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_dderivative_kurtosis"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_dderivative_kurtosis">[docs]</a><span class="k">def</span> <span class="nf">get_dderivative_kurtosis</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the kurtosis of the difference derivative of univariate time series</span>
+<span class="sd">        -- within the function we use step_size to find derivative</span>
+<span class="sd">        (default value of step_size is 1&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_kurtosis</span><span class="p">(</span><span class="n">difference_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="n">step_size</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_gderivative_kurtosis"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_gderivative_kurtosis">[docs]</a><span class="k">def</span> <span class="nf">get_gderivative_kurtosis</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the kurtosis of the gradient derivative of univariate time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_kurtosis</span><span class="p">(</span><span class="n">gradient_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_linear_weighted_average"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_linear_weighted_average">[docs]</a><span class="k">def</span> <span class="nf">get_linear_weighted_average</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns linear weighted average of a univariate time series</span>
+<span class="sd">        simply gets 2/(n*(n+1)) * sum(i* x_i) for each x_i in uni_ts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span>
+    <span class="n">i_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">w_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">i_val</span> <span class="o">*</span> <span class="n">uni_ts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">w_sum</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_quadratic_weighted_average"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_quadratic_weighted_average">[docs]</a><span class="k">def</span> <span class="nf">get_quadratic_weighted_average</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns quadratic weighted average of a univariate time series</span>
+<span class="sd">        simply gets 6/(n*(n+1)(2*n+1)) * sum(i^2 * x_i) for each x_i in uni_ts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span>
+    <span class="n">i_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">qw_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">i_val</span> <span class="o">*</span> <span class="n">i_val</span> <span class="o">*</span> <span class="n">uni_ts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">6.0</span> <span class="o">*</span> <span class="n">qw_sum</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_average_absolute_change"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_average_absolute_change">[docs]</a><span class="k">def</span> <span class="nf">get_average_absolute_change</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the average absolute first difference of a univariate time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">difference_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="get_average_absolute_derivative_change"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_average_absolute_derivative_change">[docs]</a><span class="k">def</span> <span class="nf">get_average_absolute_derivative_change</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the average absolute first difference of a derivative of univariate time series&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="get_positive_fraction"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_positive_fraction">[docs]</a><span class="k">def</span> <span class="nf">get_positive_fraction</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the fraction of positive numbers in uni_ts&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">uni_ts</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_negative_fraction"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_negative_fraction">[docs]</a><span class="k">def</span> <span class="nf">get_negative_fraction</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the fraction of negative numbers in uni_ts&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">uni_ts</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_last_K"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_last_K">[docs]</a><span class="k">def</span> <span class="nf">get_last_K</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the last k values in a univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">uni_ts</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:]</span></div>
+
+
+<div class="viewcode-block" id="get_last_value"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_last_value">[docs]</a><span class="k">def</span> <span class="nf">get_last_value</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the last value in a univariate time series. This seems</span>
+<span class="sd">    redundant since &#39;get_last_K&#39; already does this job, but it is</span>
+<span class="sd">    necessary because the return type is different (numpy.int64) than</span>
+<span class="sd">    what &#39;get_last_K&#39; returns (numpy.ndarray). This is important if the</span>
+<span class="sd">    methods in this module are going to be called from a list.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">uni_ts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_sum_of_last_K"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_sum_of_last_K">[docs]</a><span class="k">def</span> <span class="nf">get_sum_of_last_K</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the sum of last k-values in a univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:])</span></div>
+
+
+<div class="viewcode-block" id="get_mean_last_K"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_mean_last_K">[docs]</a><span class="k">def</span> <span class="nf">get_mean_last_K</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the mean of last k-values in a univariate time series &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">[</span><span class="o">-</span><span class="n">k</span><span class="p">:])</span></div>
+
+
+<div class="viewcode-block" id="get_longest_positive_run"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_longest_positive_run">[docs]</a><span class="k">def</span> <span class="nf">get_longest_positive_run</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the longest positive run in a univariate time series&quot;&quot;&quot;</span>
+    <span class="n">ts_encode</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">))]</span>
+    <span class="n">signs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">signature</span> <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">])</span>
+    <span class="n">runs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">runs</span><span class="p">[</span><span class="n">signs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># empty array</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">runs</span><span class="p">[</span><span class="n">signs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_longest_negative_run"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_longest_negative_run">[docs]</a><span class="k">def</span> <span class="nf">get_longest_negative_run</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the longest negative run in a univariate time series&quot;&quot;&quot;</span>
+    <span class="n">ts_encode</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">))]</span>
+    <span class="n">signs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">signature</span> <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">])</span>
+    <span class="n">runs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">run</span> <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">runs</span><span class="p">[</span><span class="n">signs</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># empty array</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">runs</span><span class="p">[</span><span class="n">signs</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_longest_monotonic_increase"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_longest_monotonic_increase">[docs]</a><span class="k">def</span> <span class="nf">get_longest_monotonic_increase</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the length of the time series segment with longest monotonic increase&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_longest_positive_run</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="get_longest_monotonic_decrease"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_longest_monotonic_decrease">[docs]</a><span class="k">def</span> <span class="nf">get_longest_monotonic_decrease</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the length of the time series segment with longest monotonic increase&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_longest_negative_run</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))</span></div>
+
+
+<div class="viewcode-block" id="get_slope_of_longest_mono_increase"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_slope_of_longest_mono_increase">[docs]</a><span class="k">def</span> <span class="nf">get_slope_of_longest_mono_increase</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Identifies the longest monotonic incrase and gets the slope&quot;&quot;&quot;</span>
+    <span class="n">ts_encode</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))]</span>
+    <span class="n">slopes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">:</span>
+        <span class="n">index_end</span> <span class="o">=</span> <span class="n">index_start</span> <span class="o">+</span> <span class="n">run</span>
+        <span class="n">run_vals</span> <span class="o">=</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">index_start</span><span class="p">:</span><span class="n">index_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">signature</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># it is an increase</span>
+            <span class="n">rise</span> <span class="o">=</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># last element - first element</span>
+            <span class="n">slope</span> <span class="o">=</span> <span class="n">rise</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_vals</span><span class="p">)</span>
+            <span class="n">slopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slope</span><span class="p">)</span>
+        <span class="n">index_start</span> <span class="o">=</span> <span class="n">index_end</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_slope_of_longest_mono_decrease"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_slope_of_longest_mono_decrease">[docs]</a><span class="k">def</span> <span class="nf">get_slope_of_longest_mono_decrease</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Identifies the longest monotonic decrease and gets the slope&quot;&quot;&quot;</span>
+    <span class="n">ts_encode</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))]</span>
+    <span class="n">slopes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">:</span>
+        <span class="n">index_end</span> <span class="o">=</span> <span class="n">index_start</span> <span class="o">+</span> <span class="n">run</span>
+        <span class="n">run_vals</span> <span class="o">=</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">index_start</span><span class="p">:</span><span class="n">index_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">signature</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="c1"># it is an increase</span>
+            <span class="n">rise</span> <span class="o">=</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># last element - first element</span>
+            <span class="n">slope</span> <span class="o">=</span> <span class="n">rise</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_vals</span><span class="p">)</span>
+            <span class="n">slopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slope</span><span class="p">)</span>
+        <span class="n">index_start</span> <span class="o">=</span> <span class="n">index_end</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_avg_mono_increase_slope"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_avg_mono_increase_slope">[docs]</a><span class="k">def</span> <span class="nf">get_avg_mono_increase_slope</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns average slope of monotonically increasing segments&quot;&quot;&quot;</span>
+    <span class="n">ts_encode</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))]</span>
+    <span class="n">slopes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">:</span>
+        <span class="n">index_end</span> <span class="o">=</span> <span class="n">index_start</span> <span class="o">+</span> <span class="n">run</span>
+        <span class="n">run_vals</span> <span class="o">=</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">index_start</span><span class="p">:</span><span class="n">index_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">signature</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># it is an increase</span>
+            <span class="n">rise</span> <span class="o">=</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># last element - first element</span>
+            <span class="n">slope</span> <span class="o">=</span> <span class="n">rise</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_vals</span><span class="p">)</span>
+            <span class="n">slopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slope</span><span class="p">)</span>
+        <span class="n">index_start</span> <span class="o">=</span> <span class="n">index_end</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_avg_mono_decrease_slope"><a class="viewcode-back" href="../../features.html#features.feature_collection.get_avg_mono_decrease_slope">[docs]</a><span class="k">def</span> <span class="nf">get_avg_mono_decrease_slope</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns average slope of monotonically decreasing segments&quot;&quot;&quot;</span>
+    <span class="n">ts_encode</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">group</span><span class="p">)),</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)))]</span>
+    <span class="n">slopes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">index_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">signature</span> <span class="ow">in</span> <span class="n">ts_encode</span><span class="p">:</span>
+        <span class="n">index_end</span> <span class="o">=</span> <span class="n">index_start</span> <span class="o">+</span> <span class="n">run</span>
+        <span class="n">run_vals</span> <span class="o">=</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">index_start</span><span class="p">:</span><span class="n">index_end</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">signature</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>  <span class="c1"># it is an increase</span>
+            <span class="n">rise</span> <span class="o">=</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">run_vals</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># last element - first element</span>
+            <span class="n">slope</span> <span class="o">=</span> <span class="n">rise</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">run_vals</span><span class="p">)</span>
+            <span class="n">slopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slope</span><span class="p">)</span>
+        <span class="n">index_start</span> <span class="o">=</span> <span class="n">index_end</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">slopes</span><span class="p">)</span></div>
+
+
+<span class="c1"># -----------------------------------------------------------</span>
+<span class="c1">#                       HELPER METHODS                      #</span>
+<span class="c1"># -----------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="difference_derivative"><a class="viewcode-back" href="../../features.html#features.feature_collection.difference_derivative">[docs]</a><span class="k">def</span> <span class="nf">difference_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">N</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">uni_ts</span><span class="p">[</span><span class="n">x</span> <span class="o">+</span> <span class="n">N</span><span class="p">]</span> <span class="o">-</span> <span class="n">uni_ts</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="gradient_derivative"><a class="viewcode-back" href="../../features.html#features.feature_collection.gradient_derivative">[docs]</a><span class="k">def</span> <span class="nf">gradient_derivative</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sign"><a class="viewcode-back" href="../../features.html#features.feature_collection.sign">[docs]</a><span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">uni_ts</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Kankana Sinha &amp; Azim Ahmadzadeh
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

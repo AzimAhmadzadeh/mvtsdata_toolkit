@@ -1,0 +1,481 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>features.feature_extractor_parallel &mdash; mvtsdata_toolkit 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'1.0.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> mvtsdata_toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">mvtsdata_toolkit</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mvtsdata_toolkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>features.feature_extractor_parallel</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for features.feature_extractor_parallel</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span><span class="p">,</span> <span class="n">walk</span>
+<span class="kn">import</span> <span class="nn">utils</span>
+<span class="kn">from</span> <span class="nn">features</span> <span class="k">import</span> <span class="n">extractor_utils</span>
+
+
+<div class="viewcode-block" id="FeatureExtractorParallel"><a class="viewcode-back" href="../../features.html#features.feature_extractor_parallel.FeatureExtractorParallel">[docs]</a><span class="k">class</span> <span class="nc">FeatureExtractorParallel</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    test</span>
+<span class="sd">    Note: The objective of this class is exactly the same as &#39;FeatureExtractor&#39; from</span>
+<span class="sd">    &#39;feature_extractor.py&#39;.</span>
+<span class="sd">    The only difference is that this is modified to be used with multiprocessing. To know how the</span>
+<span class="sd">    parallelism is designed, see the main method in this module.</span>
+
+<span class="sd">    This class walks through a directory of csv files of multivariate time series (mvts),</span>
+<span class="sd">    and for each of them, computes all listed statistical parameters on each of the time series.</span>
+<span class="sd">    In the mvts files, each column is one time series.</span>
+
+<span class="sd">    Key points about the input and output data:</span>
+
+<span class="sd">    - Input multivariate time series: 40 X 55 (length of ts, number of ts)</span>
+<span class="sd">    - Important multivariate time series: 40 X 33 (length of ts, number of important ts)</span>
+<span class="sd">    - Currently used multivariate time series: 40 X 24</span>
+<span class="sd">    - Number of currently used physical parameters: 24</span>
+<span class="sd">    - Number of statistical features: F</span>
+<span class="sd">    - Number of csv files (slices of time series): N</span>
+<span class="sd">    - Matrix of all features (df_all_features) extracted from one multivariate timeseries: N X (</span>
+<span class="sd">    24*F)</span>
+
+<span class="sd">    Example::</span>
+<span class="sd">        import multiprocessing</span>
+
+<span class="sd">        proc_id = 0</span>
+<span class="sd">        manager = multiprocessing.Manager()</span>
+<span class="sd">        extracted_features = manager.list()</span>
+<span class="sd">        jobs = []</span>
+<span class="sd">        for partition in partitions:  # one partition per process</span>
+<span class="sd">            pc = FeatureExtractorParallel(features_list=features_list,</span>
+<span class="sd">                                          params_name_list=params_name_list,</span>
+<span class="sd">                                          params_index_list=None,</span>
+<span class="sd">                                          need_interp=True)</span>
+<span class="sd">            process = multiprocessing.Process(target=pc.calculate_all,</span>
+<span class="sd">                                              args=(proc_id, partition, extracted_features))</span>
+<span class="sd">            jobs.append(process)</span>
+<span class="sd">            proc_id = proc_id + 1</span>
+
+<span class="sd">        for j in jobs:</span>
+<span class="sd">            j.start()</span>
+
+<span class="sd">        for j in jobs:</span>
+<span class="sd">            j.join()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                 <span class="n">params_name_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">params_index_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">need_interp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This constructor simply initializes the following information to be prepared for</span>
+<span class="sd">        extracting the statistical features from the physical parameters.</span>
+<span class="sd">        :param features_list: list of all selected methods from the module &#39;feature_collection.py&#39;.</span>
+<span class="sd">        :param params_name_list: list of the name of physical parameters. Feature extraction will</span>
+<span class="sd">        be carried out only on the given physical parameters and the remaining parameters will be</span>
+<span class="sd">        skipped. Use the header row in any of the csv files in SWAN data benchmark to choose from.</span>
+<span class="sd">        :param params_index_list: similar to &#39;params_name_list&#39;, except that using this, one could</span>
+<span class="sd">        provide column number instead of column name. Make sure to start from 1 since column 0 is</span>
+<span class="sd">        has the and it is not a physical parameter. A suggestion would be the range 1:25.</span>
+<span class="sd">        :param need_interp: True if a linear interpolation is needed to remedy the missing numerical</span>
+<span class="sd">        values. This only takes care of the missing values and will not affect the existing ones. Set</span>
+<span class="sd">        to False otherwise. Default is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># -----------------------------------------</span>
+        <span class="c1"># Verify arguments</span>
+        <span class="c1"># -----------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_param_name_arg</span> <span class="o">=</span> <span class="p">(</span><span class="n">params_name_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params_name_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_param_index_arg</span> <span class="o">=</span> <span class="p">(</span><span class="n">params_index_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params_index_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_param_name_arg</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_param_index_arg</span><span class="p">:</span>  <span class="c1"># mutual exclusive</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                One and only one of the two arguments (params_name_list, params_index_list) must</span>
+<span class="sd">                be provided.</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">features_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                The argument &#39;features_list&#39; cannot be empty!</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">features_list</span> <span class="o">=</span> <span class="n">features_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params_name_list</span> <span class="o">=</span> <span class="n">params_name_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params_index_list</span> <span class="o">=</span> <span class="n">params_index_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_interp</span> <span class="o">=</span> <span class="n">need_interp</span>
+
+<div class="viewcode-block" id="FeatureExtractorParallel.calculate_all"><a class="viewcode-back" href="../../features.html#features.feature_extractor_parallel.FeatureExtractorParallel.calculate_all">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proc_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">all_csvs</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">output_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Computes all the give statistical features on each of the csv files in &#39;path_to_root&#39;</span>
+<span class="sd">        and stores the result in the form of a single csv file.</span>
+<span class="sd">        :param proc_id: id of the process running this method.</span>
+<span class="sd">        :param all_csvs: a list of the absolute paths to all csv files from which the features are</span>
+<span class="sd">        to be extracted.</span>
+<span class="sd">        :param output_list: a list (ListProxy) of the features (dataframes) extracted by each</span>
+<span class="sd">        process.</span>
+<span class="sd">        If n processes are utilized, the list will contain n dataframes.</span>
+<span class="sd">        :return: a csv file where each row corresponds to a time series and represents all the</span>
+<span class="sd">        extracted features from that time series.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_csvs</span><span class="p">)</span>
+        <span class="n">n_features</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_list</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n\t</span><span class="s1">--------------PID--</span><span class="si">{}</span><span class="s1">-------------------&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">proc_id</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">Total No. of Features:</span><span class="se">\t\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_features</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">Total No. of time series:</span><span class="se">\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">Output TS dimensionality (</span><span class="si">{}</span><span class="s1"> X </span><span class="si">{}</span><span class="s1">):</span><span class="se">\t\t</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n_features</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">-----------------------------------------</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_csvs</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> PID:</span><span class="si">{}</span><span class="s1"> --&gt; Total Processed: </span><span class="si">{}</span><span class="s1"> / </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">proc_id</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+            <span class="n">df_mvts</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="c1"># -----------------------------------------</span>
+            <span class="c1"># Keep the important columns only</span>
+            <span class="c1"># -----------------------------------------</span>
+            <span class="n">df_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_param_name_arg</span><span class="p">:</span>
+                <span class="n">df_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_mvts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">params_name_list</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_param_index_arg</span><span class="p">:</span>
+                <span class="n">df_raw</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_mvts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params_index_list</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+            <span class="c1"># -----------------------------------------</span>
+            <span class="c1"># Interpolate to get rid of the NaN values.</span>
+            <span class="c1"># -----------------------------------------</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_interp</span><span class="p">:</span>
+                <span class="n">df_raw</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">interpolate_missing_vals</span><span class="p">(</span><span class="n">df_raw</span><span class="p">)</span>
+
+            <span class="c1"># -----------------------------------------</span>
+            <span class="c1"># Extract all the features from each column of mvts.</span>
+            <span class="c1"># -----------------------------------------</span>
+            <span class="n">extractedfeatures_df</span> <span class="o">=</span> <span class="n">extractor_utils</span><span class="o">.</span><span class="n">calculate_one_mvts</span><span class="p">(</span><span class="n">df_raw</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">features_list</span><span class="p">)</span>
+
+            <span class="c1"># -----------------------------------------</span>
+            <span class="c1"># Flatten the resultant dataframe and add the NOAA AR Number, class label, and start</span>
+            <span class="c1"># and end times.</span>
+            <span class="c1"># row_df will then have these columns:</span>
+            <span class="c1">#   NOAA_AR_NO | LABEL | START_TIME | END_TIME | FEATURE_1 | ... | FEATURE_n</span>
+            <span class="c1"># -----------------------------------------</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">noaa_no</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">extract_id</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">)</span>
+            <span class="n">flare_class</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">extract_class_label</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;lab&#39;</span><span class="p">)</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">extract_start_time</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;st&#39;</span><span class="p">)</span>
+            <span class="n">end_time</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">extract_end_time</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;et&#39;</span><span class="p">)</span>
+
+            <span class="n">noaa_no_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;NOAA_AR_NO&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">noaa_no</span><span class="p">]})</span>
+            <span class="n">label_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;LABEL&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">flare_class</span><span class="p">]})</span>
+            <span class="n">stime_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;START_TIME&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">start_time</span><span class="p">]})</span>
+            <span class="n">etime_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;END_TIME&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">end_time</span><span class="p">]})</span>
+
+            <span class="n">features_df</span> <span class="o">=</span> <span class="n">extractor_utils</span><span class="o">.</span><span class="n">flatten_to_row_df</span><span class="p">(</span><span class="n">extractedfeatures_df</span><span class="p">)</span>
+            <span class="n">row_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">noaa_no_df</span><span class="p">,</span> <span class="n">label_df</span><span class="p">,</span> <span class="n">stime_df</span><span class="p">,</span> <span class="n">etime_df</span><span class="p">,</span> <span class="n">features_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># -----------------------------------------</span>
+            <span class="c1"># Append this row to &#39;df_all_features&#39;</span>
+            <span class="c1"># -----------------------------------------</span>
+            <span class="c1"># if this is the first file, create the main dataframe, i.e., &#39;df_all_features&#39;</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">colnames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">row_df</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">row_df</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># add this row to the end of the dataframe &#39;df_all_features&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row_df</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">^^^^^^^^^^^^^^^^^^^^PID: </span><span class="si">{0}</span><span class="s1">^^^^^^^^^^^^^^^^^^^^^&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">proc_id</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">Done! </span><span class="si">{}</span><span class="s1"> files have been processed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">In total, a dataframe of dimension </span><span class="si">{}</span><span class="s1"> X </span><span class="si">{}</span><span class="s1"> is created.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">output_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df_all_features</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../features.html#features.feature_extractor_parallel.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Note: This module runs in parallel. Make sure that the settings are memory efficient</span>
+<span class="sd">    before you run it.</span>
+
+<span class="sd">    Settings:</span>
+<span class="sd">        1. n_procs: is the number of processes to be employed. This number will be used to</span>
+<span class="sd">        partition the data in a way that each process gets approximately the same number of</span>
+<span class="sd">        files to extract features from.</span>
+<span class="sd">        2. n_of_physical_params: is the index of the last parameter (column in mvts csv files)</span>
+<span class="sd">        indicating that all the parameters from index 1 to this index will be considered for</span>
+<span class="sd">        feature extraction.For example, if it is set to 24, then first 24 columns will be</span>
+<span class="sd">        considered only. (The timestamp which is the first column does not count.)</span>
+<span class="sd">        3. features_list: is a collection of all the feature-extractors. The number of columns</span>
+<span class="sd">        in the final results will depend on this list, since:</span>
+<span class="sd">            |attributes of final results| = len(features_list) X n_of_physical_params</span>
+
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">CONSTANTS</span> <span class="k">as</span> <span class="nn">CONST</span>
+    <span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+
+    <span class="n">n_procs</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># total number of processes</span>
+
+    <span class="c1"># Prepare two lists, one for the statistical features and another for the physical parameters</span>
+    <span class="n">stat_features</span> <span class="o">=</span> <span class="n">CONST</span><span class="o">.</span><span class="n">CANDIDATE_STAT_FEATURES</span>
+    <span class="n">phys_parameters</span> <span class="o">=</span> <span class="n">CONST</span><span class="o">.</span><span class="n">CANDIDATE_PHYS_PARAMETERS</span>
+
+    <span class="c1"># Prepare data</span>
+    <span class="n">path_to_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="n">CONST</span><span class="o">.</span><span class="n">IN_PATH_TO_MVTS</span><span class="p">)</span>
+    <span class="n">path_to_dest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="n">CONST</span><span class="o">.</span><span class="n">OUT_PATH_TO_EXTRACTED_FEATURES</span><span class="p">)</span>
+    <span class="n">output_filename</span> <span class="o">=</span> <span class="s1">&#39;raw_features_p3_FL_parallel_with_conversion.csv&#39;</span>
+
+    <span class="c1"># ------------------------------------------------------------</span>
+    <span class="c1"># Collect all files (only the absolute paths)</span>
+    <span class="c1"># ------------------------------------------------------------</span>
+    <span class="n">all_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">all_csv</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">walk</span><span class="p">(</span><span class="n">path_to_root</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_csv</span><span class="p">:</span>
+        <span class="n">abs_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">all_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abs_path</span><span class="p">)</span>
+
+    <span class="c1"># ------------------------------------------------------------</span>
+    <span class="c1"># partition the files to be distributed among processes.</span>
+    <span class="c1"># ------------------------------------------------------------</span>
+    <span class="n">partitions</span> <span class="o">=</span> <span class="n">extractor_utils</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">all_files</span><span class="p">,</span> <span class="n">n_procs</span><span class="p">)</span>
+    <span class="c1"># ------------------------------------------------------------</span>
+    <span class="c1"># Assign a partition to each process</span>
+    <span class="c1"># ------------------------------------------------------------</span>
+    <span class="n">proc_id</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">manager</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+    <span class="n">extracted_features</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+    <span class="n">jobs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">:</span>
+        <span class="n">pc</span> <span class="o">=</span> <span class="n">FeatureExtractorParallel</span><span class="p">(</span><span class="n">features_list</span><span class="o">=</span><span class="n">stat_features</span><span class="p">,</span>
+                                      <span class="n">params_name_list</span><span class="o">=</span><span class="n">phys_parameters</span><span class="p">,</span>
+                                      <span class="n">params_index_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">need_interp</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">pc</span><span class="o">.</span><span class="n">calculate_all</span><span class="p">,</span>
+                             <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">proc_id</span><span class="p">,</span> <span class="n">partition</span><span class="p">,</span> <span class="n">extracted_features</span><span class="p">))</span>
+        <span class="n">jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+        <span class="n">proc_id</span> <span class="o">=</span> <span class="n">proc_id</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+        <span class="n">j</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">jobs</span><span class="p">:</span>
+        <span class="n">j</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">extracted_features</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;A-----------&gt; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">extracted_features</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;B-----------&gt; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">extracted_features</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;C-----------&gt; </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">extracted_features</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span>
+    <span class="c1">#</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All </span><span class="si">{}</span><span class="s1"> processes have finished their tasks.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="n">n_procs</span><span class="p">]))</span>
+    <span class="c1"># -----------------------------------------</span>
+    <span class="c1"># Store the csv of all features to &#39;path_to_dest&#39;.</span>
+    <span class="c1"># -----------------------------------------</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path_to_dest</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">path_to_dest</span><span class="p">)</span>
+
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path_to_dest</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">)</span>
+
+    <span class="n">all_extracted_features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">extracted_features</span><span class="p">)</span>
+
+    <span class="n">all_extracted_features</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">The dataframe is stored at: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Kankana Sinha &amp; Azim Ahmadzadeh
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

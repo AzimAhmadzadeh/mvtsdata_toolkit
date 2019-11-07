@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sampling package &mdash; mvtsdata_toolkit 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'1.0.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="setup module" href="setup.html" />
+    <link rel="prev" title="normalizing package" href="normalizing.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> mvtsdata_toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">mvtsdata_toolkit</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="CONSTANTS.html">CONSTANTS module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_analysis.html">data_analysis package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_retriever.html">data_retriever module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html">features package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalizing.html">normalizing package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">sampling package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-sampling.input_validator">sampling.input_validator module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-sampling.sampler">sampling.sampler module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-sampling">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mvtsdata_toolkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="modules.html">mvtsdata_toolkit</a> &raquo;</li>
+        
+      <li>sampling package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/sampling.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sampling-package">
+<h1>sampling package<a class="headerlink" href="#sampling-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-sampling.input_validator">
+<span id="sampling-input-validator-module"></span><h2>sampling.input_validator module<a class="headerlink" href="#module-sampling.input_validator" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="sampling.input_validator.validate_input">
+<code class="descclassname">sampling.input_validator.</code><code class="descname">validate_input</code><span class="sig-paren">(</span><em>class_population: dict = None</em>, <em>desired_ratios: dict = None</em>, <em>desired_populations: dict = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/input_validator.html#validate_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.input_validator.validate_input" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>class_population</strong> – Existing classes with population present in dataset</li>
+<li><strong>desired_ratios</strong> – Given input by user(class label with desired ratio)</li>
+<li><strong>desired_populations</strong> – Given input by user(class label with desired population)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sampling.input_validator.validate_sampling_input">
+<code class="descclassname">sampling.input_validator.</code><code class="descname">validate_sampling_input</code><span class="sig-paren">(</span><em>class_population</em>, <em>minority_labels</em>, <em>majority_labels</em>, <em>base</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/input_validator.html#validate_sampling_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.input_validator.validate_sampling_input" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>class_population</strong> – Existing classes with population present in dataset</li>
+<li><strong>minority_labels</strong> – Given input by user(class labels of minority set)</li>
+<li><strong>majority_labels</strong> – Given input by user(class labels of majority set)</li>
+<li><strong>base</strong> – Given input by user(Base minority r majority class label)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sampling.sampler">
+<span id="sampling-sampler-module"></span><h2>sampling.sampler module<a class="headerlink" href="#module-sampling.sampler" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="sampling.sampler.Sampler">
+<em class="property">class </em><code class="descclassname">sampling.sampler.</code><code class="descname">Sampler</code><span class="sig-paren">(</span><em>mvts_df: pandas.core.frame.DataFrame</em>, <em>label_col_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>This module  contains several sampling methods to handle dataset issues like imbalanced class.</p>
+<p>See ReadMe.md for usage example.</p>
+<dl class="method">
+<dt id="sampling.sampler.Sampler.get_decomposed_mvts">
+<code class="descname">get_decomposed_mvts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.get_decomposed_mvts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.get_decomposed_mvts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decomposes the dataframe provided to the class into several dataframes, one for each class label.
+:return: a dictionary of dataframes, with keys being the class labels, and the corresponding
+dataframes contain instances of those labels only.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.get_labels">
+<code class="descname">get_labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.get_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.get_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>A getter method for the labels
+:return: a list of all class labels of the data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.get_original_populations">
+<code class="descname">get_original_populations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.get_original_populations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.get_original_populations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the per-class population of the original dataset.
+:return: a dictionary of labels (as key) and class populations (as values)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.get_original_ratios">
+<code class="descname">get_original_ratios</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.get_original_ratios"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.get_original_ratios" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the per-class ratio of the original dataset.
+:return: a dictionary of labels (as key) and class ratios (as values)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.oversample">
+<code class="descname">oversample</code><span class="sig-paren">(</span><em>minority_labels: list</em>, <em>majority_labels: list</em>, <em>base_majority: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.oversample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.oversample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Oversamples form the minority class to achieve a 1:1 balance between the minority and
+majority classes. This is done by keeping the population of the base_majority unchanged,
+make all other majority classes to have an equal population, and then increase the population
+of the minority classes to match with the majority classes. This increase is done in
+a way that all minority classes reach to an equal population, and their total population
+sums up to the total population of the majority classes. Hence a 1:1 balance.</p>
+<p>Example: Consider mvts data with 5 classes:</p>
+<blockquote>
+<div><a href="#id1"><span class="problematic" id="id2">|A|</span></a> = 100, <a href="#id3"><span class="problematic" id="id4">|B|</span></a> = 400, <a href="#id5"><span class="problematic" id="id6">|C|</span></a> = 300, <a href="#id7"><span class="problematic" id="id8">|D|</span></a> = 700, <a href="#id9"><span class="problematic" id="id10">|E|</span></a> = 2000
+<a href="#id11"><span class="problematic" id="id12">|A|</span></a> + <a href="#id13"><span class="problematic" id="id14">|B|</span></a> = 500, <a href="#id15"><span class="problematic" id="id16">|C|</span></a> + <a href="#id17"><span class="problematic" id="id18">|D|</span></a> + <a href="#id19"><span class="problematic" id="id20">|E|</span></a> = 3000</div></blockquote>
+<p>and given is: minority_labels = [‘A’, ‘B’], majority_labels = [‘C’, ‘D’, ‘E’], base_majority = ‘D’</p>
+<p>then, the resultant dataframe would have the following populations:</p>
+<blockquote>
+<div><a href="#id21"><span class="problematic" id="id22">|A|</span></a> = 2100/2, <a href="#id23"><span class="problematic" id="id24">|B|</span></a> = 2100/2, <a href="#id25"><span class="problematic" id="id26">|C|</span></a> = 700, <a href="#id27"><span class="problematic" id="id28">|D|</span></a> = 700, <a href="#id29"><span class="problematic" id="id30">|E|</span></a> = 700
+<a href="#id31"><span class="problematic" id="id32">|A|</span></a> + <a href="#id33"><span class="problematic" id="id34">|B|</span></a> = 2100, <a href="#id35"><span class="problematic" id="id36">|C|</span></a> + <a href="#id37"><span class="problematic" id="id38">|D|</span></a> + <a href="#id39"><span class="problematic" id="id40">|E|</span></a> = 2100</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>minority_labels</strong> – </li>
+<li><strong>majority_labels</strong> – </li>
+<li><strong>base_majority</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.sample">
+<code class="descname">sample</code><span class="sig-paren">(</span><em>desired_populations: dict = None</em>, <em>desired_ratios: dict = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Using this method one could do either undersampling or oversampling, in the most generic
+fashion. That is, the user determines the expected population size or ratios that they
+would like to get from the mvts data.
+Example: Consider a mvts data with 5 classes:</p>
+<blockquote>
+<div><a href="#id41"><span class="problematic" id="id42">|A|</span></a> = 100, <a href="#id43"><span class="problematic" id="id44">|B|</span></a> = 400, <a href="#id45"><span class="problematic" id="id46">|C|</span></a> = 300, <a href="#id47"><span class="problematic" id="id48">|D|</span></a> = 700, <a href="#id49"><span class="problematic" id="id50">|E|</span></a> = 2000</div></blockquote>
+<p>and given is: desired_ratios = [-1, -1, 0.33, 0.33, 0.33]</p>
+<p>then, the instances of classes A and B will not change, while
+the population size of each of the  C, D, and E classes would be
+one-third of the sample size (3500 * 0.33).</p>
+<dl class="docutils">
+<dt>Note:</dt>
+<dd><ol class="first last arabic simple">
+<li>One and only one of the arguments must be provided.</li>
+<li>The dictionary must contain all class labels present in the mvts dataframe.</li>
+<li>The number -1 can be used wherever the population or ratio should not change.</li>
+</ol>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>desired_populations</strong> – a dictionary of label-integer pairs, where each integer specifies</td>
+</tr>
+</tbody>
+</table>
+<p>the desired population of the corresponding class. The integers must be positive, but -1
+can be used to indicate that the population of the corresponding class should remain unchanged.
+:param desired_ratios: a dictionary of label-float pairs, where each float specifies
+the desired ratios (with respect to the total sample size) of the corresponding class.
+The floats must be positive, but -1 can be used to indicate that the ratio of the corresponding
+class should remain unchanged.
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.sample_each_class">
+<code class="descname">sample_each_class</code><span class="sig-paren">(</span><em>input_dfs: pandas.core.frame.DataFrame</em>, <em>count: int</em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="_modules/sampling/sampler.html#Sampler.sample_each_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.sample_each_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method returns output samples based on given dataset and count of desired output sample.
+If desired sample size is more than input dataset then whole input dataset is used and rest of the samples
+are created using sampling with replacement from the input dataset.
+:param input_dfs: Input Dataset
+:param count: Count of desired output samples
+:return: Sampled Dataset</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sampling.sampler.Sampler.undersample">
+<code class="descname">undersample</code><span class="sig-paren">(</span><em>minority_labels: list</em>, <em>majority_labels: list</em>, <em>base_minority: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/sampling/sampler.html#Sampler.undersample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sampling.sampler.Sampler.undersample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undersamples form the majority class to achieve a 1:1 balance between the minority and
+majority classes. This is done by keeping the population of the base_minority unchanged,
+make all other minority classes to have an equal population, and then reduce the population
+of the majority classes to match with the minority classes. This reduction is done in
+a way that all majority classes reach to an equal population, and their total population
+sum up to the total population of the minority classes. Hence a 1:1 balance.</p>
+<p>Example: Consider mvts data with 5 classes:</p>
+<blockquote>
+<div><a href="#id51"><span class="problematic" id="id52">|A|</span></a> = 100, <a href="#id53"><span class="problematic" id="id54">|B|</span></a> = 400, <a href="#id55"><span class="problematic" id="id56">|C|</span></a> = 300, <a href="#id57"><span class="problematic" id="id58">|D|</span></a> = 700, <a href="#id59"><span class="problematic" id="id60">|E|</span></a> = 2000
+<a href="#id61"><span class="problematic" id="id62">|A|</span></a> + <a href="#id63"><span class="problematic" id="id64">|B|</span></a> = 500, <a href="#id65"><span class="problematic" id="id66">|C|</span></a> + <a href="#id67"><span class="problematic" id="id68">|D|</span></a> + <a href="#id69"><span class="problematic" id="id70">|E|</span></a> = 3000</div></blockquote>
+<p>and given is: minority_labels = [‘A’, ‘B’], majority_labels = [‘C’, ‘D’, ‘E’], base_minority = ‘A’</p>
+<p>then, the resultant dataframe would have the following populations:</p>
+<blockquote>
+<div><a href="#id71"><span class="problematic" id="id72">|A|</span></a> = 100, <a href="#id73"><span class="problematic" id="id74">|B|</span></a> = 100, <a href="#id75"><span class="problematic" id="id76">|C|</span></a> = 200/3, <a href="#id77"><span class="problematic" id="id78">|D|</span></a> = 200/3, <a href="#id79"><span class="problematic" id="id80">|E|</span></a> = 200/3
+<a href="#id81"><span class="problematic" id="id82">|A|</span></a> + <a href="#id83"><span class="problematic" id="id84">|B|</span></a> = 200, <a href="#id85"><span class="problematic" id="id86">|C|</span></a> + <a href="#id87"><span class="problematic" id="id88">|D|</span></a> + <a href="#id89"><span class="problematic" id="id90">|E|</span></a> = 200</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>minority_labels</strong> – </li>
+<li><strong>majority_labels</strong> – </li>
+<li><strong>base_minority</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sampling">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-sampling" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="setup.html" class="btn btn-neutral float-right" title="setup module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="normalizing.html" class="btn btn-neutral float-left" title="normalizing package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Kankana Sinha &amp; Azim Ahmadzadeh
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

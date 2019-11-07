@@ -1,0 +1,30 @@
+sampling package
+================
+
+Submodules
+----------
+
+sampling\.input\_validator module
+---------------------------------
+
+.. automodule:: sampling.input_validator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+sampling\.sampler module
+------------------------
+
+.. automodule:: sampling.sampler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: sampling
+    :members:
+    :undoc-members:
+    :show-inheritance:

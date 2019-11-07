@@ -1,0 +1,46 @@
+features package
+================
+
+Submodules
+----------
+
+features\.extractor\_utils module
+---------------------------------
+
+.. automodule:: features.extractor_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+features\.feature\_collection module
+------------------------------------
+
+.. automodule:: features.feature_collection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+features\.feature\_extractor module
+-----------------------------------
+
+.. automodule:: features.feature_extractor
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+features\.feature\_extractor\_parallel module
+---------------------------------------------
+
+.. automodule:: features.feature_extractor_parallel
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: features
+    :members:
+    :undoc-members:
+    :show-inheritance:

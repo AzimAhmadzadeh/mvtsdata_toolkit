@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sampling.sampler &mdash; mvtsdata_toolkit 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'1.0.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> mvtsdata_toolkit
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">mvtsdata_toolkit</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">mvtsdata_toolkit</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>sampling.sampler</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for sampling.sampler</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sampling.input_validator</span> <span class="k">import</span> <span class="n">validate_input</span><span class="p">,</span><span class="n">validate_sampling_input</span>
+
+
+<div class="viewcode-block" id="Sampler"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler">[docs]</a><span class="k">class</span> <span class="nc">Sampler</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This module  contains several sampling methods to handle dataset issues like imbalanced class.</span>
+
+<span class="sd">    See ReadMe.md for usage example.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mvts_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">label_col_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The constructor method takes the input dataset as pandas dataframe and the column name to decompose</span>
+<span class="sd">        the specific column or feature.</span>
+<span class="sd">        We can get the population and ratio of the provided column name.</span>
+<span class="sd">        It also decomposes the whole dataset in several smaller dataset based on class.</span>
+
+<span class="sd">        :param mvts_df:</span>
+<span class="sd">        :param label_col_name:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df</span> <span class="o">=</span> <span class="n">mvts_df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_col_name</span> <span class="o">=</span> <span class="n">label_col_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">mvts_df</span><span class="p">[</span><span class="n">label_col_name</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>  <span class="c1"># {label: pd.DataFrame for label in self.labels}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__decompose_mvts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_population</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_original_population</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_ratios</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_original_ratios</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__compute_original_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A private method that computes the sample population of the original dataset.</span>
+<span class="sd">        :return: a dictionary of labels (as key) and populations (as values)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pop_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">])</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">pop_dict</span>
+
+    <span class="k">def</span> <span class="nf">__compute_original_ratios</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">class_ratios</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">/</span> <span class="n">total</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">class_ratios</span>
+
+    <span class="k">def</span> <span class="nf">__decompose_mvts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A private method that decomposes the mvts dataframe into several dataframes, one for each class label.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[:][</span><span class="bp">self</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">label_col_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">key</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Sampler.get_labels"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A getter method for the labels</span>
+<span class="sd">        :return: a list of all class labels of the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span></div>
+
+<div class="viewcode-block" id="Sampler.get_original_populations"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.get_original_populations">[docs]</a>    <span class="k">def</span> <span class="nf">get_original_populations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the per-class population of the original dataset.</span>
+<span class="sd">        :return: a dictionary of labels (as key) and class populations (as values)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_population</span></div>
+
+<div class="viewcode-block" id="Sampler.get_original_ratios"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.get_original_ratios">[docs]</a>    <span class="k">def</span> <span class="nf">get_original_ratios</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets the per-class ratio of the original dataset.</span>
+<span class="sd">        :return: a dictionary of labels (as key) and class ratios (as values)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_ratios</span></div>
+
+<div class="viewcode-block" id="Sampler.get_decomposed_mvts"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.get_decomposed_mvts">[docs]</a>    <span class="k">def</span> <span class="nf">get_decomposed_mvts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decomposes the dataframe provided to the class into several dataframes, one for each class label.</span>
+<span class="sd">        :return: a dictionary of dataframes, with keys being the class labels, and the corresponding</span>
+<span class="sd">        dataframes contain instances of those labels only.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span></div>
+
+<div class="viewcode-block" id="Sampler.sample"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">desired_populations</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">desired_ratios</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Using this method one could do either undersampling or oversampling, in the most generic</span>
+<span class="sd">        fashion. That is, the user determines the expected population size or ratios that they</span>
+<span class="sd">        would like to get from the mvts data.</span>
+<span class="sd">        Example: Consider a mvts data with 5 classes:</span>
+
+<span class="sd">            |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000</span>
+
+<span class="sd">        and given is: desired_ratios = [-1, -1, 0.33, 0.33, 0.33]</span>
+
+<span class="sd">        then, the instances of classes A and B will not change, while</span>
+<span class="sd">        the population size of each of the  C, D, and E classes would be</span>
+<span class="sd">        one-third of the sample size (3500 * 0.33).</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            1. One and only one of the arguments must be provided.</span>
+<span class="sd">            2. The dictionary must contain all class labels present in the mvts dataframe.</span>
+<span class="sd">            3. The number -1 can be used wherever the population or ratio should not change.</span>
+
+<span class="sd">        :param desired_populations: a dictionary of label-integer pairs, where each integer specifies</span>
+<span class="sd">        the desired population of the corresponding class. The integers must be positive, but -1</span>
+<span class="sd">        can be used to indicate that the population of the corresponding class should remain unchanged.</span>
+<span class="sd">        :param desired_ratios: a dictionary of label-float pairs, where each float specifies</span>
+<span class="sd">        the desired ratios (with respect to the total sample size) of the corresponding class.</span>
+<span class="sd">        The floats must be positive, but -1 can be used to indicate that the ratio of the corresponding</span>
+<span class="sd">        class should remain unchanged.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">desired_populations</span><span class="p">:</span>
+            <span class="n">validate_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="p">,</span> <span class="n">desired_ratios</span><span class="o">=</span><span class="n">desired_ratios</span><span class="p">)</span>
+            <span class="n">total_population</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">desired_populations</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">desired_ratios</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">desired_populations</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">desired_populations</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="n">total_population</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">validate_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="p">,</span> <span class="n">desired_populations</span><span class="o">=</span><span class="n">desired_populations</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">desired_populations</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">desired_populations</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+                <span class="n">output_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_each_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">count</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_dfs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span></div>
+
+<div class="viewcode-block" id="Sampler.undersample"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.undersample">[docs]</a>    <span class="k">def</span> <span class="nf">undersample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minority_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">majority_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">base_minority</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Undersamples form the majority class to achieve a 1:1 balance between the minority and</span>
+<span class="sd">        majority classes. This is done by keeping the population of the base_minority unchanged,</span>
+<span class="sd">        make all other minority classes to have an equal population, and then reduce the population</span>
+<span class="sd">        of the majority classes to match with the minority classes. This reduction is done in</span>
+<span class="sd">        a way that all majority classes reach to an equal population, and their total population</span>
+<span class="sd">        sum up to the total population of the minority classes. Hence a 1:1 balance.</span>
+
+<span class="sd">        Example: Consider mvts data with 5 classes:</span>
+
+<span class="sd">            |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000</span>
+<span class="sd">            |A| + |B| = 500, |C| + |D| + |E| = 3000</span>
+
+<span class="sd">        and given is: minority_labels = [&#39;A&#39;, &#39;B&#39;], majority_labels = [&#39;C&#39;, &#39;D&#39;, &#39;E&#39;], base_minority = &#39;A&#39;</span>
+
+<span class="sd">        then, the resultant dataframe would have the following populations:</span>
+
+<span class="sd">            |A| = 100, |B| = 100, |C| = 200/3, |D| = 200/3, |E| = 200/3</span>
+<span class="sd">            |A| + |B| = 200, |C| + |D| + |E| = 200</span>
+
+<span class="sd">        :param minority_labels:</span>
+<span class="sd">        :param majority_labels:</span>
+<span class="sd">        :param base_minority:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validate_sampling_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="p">,</span><span class="n">minority_labels</span><span class="o">=</span> <span class="n">minority_labels</span><span class="p">,</span> <span class="n">majority_labels</span><span class="o">=</span> <span class="n">majority_labels</span>
+                                <span class="p">,</span> <span class="n">base</span><span class="o">=</span> <span class="n">base_minority</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base_minority</span><span class="p">:</span>
+            <span class="n">base_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">base_minority</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">total_min_count</span> <span class="o">=</span> <span class="n">base_count</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">minority_labels</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">minority_labels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="n">base_minority</span><span class="p">:</span>
+                    <span class="n">output_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_each_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">base_count</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_dfs</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+
+            <span class="n">maj_base_count</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_min_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">majority_labels</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">majority_labels</span><span class="p">:</span>
+                <span class="n">output_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_each_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">maj_base_count</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_dfs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Sampler.oversample"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.oversample">[docs]</a>    <span class="k">def</span> <span class="nf">oversample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minority_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">majority_labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">base_majority</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Oversamples form the minority class to achieve a 1:1 balance between the minority and</span>
+<span class="sd">        majority classes. This is done by keeping the population of the base_majority unchanged,</span>
+<span class="sd">        make all other majority classes to have an equal population, and then increase the population</span>
+<span class="sd">        of the minority classes to match with the majority classes. This increase is done in</span>
+<span class="sd">        a way that all minority classes reach to an equal population, and their total population</span>
+<span class="sd">        sums up to the total population of the majority classes. Hence a 1:1 balance.</span>
+
+<span class="sd">        Example: Consider mvts data with 5 classes:</span>
+
+<span class="sd">            |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000</span>
+<span class="sd">            |A| + |B| = 500, |C| + |D| + |E| = 3000</span>
+
+<span class="sd">        and given is: minority_labels = [&#39;A&#39;, &#39;B&#39;], majority_labels = [&#39;C&#39;, &#39;D&#39;, &#39;E&#39;], base_majority = &#39;D&#39;</span>
+
+<span class="sd">        then, the resultant dataframe would have the following populations:</span>
+
+<span class="sd">            |A| = 2100/2, |B| = 2100/2, |C| = 700, |D| = 700, |E| = 700</span>
+<span class="sd">            |A| + |B| = 2100, |C| + |D| + |E| = 2100</span>
+
+<span class="sd">        :param minority_labels:</span>
+<span class="sd">        :param majority_labels:</span>
+<span class="sd">        :param base_majority:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">validate_sampling_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">class_population</span><span class="p">,</span> <span class="n">minority_labels</span><span class="o">=</span><span class="n">minority_labels</span><span class="p">,</span> <span class="n">majority_labels</span><span class="o">=</span><span class="n">majority_labels</span><span class="p">,</span>
+                                <span class="n">base</span><span class="o">=</span><span class="n">base_majority</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base_majority</span><span class="p">:</span>
+            <span class="n">base_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">base_majority</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">total_maj_count</span> <span class="o">=</span> <span class="n">base_count</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">majority_labels</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">majority_labels</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="n">base_majority</span><span class="p">:</span>
+                    <span class="n">output_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_each_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">base_count</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_dfs</span><span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+
+            <span class="n">min_base_count</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">total_maj_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">minority_labels</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">minority_labels</span><span class="p">:</span>
+                <span class="n">output_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_each_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dfs_dict</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">min_base_count</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">desired_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_dfs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Sampler.sample_each_class"><a class="viewcode-back" href="../../sampling.html#sampling.sampler.Sampler.sample_each_class">[docs]</a>    <span class="k">def</span> <span class="nf">sample_each_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dfs</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method returns output samples based on given dataset and count of desired output sample.</span>
+<span class="sd">        If desired sample size is more than input dataset then whole input dataset is used and rest of the samples</span>
+<span class="sd">        are created using sampling with replacement from the input dataset.</span>
+<span class="sd">        :param input_dfs: Input Dataset</span>
+<span class="sd">        :param count: Count of desired output samples</span>
+<span class="sd">        :return: Sampled Dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">input_dfs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">output_dfs</span> <span class="o">=</span> <span class="n">input_dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">input_dfs</span><span class="o">.</span><span class="n">sample</span><span class="p">((</span><span class="n">count</span> <span class="o">-</span> <span class="n">input_dfs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_dfs</span> <span class="o">=</span> <span class="n">input_dfs</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output_dfs</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Kankana Sinha &amp; Azim Ahmadzadeh
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

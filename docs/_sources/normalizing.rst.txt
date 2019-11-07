@@ -1,0 +1,22 @@
+normalizing package
+===================
+
+Submodules
+----------
+
+normalizing\.normalizer module
+------------------------------
+
+.. automodule:: normalizing.normalizer
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: normalizing
+    :members:
+    :undoc-members:
+    :show-inheritance:

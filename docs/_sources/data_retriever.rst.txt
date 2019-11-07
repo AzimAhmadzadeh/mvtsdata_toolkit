@@ -1,0 +1,7 @@
+data\_retriever module
+======================
+
+.. automodule:: data_retriever
+    :members:
+    :undoc-members:
+    :show-inheritance:
