@@ -17,10 +17,12 @@ pipelines:
         name: doc generator
         trigger: manual
         caches:
-           - pip
+          - pip
         script: # use sphinx to automatically generate html documentations.
-           - pip install sphinx_rtd_theme
-           - mkdir -p sphinxdocs
-           - cd sphinxdocs
-           - sphinx-apidoc -o . ..
-           - make html
+          - apt-get update && apt-get install python-sphinx
+          - pip install sphinx_rtd_theme
+          # generate html documentations
+          - mkdir -p sphinxdocs
+          - cd sphinxdocs
+          - sphinx-apidoc -o . ..
+          - make html
