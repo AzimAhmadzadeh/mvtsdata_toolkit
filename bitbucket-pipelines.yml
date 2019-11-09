@@ -8,6 +8,8 @@ image: python:3.6.8
 pipelines:
   default:
     - step:
+        name: pip install
+        triger: manual
         caches:
           - pip
         script:
@@ -19,7 +21,7 @@ pipelines:
         caches:
           - pip
         script: # use sphinx to automatically generate html documentations.
-          - apt-get update && apt-get install python-sphinx
+          - apt-get update && apt-get -y install python-sphinx
           - pip install sphinx_rtd_theme
           # generate html documentations
           - mkdir -p sphinxdocs
