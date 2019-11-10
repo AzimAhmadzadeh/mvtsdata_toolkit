@@ -21,7 +21,7 @@ pipelines:
         name: testing
         trigger: manual
         script:
-          - sudo apt-get install tree
+          - apt-get -y install tree
           - echo BITBUCKET_CLONE_DIR > $BITBUCKET_CLONE_DIR
           - tree -L 3
 
