@@ -12,9 +12,18 @@ pipelines:
         caches:
           - pip
         script:
+          echo Nothing interesting here!
           #- pip install -r requirements.txt
-          - apt-get update && apt-get -y install python-sphinx
-          - pip install sphinx_rtd_theme
+          #- apt-get update && apt-get -y install python-sphinx
+          #- pip install sphinx_rtd_theme
+
+    - step:
+        name: testing
+        trigger: manual
+        script:
+          - sudo apt-get install tree
+          - echo BITBUCKET_CLONE_DIR > $BITBUCKET_CLONE_DIR
+          - tree -L 3
 
     - step:
         name: doc generator
