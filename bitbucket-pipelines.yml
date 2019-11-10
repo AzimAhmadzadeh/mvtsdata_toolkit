@@ -9,11 +9,12 @@ pipelines:
   default:
     - step:
         name: pip install
-        trigger: manual
         caches:
           - pip
         script:
-          - pip install -r requirements.txt
+          #- pip install -r requirements.txt
+          - apt-get update && apt-get -y install python-sphinx
+          - pip install sphinx_rtd_theme
 
     - step:
         name: doc generator
@@ -21,8 +22,6 @@ pipelines:
         caches:
           - pip
         script: # use sphinx to automatically generate html documentations.
-          - apt-get update && apt-get -y install python-sphinx
-          - pip install sphinx_rtd_theme
           # generate html documentations
           - mkdir -p sphinxdocs
           - cd sphinxdocs
