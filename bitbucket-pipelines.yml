@@ -14,8 +14,6 @@ pipelines:
         script:
           - echo Nothing interesting here!
           #- pip install -r requirements.txt
-          #- apt-get update && apt-get -y install python-sphinx
-          #- pip install sphinx_rtd_theme
 
     - step:
         name: testing
@@ -32,7 +30,8 @@ pipelines:
           - pip
         script: # use sphinx to automatically generate html documentations.
           # generate html documentations
-          - mkdir -p sphinxdocs
+          - apt-get update && apt-get -y install python-sphinx
+          - pip install sphinx_rtd_theme
           - cd sphinxdocs
           - echo Current dir $PWD
           - echo Cleaning ...
