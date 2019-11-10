@@ -12,7 +12,7 @@ pipelines:
         caches:
           - pip
         script:
-          echo Nothing interesting here!
+          - echo Nothing interesting here!
           #- pip install -r requirements.txt
           #- apt-get update && apt-get -y install python-sphinx
           #- pip install sphinx_rtd_theme
