@@ -9,7 +9,7 @@ pipelines:
   default:
     - step:
         name: pip install
-        triger: manual
+        trigger: manual
         caches:
           - pip
         script:
