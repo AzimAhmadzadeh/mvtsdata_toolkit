@@ -25,4 +25,4 @@ help:
 
 clean:
 	rm -f ${FILESTOBEREMOVED}
-	rm -r $(BUILDDIR) $(TEMPLATES) $(STATIC)
+	rm -rf $(BUILDDIR) $(TEMPLATES) $(STATIC)
