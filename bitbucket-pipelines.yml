@@ -21,8 +21,8 @@ pipelines:
         name: testing
         trigger: manual
         script:
-          - echo BITBUCKET_CLONE_DIR > $BITBUCKET_CLONE_DIR
-          - echo PWD > $PWD
+          - echo BITBUCKET_CLONE_DIR $BITBUCKET_CLONE_DIR
+          - echo PWD $PWD
           - find . -type d -maxdepth 3
 
     - step:
