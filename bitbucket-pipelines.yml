@@ -26,5 +26,9 @@ pipelines:
           # generate html documentations
           - mkdir -p sphinxdocs
           - cd sphinxdocs
+          - echo Current dir $PWD
+          - echo Cleaning ...
+          - make clean
+          - echo Generating docs ...
           - sphinx-apidoc -o . ..
           - make html
