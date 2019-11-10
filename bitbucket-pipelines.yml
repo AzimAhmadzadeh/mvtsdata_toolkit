@@ -21,9 +21,9 @@ pipelines:
         name: testing
         trigger: manual
         script:
-          - apt-get -y install tree
           - echo BITBUCKET_CLONE_DIR > $BITBUCKET_CLONE_DIR
-          - tree -L 3
+          - echo PWD > $PWD
+          - find . -type d -maxdepth 3
 
     - step:
         name: doc generator
