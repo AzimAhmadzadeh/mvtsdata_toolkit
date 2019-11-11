@@ -6,49 +6,41 @@
 image: python:3.6.8
 
 pipelines:
-  default:
-    - step:
-        name: pip install
-        caches:
-          - pip
-        script:
-          - echo Nothing interesting here!
-          #- pip install -r requirements.txt
+  branches:
+    - master: # triggered only if a push is made to the 'master' branch.
+        - step:
+            name: pip install
+            caches:
+              - pip
+            script:
+              - echo Nothing interesting here!
+              #- pip install -r requirements.txt
 
-    - step:
-        name: testing
-        trigger: manual
-        script:
-          - echo BITBUCKET_CLONE_DIR $BITBUCKET_CLONE_DIR
-          - echo PWD $PWD
-          - find . -type d -maxdepth 3
+        - step:
+            name: doc generator
+            trigger: manual
+            caches:
+              - pip
+            script: # use sphinx to automatically generate html documentations.
+              # generate html documentations
+              - apt-get update && apt-get -y install python-sphinx
+              - pip install sphinx_rtd_theme
+              - cd sphinxdocs
+              - make clean
+              - sphinx-apidoc -o . ..
+              - make html
+            artifacts:
+              # This is the path (relative to the root of project) where the generated htmls
+              # will be copied to.
+              - sphinxdocs/_build/html/**
 
-    - step:
-        name: doc generator
-        trigger: manual
-        caches:
-          - pip
-        script: # use sphinx to automatically generate html documentations.
-          # generate html documentations
-          - apt-get update && apt-get -y install python-sphinx
-          - pip install sphinx_rtd_theme
-          - cd sphinxdocs
-          - echo Current dir $PWD
-          - echo Cleaning ...
-          - make clean
-          - echo Generating docs ...
-          - sphinx-apidoc -o . ..
-          - make html
-        artifacts:
-          - sphinxdocs/_build/html/** #These artifacts are to be used when publishing the javadoc
-
-    - step:
-        name: rsync
-        trigger: manual
-        script:
-          - pipe: atlassian/rsync-deploy:0.3.2
-            variables:
-              USER: $DEPLOY_USER
-              SERVER: $DEPLOY_HOST
-              REMOTE_PATH: $DOCUMENTS_PATH
-              LOCAL_PATH: $SOURCE_PATH
+        - step:
+            name: rsync
+            trigger: manual
+            script:
+              - pipe: atlassian/rsync-deploy:0.3.2
+                variables:
+                  USER: $DEPLOY_USER
+                  SERVER: $DEPLOY_HOST
+                  REMOTE_PATH: $DOCUMENTS_PATH  # destination path  '.../docs/mvtsdata_toolkit'
+                  LOCAL_PATH: $SOURCE_PATH  # source path: '/sphinxdocs/_build/html/'
