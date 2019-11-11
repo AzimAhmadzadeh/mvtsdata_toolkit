@@ -43,13 +43,10 @@ pipelines:
     - step:
         name: rsync
         trigger: manual
+        script:
           - pipe: atlassian/rsync-deploy:0.3.2
             variables:
               USER: $DEPLOY_USER
               SERVER: $DEPLOY_HOST
               REMOTE_PATH: $DOCUMENTS_PATH
               LOCAL_PATH: $SOURCE_PATH
-              # SSH_KEY: '<string>' # Optional.
-              # SSH_PORT: '<string>' # Optional.
-              # EXTRA_ARGS: '<string>' # Optional.
-              # DEBUG: '<boolean>' # Optional.
