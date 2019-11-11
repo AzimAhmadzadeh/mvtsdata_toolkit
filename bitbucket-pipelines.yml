@@ -13,8 +13,7 @@ pipelines:
             caches:
               - pip
             script:
-              - echo Nothing interesting here!
-              #- pip install -r requirements.txt
+              - pip install -r requirements.txt  # Sphinx needs the libs to be able to generate docs
 
         - step:
             name: doc generator
