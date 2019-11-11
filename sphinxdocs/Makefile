@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-MAKEDIRS      = mkdir -p
+MKDIR_P       = mkdir -p
 SPHINXPROJ    = mvtsdata_toolkit
 SOURCEDIR     = .
 BUILDDIR      = _build
@@ -21,6 +21,7 @@ help:
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
+	@${MKDIR_P} $(BUILDDIR) $(TEMPLATES) $(STATIC)
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 clean:
