@@ -7,7 +7,7 @@ image: python:3.6.8
 
 pipelines:
   branches:
-    - master: # triggered only if a push is made to the 'master' branch.
+    master: # triggered only if a push is made to the 'master' branch.
         - step:
             name: pip install
             caches:
