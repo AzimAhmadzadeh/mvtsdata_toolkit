@@ -39,6 +39,8 @@ pipelines:
           - echo Generating docs ...
           - sphinx-apidoc -o . ..
           - make html
+        artifacts:
+          - sphinxdocs/_build/html/** #These artifacts are to be used when publishing the javadoc
 
     - step:
         name: rsync
