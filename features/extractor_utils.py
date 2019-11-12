@@ -4,9 +4,11 @@ import features.feature_collection as fc
 
 def get_methods_for_names(method_names: list):
     """
+    for a given method-name, it finds it in `feature_collection` and returns it as a callable
+    method.
 
-    :param method_names:
-    :return:
+    :param method_names: name of the method of interest that exists in `feature_collection`.
+    :return: a callable instance of the method whose name is given.
     """
     callable_methods = []
     for m in method_names:
@@ -15,11 +17,13 @@ def get_methods_for_names(method_names: list):
     return callable_methods
 
 
-def __get_methods_for_names(method_names: list):
+def __get_methods_for_names(method_names: list):  # TODO: there are two version of this. Drop one!
     """
+    for a given method-name, it finds it in `feature_collection` and returns it as a callable
+    method.
 
-    :param method_names:
-    :return:
+    :param method_names: name of the method of interest that exists in `feature_collection`.
+    :return: a callable instance of the method whose name is given.
     """
     callable_methods = []
     for m in method_names:
