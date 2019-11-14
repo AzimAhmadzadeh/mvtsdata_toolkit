@@ -10,28 +10,36 @@ import CONSTANTS as CONST
 
 class FeatureExtractor:
     """
-    This class loads the configuration file 'feature_extraction_configs.yml', and read the
-    following pieces of information from it:
-     - PATH_TO_MVTS: path to where the csv (mvts) files are stored.
-     - MVTS_PARAMETERS: a list of time series name; only those listed here will be processed.
-     - STATISTICAL_FEATURES: a list of statistical features to be extracted from each time series.
-     - META_DATA_TAGS: a list of tags used in the mvts file names; to be used for extraction of
-     some metadata from file names.
-     - PATH_TO_EXTRACTED_FEATURES: path to a directory where the extracted features (one csv
-     file) will be stored.
+    This class loads the configuration file `feature_extraction_configs.yml`, and reads the
+    following pieces of information from it.
 
-    Based on these values, it walks through the directory PATH_TO_MVTS and for each of the mvts
-    files, it computes the statistical features STATISTICAL_FEATURES on all time series listed in
-    MVTS_PARAMETERS. It used the tags in META_DATA_TAGS to extract some metadata, such as class
-    label, time stamp, id, etc.
+    Below are the column names of the summary dataframe:
+        * `PATH_TO_MVTS`: path to where the csv (mvts) files are stored.
+        * `MVTS_PARAMETERS`: a list of time series name; only those listed here will be processed.
+        * `STATISTICAL_FEATURES`: a list of statistical features to be extracted from each time
+           series.
+        * `META_DATA_TAGS`: a list of tags used in the mvts file names; to be used for extraction of
+           some metadata from file names.
+        * `PATH_TO_EXTRACTED_FEATURES`: path to a directory where the extracted features (one csv
+           file) will be stored.
 
-    The resultant dataframe (i.e., the extracted features) will have T X F + x columns, where F is
-    the total number of features (in , STATISTICAL_FEATURES), T is the total number of
-    time series parameters (in MVTS_PARAMETERS), and x is the number of meta data extracted from
-    the file names (i.e., number of tags in META_DATA_TAGS). In the extracted features dataframe,
-    the column-name of the nominal attributes is of the structure
-    <TIME_SERIES_NAME>_<statistic_name>. For instance, for a time series named 'DENSITY' and the
-    statistical feature 'mean', the corresponding column-name would be 'DENSITY_mean'.
+    Based on these values, it walks through the directory `PATH_TO_MVTS` and for each of the mvts
+    files, it computes the statistical features listed in `STATISTICAL_FEATURES` on all time series
+    listed in `MVTS_PARAMETERS`. It uses the tags in `META_DATA_TAGS` to extract some metadata,
+    such as class `label`, `time stamp`, `id`, etc.
+
+    The resultant dataframe (i.e., the extracted features) will have `T X F + x` columns, where `F`
+    is the total number of features (i.e., `len(STATISTICAL_FEATURES)`), `T` is the total number of
+    time series parameters (i.e., `len(MVTS_PARAMETERS)`), and `x` is the number of meta data
+    extracted from the file names (i.e., `len(META_DATA_TAGS)`).
+
+    In the extracted features dataframe, the column-name of the nominal attributes is of the
+    following structure::
+
+        <TIME_SERIES_NAME>_<statistic_name>
+
+    For instance, for a time series named `DENSITY` and the statistical feature `mean`, the
+    corresponding column-name would be `DENSITY_mean`.
     """
 
     def __init__(self, path_to_config: str):
@@ -59,12 +67,16 @@ class FeatureExtractor:
         class-field `df_all_features`.
 
         :param params_index_list: A list of column indices, that can be used instead of the list
-        STATISTICAL_FEATURES that is read from the configuration file in the constructor. The
-        numbers in this list (instead of strings in STATISTICAL_FEATUES) can be used to confine
-        the feature extraction to a subset of time series (columns) in the mvts data.
+                                  `STATISTICAL_FEATURES` that is read from the configuration file
+                                  in the constructor. The numbers in this list (instead of
+                                  strings in STATISTICAL_FEATUES) can be used to confine the
+                                  feature extraction to a subset of time series (columns) in the
+                                  mvts data.
         :param need_interp: True if a linear interpolation is needed to alter the missing numerical
-        values. This only takes care of the missing values and will not affect the existing ones.
-        Set it to False otherwise. Default is True.
+                            values. This only takes care of the missing values and will not
+                            affect the existing ones. Set it to False otherwise. Default is True.
+
+        :return: None
         """
         # -----------------------------------------
         # Verify arguments
@@ -131,7 +143,7 @@ class FeatureExtractor:
                 # -----------------------------------------
                 # Extract all the features from each column of mvts.
                 # -----------------------------------------
-                extracted_features_df =\
+                extracted_features_df = \
                     extractor_utils.calculate_one_mvts(df_raw, self.statistical_features)
 
                 # -----------------------------------------
@@ -178,8 +190,9 @@ class FeatureExtractor:
 
         If the output directory given in the configuration file does not exist, it will be created
         recursively.
+
         :param output_filename: the name of the output csv file as the calculated data frame. If
-        the '.csv' extension is not provided, it will ba appended to the given name.
+               the '.csv' extension is not provided, it will ba appended to the given name.
         """
         # -----------------------------------------
         # Store the csv of all features to 'path_to_dest'.

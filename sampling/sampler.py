@@ -11,13 +11,13 @@ class Sampler:
 
     def __init__(self, mvts_df: pd.DataFrame, label_col_name):
         """
-        The constructor method takes the input dataset as pandas dataframe and the column name to decompose
-        the specific column or feature.
-        We can get the population and ratio of the provided column name.
-        It also decomposes the whole dataset in several smaller dataset based on class.
+        The constructor method takes the input dataset as pandas dataframe and the column-name to
+        decompose the specific column or feature. We can get the population and ratio of the
+        provided column-names. It also decomposes the whole dataset in several smaller
+        dataset based on class.
 
-        :param mvts_df:
-        :param label_col_name:
+        :param mvts_df: a dataframe whose rows are the instances and columns are the features.
+        :param label_col_name: the name of the column that is used to keep the class labels.
         """
         self.df = mvts_df
         self.label_col_name = label_col_name
@@ -31,6 +31,7 @@ class Sampler:
     def __compute_original_population(self):
         """
         A private method that computes the sample population of the original dataset.
+
         :return: a dictionary of labels (as key) and populations (as values)
         """
         pop_dict = {label: len(self.dfs_dict[label]) for label in self.dfs_dict.keys()}
@@ -43,46 +44,51 @@ class Sampler:
 
     def __decompose_mvts(self):
         """
-        A private method that decomposes the mvts dataframe into several dataframes, one for each class label.
+        A private method that decomposes the mvts dataframe into several dataframes, one for each
+        class label.
         """
         for key in self.dfs_dict.keys():
             self.dfs_dict[key] = self.df[:][self.df[self.label_col_name] == key]
 
-    def get_labels(self):
+    def get_labels(self) -> pd.DataFrame:
         """
-        A getter method for the labels
         :return: a list of all class labels of the data.
         """
         return self.labels
 
-    def get_original_populations(self):
+    def get_original_populations(self) -> dict:
         """
         Gets the per-class population of the original dataset.
+
         :return: a dictionary of labels (as key) and class populations (as values)
         """
         return self.class_population
 
-    def get_original_ratios(self):
+    def get_original_ratios(self) -> list:
         """
         Gets the per-class ratio of the original dataset.
+
         :return: a dictionary of labels (as key) and class ratios (as values)
         """
         return self.class_ratios
 
-    def get_decomposed_mvts(self):
+    def get_decomposed_mvts(self) -> dict:
         """
-        Decomposes the dataframe provided to the class into several dataframes, one for each class label.
+        Decomposes the dataframe provided to the class into several dataframes, one for each
+        class label.
+
         :return: a dictionary of dataframes, with keys being the class labels, and the corresponding
-        dataframes contain instances of those labels only.
+                 dataframes contain instances of those labels only.
         """
         return self.dfs_dict
 
-    def sample(self, desired_populations: dict = None, desired_ratios: dict = None):
+    def sample(self, desired_populations: dict = None, desired_ratios: dict = None) -> pd.DataFrame:
         """
         Using this method one could do either undersampling or oversampling, in the most generic
         fashion. That is, the user determines the expected population size or ratios that they
         would like to get from the mvts data.
-        Example: Consider a mvts data with 5 classes:
+
+        Example: Consider a mvts data with 5 classes::
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
 
@@ -104,7 +110,7 @@ class Sampler:
         the desired ratios (with respect to the total sample size) of the corresponding class.
         The floats must be positive, but -1 can be used to indicate that the ratio of the corresponding
         class should remain unchanged.
-        :return:
+        :return: the sampled data.
         """
 
         if not desired_populations:
@@ -141,14 +147,13 @@ class Sampler:
         a way that all majority classes reach to an equal population, and their total population
         sum up to the total population of the minority classes. Hence a 1:1 balance.
 
-        Example: Consider mvts data with 5 classes:
+        Example: Consider mvts data with 5 classes::
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
             |A| + |B| = 500, |C| + |D| + |E| = 3000
 
-        and given is: minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'], base_minority = 'A'
-
-        then, the resultant dataframe would have the following populations:
+        and given is: minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'],
+        base_minority = 'A', then, the resultant dataframe would have the following populations::
 
             |A| = 100, |B| = 100, |C| = 200/3, |D| = 200/3, |E| = 200/3
             |A| + |B| = 200, |C| + |D| + |E| = 200
@@ -180,19 +185,19 @@ class Sampler:
         """
         Oversamples form the minority class to achieve a 1:1 balance between the minority and
         majority classes. This is done by keeping the population of the base_majority unchanged,
-        make all other majority classes to have an equal population, and then increase the population
-        of the minority classes to match with the majority classes. This increase is done in
-        a way that all minority classes reach to an equal population, and their total population
-        sums up to the total population of the majority classes. Hence a 1:1 balance.
+        make all other majority classes to have an equal population, and then increase the
+        population of the minority classes to match with the majority classes. This increase is
+        done in a way that all minority classes reach to an equal population, and their total
+        population sums up to the total population of the majority classes. Hence a 1:1
+        balance.
 
-        Example: Consider mvts data with 5 classes:
+        Example: Consider mvts data with 5 classes::
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
             |A| + |B| = 500, |C| + |D| + |E| = 3000
 
-        and given is: minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'], base_majority = 'D'
-
-        then, the resultant dataframe would have the following populations:
+        and given is: minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'],
+        base_majority = 'D', then, the resultant dataframe would have the following populations::
 
             |A| = 2100/2, |B| = 2100/2, |C| = 700, |D| = 700, |E| = 700
             |A| + |B| = 2100, |C| + |D| + |E| = 2100
@@ -222,9 +227,11 @@ class Sampler:
 
     def sample_each_class(self, input_dfs: pd.DataFrame, count: int) -> pd.DataFrame:
         """
-        This method returns output samples based on given dataset and count of desired output sample.
-        If desired sample size is more than input dataset then whole input dataset is used and rest of the samples
-        are created using sampling with replacement from the input dataset.
+        This method returns output samples based on given dataset and count of desired output
+        sample. If desired sample size is more than input dataset then whole input dataset is
+        used and rest of the samples are created using sampling with replacement from the input
+        dataset.
+
         :param input_dfs: Input Dataset
         :param count: Count of desired output samples
         :return: Sampled Dataset

@@ -27,8 +27,13 @@ class ExtractedFeaturesAnalysis:
         """
         A constructor that initializes the class variables.
 
-        :param mvts_df: the extracted features as it was produced by `features.feature_extractor.py`
-                        (or `features.feature_extractor_parallel.py`).
+        :param mvts_df: the extracted features as it was produced by `FeatureExtractor` in
+                        `features.feature_extractor` or `FeatureExtractorParallel` in
+                        `features.feature_extractor_parallel.
+        :param exclude: a list of column-names indicating which columns should be excluded from
+                        this analysis. All non-numeric columns will automatically be removed. But
+                        this argument can be used to drop some numeric columns (e.g., ID) whose
+                        numerical statistics makes no sense.
         """
         self.df = mvts_df
         self.summary = pd.DataFrame()
@@ -36,9 +41,8 @@ class ExtractedFeaturesAnalysis:
 
     def compute_summary(self):
         """
-        Using the extracted data (self.mvts_df-->extracted_feature.csv) this method calculates
-        all the basic analysis with respect to each statistical feature(each column of
-        mvts_df).
+        Using the extracted data this method calculates all the basic analysis with respect to
+        each statistical feature (each column of `mvts_df`).
 
         It populates the summary dataframe of the class with all the required data corresponding
         to each feature.
@@ -62,7 +66,7 @@ class ExtractedFeaturesAnalysis:
             * 'Std. Dev': Contains the standard deviation of the feature(Without considering the
               null/nan value)
 
-        :return: dataframe with data analysis summary
+        The computed summary will be stored in the class field `summary`.
         """
 
         if not self.df.empty:
@@ -107,8 +111,8 @@ class ExtractedFeaturesAnalysis:
         """
         Gets the missing value counts for each feature.
 
-        :return: a dictionary of column names (as keys) and the counts of missing values (as
-        values).
+        :return: a dataframe of two columns, one for the column name of `mvts_df` and the other
+                 for the counts of missing values corresponding to each column, will be returned.
         """
         if self.summary.empty:
             raise ValueError(
@@ -155,7 +159,7 @@ class ExtractedFeaturesAnalysis:
         """
         Stores the summary statistics.
         :param output_path: path to where the summary should be stored.
-        :param file_name: name of the csv file. If the extension is not given, '.csv' will be
+        :param file_name: name of the csv file. If the extension is not given, `.csv` will be
         appended to the given name.
         """
         if self.summary.empty:

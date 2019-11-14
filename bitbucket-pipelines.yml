@@ -1,0 +1,38 @@
+# This is a sample build configuration for Python.
+# Check our guides at https://confluence.atlassian.com/x/x4UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: python:3.6.8
+
+pipelines:
+  branches:
+    master: # triggered only if a push is made to the 'master' branch.
+        - step:
+            name: doc generator
+            caches:
+              - pip
+            script: # use sphinx to automatically generate html documentations.
+              # generate html documentations
+              - pip install -r requirements.txt
+              - apt-get update && apt-get -y install python-sphinx
+              - pip install sphinx_rtd_theme
+              - cd sphinxdocs
+              - make clean
+              - sphinx-apidoc -o . ..
+              - make html
+            artifacts:
+              # This is the path (relative to the root of project) where the generated htmls
+              # will be copied to.
+              - sphinxdocs/_build/html/**
+
+        - step:
+            name: rsync
+            trigger: manual
+            script:
+              - pipe: atlassian/rsync-deploy:0.3.2
+                variables:
+                  USER: $DEPLOY_USER
+                  SERVER: $DEPLOY_HOST
+                  REMOTE_PATH: $DOCUMENTS_PATH  # destination path  '.../docs/mvtsdata_toolkit'
+                  LOCAL_PATH: $SOURCE_PATH  # source path: '/sphinxdocs/_build/html/'

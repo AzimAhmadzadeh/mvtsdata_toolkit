@@ -24,7 +24,6 @@ jupyter==1.0.0
 jupyter-client==5.3.4
 jupyter-console==6.0.0
 jupyter-core==4.6.1
-kaggle==1.5.6
 kiwisolver==1.1.0
 MarkupSafe==1.1.1
 matplotlib==3.1.0
@@ -43,7 +42,6 @@ pkginfo==1.5.0.1
 prometheus-client==0.7.1
 prompt-toolkit==2.0.10
 ptyprocess==0.6.0
-pyDataverse==0.2.1
 Pygments==2.4.2
 Pympler==0.7
 pyparsing==2.4.0
