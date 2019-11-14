@@ -9,19 +9,12 @@ pipelines:
   branches:
     master: # triggered only if a push is made to the 'master' branch.
         - step:
-            name: pip install
-            caches:
-              - pip
-            script:
-              - pip install -r requirements.txt  # Sphinx needs the libs to be able to generate docs
-
-        - step:
             name: doc generator
-            trigger: manual
             caches:
               - pip
             script: # use sphinx to automatically generate html documentations.
               # generate html documentations
+              - pip install -r requirements.txt
               - apt-get update && apt-get -y install python-sphinx
               - pip install sphinx_rtd_theme
               - cd sphinxdocs
