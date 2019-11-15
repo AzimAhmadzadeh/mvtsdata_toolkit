@@ -120,7 +120,7 @@ class ExtractedFeaturesAnalysis:
                 Execute `compute_summary` before getting the missing values.
                 """
             )
-        count_df = self.summary[[_summary_keywords["params_col"], _summary_keywords["null_col"]]]
+        count_df = self.summary[[_summary_keywords["null_col"]]]
         return count_df
 
     def get_five_num_summary(self) -> pd.DataFrame:
@@ -158,9 +158,10 @@ class ExtractedFeaturesAnalysis:
     def summary_to_csv(self, output_path, file_name):
         """
         Stores the summary statistics.
+
         :param output_path: path to where the summary should be stored.
         :param file_name: name of the csv file. If the extension is not given, `.csv` will be
-        appended to the given name.
+                          appended to the given name.
         """
         if self.summary.empty:
             raise ValueError(

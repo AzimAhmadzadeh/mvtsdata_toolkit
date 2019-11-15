@@ -2,12 +2,15 @@ import os
 import pandas as pd
 from os import path, walk
 import utils
+import yaml
+import CONSTANTS as CONST
 from features import extractor_utils
 
 
 class FeatureExtractorParallel:
     """
-    test
+    #TODO: This documentation needs a carefull review.
+
     Note: The objective of this class is exactly the same as 'FeatureExtractor' from
     'feature_extractor.py'.
     The only difference is that this is modified to be used with multiprocessing. To know how the
@@ -18,15 +21,14 @@ class FeatureExtractorParallel:
     In the mvts files, each column is one time series.
 
     Key points about the input and output data:
-
-    - Input multivariate time series: 40 X 55 (length of ts, number of ts)
-    - Important multivariate time series: 40 X 33 (length of ts, number of important ts)
-    - Currently used multivariate time series: 40 X 24
-    - Number of currently used physical parameters: 24
-    - Number of statistical features: F
-    - Number of csv files (slices of time series): N
-    - Matrix of all features (df_all_features) extracted from one multivariate timeseries: N X (
-    24*F)
+        - Input multivariate time series: 40 X 55 (length of ts, number of ts)
+        - Important multivariate time series: 40 X 33 (length of ts, number of important ts)
+        - Currently used multivariate time series: 40 X 24
+        - Number of currently used physical parameters: 24
+        - Number of statistical features: F
+        - Number of csv files (slices of time series): N
+        - Matrix of all features (df_all_features) extracted from one multivariate timeseries: N X (
+          24*F)
 
     Example::
         import multiprocessing
@@ -52,30 +54,53 @@ class FeatureExtractorParallel:
             j.join()
     """
 
-    def __init__(self, features_list: list,
-                 params_name_list: list = None,
-                 params_index_list: list = None,
-                 need_interp: bool = True):
+    def __init__(self, path_to_config: str):
         """
         This constructor simply initializes the following information to be prepared for
         extracting the statistical features from the physical parameters.
-        :param features_list: list of all selected methods from the module 'feature_collection.py'.
-        :param params_name_list: list of the name of physical parameters. Feature extraction will
-        be carried out only on the given physical parameters and the remaining parameters will be
-        skipped. Use the header row in any of the csv files in SWAN data benchmark to choose from.
-        :param params_index_list: similar to 'params_name_list', except that using this, one could
-        provide column number instead of column name. Make sure to start from 1 since column 0 is
-        has the and it is not a physical parameter. A suggestion would be the range 1:25.
-        :param need_interp: True if a linear interpolation is needed to remedy the missing numerical
-        values. This only takes care of the missing values and will not affect the existing ones. Set
-        to False otherwise. Default is True.
+
+        :param path_to_config: path to where the corresponding configuration (YAML) file is located.
         """
+
+        with open(path_to_config) as file:
+            configs = yaml.load(file, Loader=yaml.FullLoader)
+
+        # self.path_to_root = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS']) " Not needed
+        self.path_to_output = os.path.join(CONST.ROOT, configs['PATH_TO_EXTRACTED_FEATURES'])
+        self.statistical_features: list = \
+            extractor_utils.get_methods_for_names(configs['STATISTICAL_FEATURES'])
+        self.mvts_parameters: list = configs['MVTS_PARAMETERS']
+        self.metadata_tags: list = configs['META_DATA_TAGS']
+        self.df_all_features = pd.DataFrame()
+
+    def calculate_all(self, proc_id: int, all_csvs: list, output_list: list,
+                      params_index_list: list = None,
+                      need_interp: bool = True):
+        """
+        #Todo check params_index_list whether needed or not
+        Computes all the give statistical features on each of the csv files in 'path_to_root'
+        and stores the result in the form of a single csv file.
+
+        If n processes are utilized, the list will contain n dataframes.
+
+        :param proc_id: id of the process running this method.
+        :param all_csvs: a list of the absolute paths to all csv files from which the features are
+               to be extracted.
+        :param output_list: a list (ListProxy) of the features (dataframes) extracted by each
+               process.
+        :param need_interp:
+        :param params_index_list:
+
+        :return: a csv file where each row corresponds to a time series and represents all the
+        extracted features from that time series.
+        """
+
         # -----------------------------------------
         # Verify arguments
         # -----------------------------------------
-        self.has_param_name_arg = (params_name_list is not None) and (len(params_name_list) > 0)
-        self.has_param_index_arg = (params_index_list is not None) and (len(params_index_list) > 0)
-        if self.has_param_name_arg == self.has_param_index_arg:  # mutual exclusive
+        has_param_name_arg = (self.mvts_parameters is not None) and (len(self.mvts_parameters) > 0)
+        has_param_index_arg = (params_index_list is not None) and (len(params_index_list) > 0)
+        if has_param_name_arg == has_param_index_arg:  # mutual exclusive
             raise ValueError(
                 """
                 One and only one of the two arguments (params_name_list, params_index_list) must
@@ -83,34 +108,15 @@ class FeatureExtractorParallel:
                 """
             )
 
-        if len(features_list) == 0:
+        if len(self.statistical_features) == 0:
             raise ValueError(
                 """
-                The argument 'features_list' cannot be empty!
+                The argument 'self.statistical_features' cannot be empty!
                 """
             )
 
-        self.features_list = features_list
-        self.params_name_list = params_name_list
-        self.params_index_list = params_index_list
-        self.df_all_features = pd.DataFrame()
-        self.need_interp = need_interp
-
-    def calculate_all(self, proc_id: int, all_csvs: list, output_list: list):
-        """
-        Computes all the give statistical features on each of the csv files in 'path_to_root'
-        and stores the result in the form of a single csv file.
-        :param proc_id: id of the process running this method.
-        :param all_csvs: a list of the absolute paths to all csv files from which the features are
-        to be extracted.
-        :param output_list: a list (ListProxy) of the features (dataframes) extracted by each
-        process.
-        If n processes are utilized, the list will contain n dataframes.
-        :return: a csv file where each row corresponds to a time series and represents all the
-        extracted features from that time series.
-        """
         n = len(all_csvs)
-        n_features = len(self.features_list)
+        n_features = len(self.statistical_features)
         i = 1
 
         print('\n\n\t--------------PID--{}-------------------'.format(proc_id))
@@ -128,48 +134,46 @@ class FeatureExtractorParallel:
             # Keep the important columns only
             # -----------------------------------------
             df_raw = pd.DataFrame()
-            if self.has_param_name_arg:
-                df_raw = pd.DataFrame(df_mvts[self.params_name_list], dtype=float)
-            elif self.has_param_index_arg:
+            if has_param_name_arg:
+                df_raw = pd.DataFrame(df_mvts[self.mvts_parameters], dtype=float)
+            elif has_param_index_arg:
                 df_raw = pd.DataFrame(df_mvts.iloc[:, self.params_index_list], dtype=float)
 
             # -----------------------------------------
             # Interpolate to get rid of the NaN values.
             # -----------------------------------------
-            if self.need_interp:
+            if need_interp:
                 df_raw = utils.interpolate_missing_vals(df_raw)
 
             # -----------------------------------------
             # Extract all the features from each column of mvts.
             # -----------------------------------------
-            extractedfeatures_df = extractor_utils.calculate_one_mvts(df_raw, self.features_list)
+            extractedfeatures_df = extractor_utils.calculate_one_mvts(df_raw, self.statistical_features)
 
             # -----------------------------------------
-            # Flatten the resultant dataframe and add the NOAA AR Number, class label, and start
-            # and end times.
+            # Extract the given meta data from this mvts name.
+            # -----------------------------------------
+            tags_dict = dict()
+            for tag in self.metadata_tags:
+                tags_dict.update({tag: utils.extract_tagged_info(f, tag)})
+            # -----------------------------------------
+            # Flatten the resultant dataframe and add the mvts_id, class label, and start-time
+            # and end-time.
             # row_df will then have these columns:
-            #   NOAA_AR_NO | LABEL | START_TIME | END_TIME | FEATURE_1 | ... | FEATURE_n
+            #   ID | LAB | ST | ET | FEATURE_1 | ... | FEATURE_n
             # -----------------------------------------
-            filename = os.path.basename(f)
-            noaa_no = utils.extract_id(filename, 'id')
-            flare_class = utils.extract_class_label(filename, 'lab')
-            start_time = utils.extract_start_time(filename, 'st')
-            end_time = utils.extract_end_time(filename, 'et')
-
-            noaa_no_df = pd.DataFrame({'NOAA_AR_NO': [noaa_no]})
-            label_df = pd.DataFrame({'LABEL': [flare_class]})
-            stime_df = pd.DataFrame({'START_TIME': [start_time]})
-            etime_df = pd.DataFrame({'END_TIME': [end_time]})
+            row_dfs = []
+            for tag, extracted_info in tags_dict.items():
+                row_dfs.append(pd.DataFrame({tag: [extracted_info]}))
 
             features_df = extractor_utils.flatten_to_row_df(extractedfeatures_df)
-            row_df = pd.concat([noaa_no_df, label_df, stime_df, etime_df, features_df], axis=1)
-
+            row_dfs.append(features_df)
+            row_df = pd.concat(row_dfs, axis=1)
             # -----------------------------------------
             # Append this row to 'df_all_features'
             # -----------------------------------------
             # if this is the first file, create the main dataframe, i.e., 'df_all_features'
             if i == 1:
-                colnames = list(row_df)
                 self.df_all_features = pd.DataFrame(row_df)
             else:
                 # add this row to the end of the dataframe 'df_all_features'
@@ -187,6 +191,8 @@ class FeatureExtractorParallel:
 
 def main():
     """
+    TODO: this should not be in the `main` method but in a method that users can actually call.
+
     Note: This module runs in parallel. Make sure that the settings are memory efficient
     before you run it.
 
@@ -204,18 +210,12 @@ def main():
 
     :return:
     """
-    import CONSTANTS as CONST
+
     import multiprocessing as mp
 
     n_procs = 2  # total number of processes
-
-    # Prepare two lists, one for the statistical features and another for the physical parameters
-    stat_features = CONST.CANDIDATE_STAT_FEATURES
-    phys_parameters = CONST.CANDIDATE_PHYS_PARAMETERS
-
-    # Prepare data
-    path_to_root = os.path.join('..', CONST.IN_PATH_TO_MVTS)
-    path_to_dest = os.path.join('..', CONST.OUT_PATH_TO_EXTRACTED_FEATURES)
+    # Todo: Check (as path_to_root is before instance creation)
+    path_to_root = os.path.join(CONST.ROOT, 'pet_datasets/subset_partition3')
     output_filename = 'raw_features_p3_FL_parallel_with_conversion.csv'
 
     # ------------------------------------------------------------
@@ -223,6 +223,7 @@ def main():
     # ------------------------------------------------------------
     all_files = list()
     dirpath, _, all_csv = next(walk(path_to_root))
+    path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
     for f in all_csv:
         abs_path = path.join(dirpath, f)
         all_files.append(abs_path)
@@ -239,10 +240,7 @@ def main():
     extracted_features = manager.list()
     jobs = []
     for partition in partitions:
-        pc = FeatureExtractorParallel(features_list=stat_features,
-                                      params_name_list=phys_parameters,
-                                      params_index_list=None,
-                                      need_interp=True)
+        pc = FeatureExtractorParallel(path_to_config)
         process = mp.Process(target=pc.calculate_all,
                              args=(proc_id, partition, extracted_features))
         jobs.append(process)
@@ -254,8 +252,6 @@ def main():
     for j in jobs:
         j.join()
 
-    print(list(extracted_features))
-
     print('A-----------> {}'.format(type(extracted_features)))
     print('B-----------> {}'.format(len(extracted_features)))
     print('C-----------> {}'.format(type(extracted_features[0])))
@@ -264,10 +260,11 @@ def main():
     # -----------------------------------------
     # Store the csv of all features to 'path_to_dest'.
     # -----------------------------------------
-    if not os.path.exists(path_to_dest):
-        os.makedirs(path_to_dest)
+    # Todo: Check (as instance still retains path_to_output should this be used?)
+    if not os.path.exists(pc.path_to_output):
+        os.makedirs(pc.path_to_output)
 
-    fname = os.path.join(path_to_dest, output_filename)
+    fname = os.path.join(pc.path_to_output, output_filename)
 
     all_extracted_features = pd.concat(extracted_features)
 

@@ -12,12 +12,14 @@ def extract_tagged_info(file_name: str, tag: str) -> str:
 
     For example, for the following filename:
         file_name: 'lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv'
+
         tag : 'lab'
+
     the tag 'lab' can be used to extract the mvts class 'B', or the tag `et` might be used to get
     access to the end time '2011-01-24T11:12:00', and so on.
 
     :param file_name: mvts filename with a class-label string encoded in it that follows the
-    description above.
+           description above.
     :param tag: a string that points to the piece of info of interest.
     :return: the embedded class label of the given filename.
     """
@@ -33,6 +35,7 @@ def get_end_pair_index(s: str, i: int):
     This method takes a string and an integer as inputs. It searches for the opening brace'[' using
     the given integer as the index of the opening brace in the given string. It outputs the index
     of the closing pair ']' in the string.
+
     :param s: The input string
     :param i: Index position of the opening brace '['
     :return: Index position of the closing pair ']' of the opening brace '['
@@ -72,6 +75,7 @@ def get_substring(file_name: str, left_expression: str) -> str:
     Filename format: lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv
     Left_expression : id
     Extracted Substring : 345
+
     :param file_name: a string that contains the time-series filename with the specified format
     :param left_expression: a string in the filename that points to the beginning of the embedded
                             substring.

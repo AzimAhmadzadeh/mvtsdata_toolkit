@@ -1,6 +1,7 @@
-
-def validate_input(class_population: dict = None, desired_ratios: dict = None, desired_populations: dict = None, ):
+def validate_input(class_population: dict = None, desired_ratios: dict = None,
+                   desired_populations: dict = None, ):
     """
+
     :param class_population: Existing classes with population present in dataset
     :param desired_ratios: Given input by user(class label with desired ratio)
     :param desired_populations: Given input by user(class label with desired population)

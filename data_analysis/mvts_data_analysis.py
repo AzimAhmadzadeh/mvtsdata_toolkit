@@ -20,6 +20,7 @@ class MVTSDataAnalysis:
     """
     This class walks through a directory of csv files (each being a mvts) and calculates
     estimated statistics of each of the features.
+
     It will perform the below tasks:
         1. Read each MVTS(.csv files) from the folder where the MVTS dataset is kept, i.e.,
            /pet_datasets/subset_partition3. Parameter path_to_root will be provided by the user
@@ -29,7 +30,7 @@ class MVTSDataAnalysis:
             b. Missing Value count
             c. Five-Number summary of each physical parameter(Estimated Values)
         3. Summary report can be saved in .CSV file in output folder,
-        i.e., /pet_datasets/mvts_analysis using summary_to_csv() method.
+           i.e., /pet_datasets/mvts_analysis using summary_to_csv() method.
 
     This class uses t-digest, a new data structure for accurate accumulation of rank-based
     statistics in distributed system. TDigest module is installed in order to use this data
@@ -127,10 +128,10 @@ class MVTSDataAnalysis:
 
         total_param = feature_list.__len__()
 
-        param_seq = [str for i in range(total_param)]
-        digest = [TDigest() for i in range(total_param)]
-        null_count = [0] * total_param
-        col_count = [0] * total_param
+        param_seq = [""] * total_param
+        digests = [TDigest() for i in range(total_param)]
+        null_counts = [0] * total_param
+        col_counts = [0] * total_param
         i = 0
         j = 0
         for f in all_csv_files:
@@ -157,15 +158,15 @@ class MVTSDataAnalysis:
                 for (param, series) in df_req.iteritems():
                     temp_null_count = int(series.isnull().sum())
                     temp_count = int(series.count())
-                    null_count[j] += temp_null_count
-                    col_count[j] += temp_count
+                    null_counts[j] += temp_null_count
+                    col_counts[j] += temp_count
                     if series.isnull().sum() != 0:
                         series = series.dropna()
                     if not series.empty:
                         series = np.array(series.values.flatten())
                         param_seq[j] = param
-                        digest[j].batch_update(series)
-                        digest[j].compress()
+                        digests[j].batch_update(series)
+                        digests[j].compress()
 
                     j += 1
 
@@ -178,15 +179,15 @@ class MVTSDataAnalysis:
 
         for i in range(0, j):
             attname = param_seq[i]
-            count_col = col_count[i]
-            col_miss = null_count[i]
+            count_col = col_counts[i]
+            col_miss = null_counts[i]
             col_min = col_Q1 = col_mean = col_Q3 = col_max = 0
-            if digest[i]:
-                col_min = digest[i].percentile(0)
-                col_Q1 = digest[i].percentile(25)
-                col_mean = digest[i].percentile(50)
-                col_Q3 = digest[i].percentile(75)
-                col_max = digest[i].percentile(100)
+            if digests[i]:
+                col_min = digests[i].percentile(0)
+                col_Q1 = digests[i].percentile(25)
+                col_mean = digests[i].percentile(50)
+                col_Q3 = digests[i].percentile(75)
+                col_max = digests[i].percentile(100)
 
             eda_dict.loc[i] = [attname, count_col, col_miss, col_min, col_Q1, col_mean, col_Q3,
                                col_max]
@@ -205,6 +206,7 @@ class MVTSDataAnalysis:
     def get_missing_values(self) -> pd.DataFrame:
         """
         Gets the missing value counts for each feature.
+
         :return: a dataframe with two columns feature name and the counts of missing values.
         """
         if self.summary.empty:
