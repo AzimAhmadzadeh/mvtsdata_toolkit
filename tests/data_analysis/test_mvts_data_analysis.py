@@ -1,16 +1,13 @@
 import unittest
-import CONSTANTS as CONST
 from data_analysis import mvts_data_analysis
-import pandas as pd
-import os
+import numpy as np
 
 
 class TestMVTSDataAnalysis(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        f_path = os.path.join(CONST.ROOT, 'tests/test_dataset/mvts')
-
+        f_path = 'tests/test_dataset/mvts'
         cls.mvts = mvts_data_analysis.MVTSDataAnalysis(f_path)
         cls.mvts.compute_summary()
 
@@ -19,18 +16,13 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         pass
 
     def test_get_missing_values(self):
-        expected_class_population = pd.DataFrame(
-            {'Feature Name': ['TOTUSJH', 'TOTBSQ', 'TOTPOT'], 'Null Count': [1, 1, 1]})
+        expected_class_population = np.array([3, 1, 1], dtype=int)
 
         actual_class_population = self.mvts.get_missing_values()
-
         actual_class_population = actual_class_population.iloc[:3]
-        print(expected_class_population)
-        print(actual_class_population)
-        # todo check why it is not returning equal
-        print(expected_class_population.equals(actual_class_population))
-        self.assertEqual(expected_class_population.equals(actual_class_population), True,
-                         'Expected != Actual')
+        actual_class_population = actual_class_population['Null-Count'].values
+
+        np.testing.assert_equal(actual_class_population, expected_class_population)
 
 
 if __name__ == '__main__':
