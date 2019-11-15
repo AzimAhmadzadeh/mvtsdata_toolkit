@@ -50,34 +50,7 @@ class MVTSDataAnalysis:
         self.path_to_dataset, _, self.path_to_all_mvts = next(walk(path_to_dataset))
         self.summary = pd.DataFrame()
 
-    def get_number_of_mvts(self):
-        return len(self.path_to_all_mvts)
-
-    def get_average_mvts_size(self):
-        all_sizes_in_bytes = []
-        for f in self.path_to_all_mvts:
-            if f.lower().find('.csv') != -1:
-                f = os.path.join(f, self.path_to_dataset)
-                all_sizes_in_bytes.append(os.stat(f).st_size)
-        return np.mean(all_sizes_in_bytes)
-
-    def get_total_mvts_size(self):
-        all_sizes_in_bytes = []
-        for f in self.path_to_all_mvts:
-            if f.lower().find('.csv') != -1:
-                f = os.path.join(f, self.path_to_dataset)
-                all_sizes_in_bytes.append(os.stat(f).st_size)
-        return np.sum(all_sizes_in_bytes)
-
-    def print_stat_of_directory(self):
-        print('----------------------------------------')
-        print('Directory:\t\t\t\t\t{}'.format(self.path_to_dataset))
-        print('Total number of mvts files:\t{}'.format(self.get_number_of_mvts()))
-        print('Total size:\t\t\t\t\t{}'.format(size(self.get_total_mvts_size())))
-        print('Total average:\t\t\t\t{}'.format(size(self.get_average_mvts_size())))
-        print('----------------------------------------')
-
-    def compute_summary(self, first_k: int = None, feature_list: list = None):
+    def compute_summary(self, feature_list: list = None, first_k: int = None):
         """
         By reading each CSV file from the MVTS dataset this method calculates all the basic analysis
         with respect to each feature(each column of csv). As the data is distributed in several
@@ -155,6 +128,7 @@ class MVTSDataAnalysis:
                         """
                     )
                 j = 0
+                # Iterate the mvts by column, and compute tDigest on each column.
                 for (param, series) in df_req.iteritems():
                     temp_null_count = int(series.isnull().sum())
                     temp_count = int(series.count())
@@ -175,9 +149,9 @@ class MVTSDataAnalysis:
         all_columns.insert(0, _summary_keywords['count_col'])
         all_columns.insert(0, _summary_keywords['params_col'])
 
-        eda_dict = pd.DataFrame(columns=all_columns)
+        summary_stat_df = pd.DataFrame(columns=all_columns)
 
-        for i in range(0, j):
+        for i in range(total_param):
             attname = param_seq[i]
             count_col = col_counts[i]
             col_miss = null_counts[i]
@@ -189,19 +163,46 @@ class MVTSDataAnalysis:
                 col_Q3 = digests[i].percentile(75)
                 col_max = digests[i].percentile(100)
 
-            eda_dict.loc[i] = [attname, count_col, col_miss, col_min, col_Q1, col_mean, col_Q3,
+            summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_Q1, col_mean, col_Q3,
                                col_max]
 
-        if eda_dict.empty:
+        if summary_stat_df.empty:
             raise ValueError(
                 """
                 Unable to get MVTS Data Analysis. Please check the parameter list or the dataset files.
                 """
             )
-        eda_dict.reset_index(inplace=True)
-        eda_dict.drop(labels='index', inplace=True, axis=1)
+        summary_stat_df.reset_index(inplace=True)
+        summary_stat_df.drop(labels='index', inplace=True, axis=1)
 
-        self.summary = eda_dict
+        self.summary = summary_stat_df
+
+    def get_number_of_mvts(self):
+        return len(self.path_to_all_mvts)
+
+    def get_average_mvts_size(self):
+        all_sizes_in_bytes = []
+        for f in self.path_to_all_mvts:
+            if f.lower().find('.csv') != -1:
+                f = os.path.join(f, self.path_to_dataset)
+                all_sizes_in_bytes.append(os.stat(f).st_size)
+        return np.mean(all_sizes_in_bytes)
+
+    def get_total_mvts_size(self):
+        all_sizes_in_bytes = []
+        for f in self.path_to_all_mvts:
+            if f.lower().find('.csv') != -1:
+                f = os.path.join(f, self.path_to_dataset)
+                all_sizes_in_bytes.append(os.stat(f).st_size)
+        return np.sum(all_sizes_in_bytes)
+
+    def print_stat_of_directory(self):
+        print('----------------------------------------')
+        print('Directory:\t\t\t\t\t{}'.format(self.path_to_dataset))
+        print('Total number of mvts files:\t{}'.format(self.get_number_of_mvts()))
+        print('Total size:\t\t\t\t\t{}'.format(size(self.get_total_mvts_size())))
+        print('Total average:\t\t\t\t{}'.format(size(self.get_average_mvts_size())))
+        print('----------------------------------------')
 
     def get_missing_values(self) -> pd.DataFrame:
         """
@@ -275,7 +276,9 @@ class MVTSDataAnalysis:
 
 
 def main():
-    path_to_dataset = os.path.join(CONST.ROOT, 'pet_datasets/subset_partition3')
+    # path_to_dataset = os.path.join(CONST.ROOT, 'pet_datasets/subset_partition3')
+    path_to_dataset = os.path.join(CONST.ROOT, 'data/petdataset_01/')
+
     mvts = MVTSDataAnalysis(path_to_dataset)
     mvts.print_stat_of_directory()
 
