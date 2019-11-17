@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 # '-.k' # dashdot black
 # ':r'  # dotted red
 
+
 def plot_iter_memory():
     """
     Loads the results in 'experiment_tdigest_time_memory.py' and plots
     a line plot of iteration vs time. Time corresponds to the execution
     time (in microseconds) recored in the experiment.
     """
-    mem_df = pd.read_csv('./tDigest_mem_test_i[10]_n[100]_l[100].csv')
+    mem_df = pd.read_csv('./tDigest_mem_test_i[10]_n[1000]_l[100].csv')
     mean_mems = np.mean(mem_df, axis=1)
     x_vals = np.arange(len(mean_mems))
 
@@ -38,7 +39,7 @@ def plot_iter_time():
     a line plot of iteration vs time. Time corresponds to the execution
     time (in microseconds) recored in the experiment.
     """
-    times_df = pd.read_csv('./tDigest_time_test_i[10]_n[100]_l[100].csv')
+    times_df = pd.read_csv('./tDigest_time_test_i[10]_n[1000]_l[100].csv')
     mean_times = np.mean(times_df, axis=1)
     x_vals = np.arange(len(mean_times))
 

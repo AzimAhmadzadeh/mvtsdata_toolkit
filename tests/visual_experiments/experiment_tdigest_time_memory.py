@@ -31,8 +31,7 @@ def run_tdigest(n_array, length_of_array):
         digest.batch_update(np.random.random(length_of_array))
         digest.compress()
         e_time = datetime.datetime.now()  # -------- START TIME ------------
-        mem_consumption = get_size(digest)
-        # mem_consumption = asizeof(digest)  # this gives a constant value for all digests!
+        mem_consumption = asizeof(digest)
         delta = e_time - s_time
         all_timediffs.append(delta)
         all_mem_consumptions.append(mem_consumption)
@@ -102,7 +101,7 @@ def get_size(obj, seen=None):
 
 def main():
     n_iterations = 10
-    n_array = 10
+    n_array = 1000
     length_of_array = 100
     time_mem_test(n_iterations, n_array, length_of_array)
 
