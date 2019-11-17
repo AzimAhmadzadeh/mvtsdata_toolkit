@@ -1,8 +1,3 @@
-### Branch: `dev`
-**Warning:** This is NOT the _master_ branch. Make sure the changes concern the development branch.
-
-----
-
 ## MVTS Data Toolkit
 Multivariate Time Series Data Toolkit is a python package that works on multivariate time series datasets and provides: 
 

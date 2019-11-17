@@ -116,8 +116,6 @@ class FeatureExtractor:
         # Loop through each csv file and extract the features
         # -----------------------------------------
         for f in all_csv_files:
-            if i > 10:
-                break
             if f.lower().find('.csv') != -1:
                 print('\t >>> Total Processed: {0} / {1} <<<\r'.format(i, n))
                 sys.stdout.flush()
@@ -212,7 +210,7 @@ def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
     pc = FeatureExtractor(path_to_config)
     pc.calculate_all()
-    pc.store_extracted_features('extracted_features_tmp.csv')
+    pc.store_extracted_features('extracted_features_3_pararams_3_featues.csv')
 
 
 if __name__ == '__main__':

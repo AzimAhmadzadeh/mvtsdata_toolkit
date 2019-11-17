@@ -5,21 +5,22 @@ import pandas as pd
 import numpy as np
 from tdigest import TDigest
 from hurry.filesize import size
-
+import utils
+import yaml
 import CONSTANTS as CONST
 
-_summary_keywords: dict = {"params_col": 'Feature-Name',
+_summary_keywords: dict = {"params_col": 'Parameter-Name',
                            "null_col": "Null-Count",
                            "count_col": "Count",
                            "label_col": "Label"}
 
-_5num_colnames: list = ['min', '25%', '50%', '75%', 'max']
+_5num_colnames: list = ['min', '25th', '50th', '75th', 'max']
 
 
 class MVTSDataAnalysis:
     """
     This class walks through a directory of csv files (each being a mvts) and calculates
-    estimated statistics of each of the features.
+    estimated statistics of each of the parameters.
 
     It will perform the below tasks:
         1. Read each MVTS(.csv files) from the folder where the MVTS dataset is kept, i.e.,
@@ -37,80 +38,60 @@ class MVTSDataAnalysis:
     structure.
     """
 
-    def __init__(self, path_to_dataset):
+    def __init__(self, path_to_config):
         """
         This constructor initializes the class variables in order to use them in the methods for
         analysis of the MVTS dataset.
 
-        :param path_to_dataset: folder location of the MVTS dataset
+        :param path_to_config: path to the yml configuration file
 
         """
 
-        path_to_dataset = os.path.join(CONST.ROOT, path_to_dataset)
-        self.path_to_dataset, _, self.path_to_all_mvts = next(walk(path_to_dataset))
+        path_to_config = os.path.join(CONST.ROOT, path_to_config)
+        with open(path_to_config) as file:
+            configs = yaml.load(file, Loader=yaml.FullLoader)
+
+        self.path_to_dataset = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
+        _, _, self.path_to_all_mvts = next(walk(self.path_to_dataset))
+        self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.summary = pd.DataFrame()
 
-    def get_number_of_mvts(self):
-        return len(self.path_to_all_mvts)
-
-    def get_average_mvts_size(self):
-        all_sizes_in_bytes = []
-        for f in self.path_to_all_mvts:
-            if f.lower().find('.csv') != -1:
-                f = os.path.join(f, self.path_to_dataset)
-                all_sizes_in_bytes.append(os.stat(f).st_size)
-        return np.mean(all_sizes_in_bytes)
-
-    def get_total_mvts_size(self):
-        all_sizes_in_bytes = []
-        for f in self.path_to_all_mvts:
-            if f.lower().find('.csv') != -1:
-                f = os.path.join(f, self.path_to_dataset)
-                all_sizes_in_bytes.append(os.stat(f).st_size)
-        return np.sum(all_sizes_in_bytes)
-
-    def print_stat_of_directory(self):
-        print('----------------------------------------')
-        print('Directory:\t\t\t\t\t{}'.format(self.path_to_dataset))
-        print('Total number of mvts files:\t{}'.format(self.get_number_of_mvts()))
-        print('Total size:\t\t\t\t\t{}'.format(size(self.get_total_mvts_size())))
-        print('Total average:\t\t\t\t{}'.format(size(self.get_average_mvts_size())))
-        print('----------------------------------------')
-
-    def compute_summary(self, first_k: int = None, feature_list: list = None):
+    def compute_summary(self, parameters_list: list = None, first_k: int = None):
         """
-        By reading each CSV file from the MVTS dataset this method calculates all the basic analysis
-        with respect to each feature(each column of csv). As the data is distributed in several
-        csv files this method reads each csv and accumulate the values.
+        By reading each csv file from the path listed in the configuration file, this method
+        calculates all the basic statistics with respect to each parameter (each column of the
+        mvts). As the data is distributed in several csv files this method computes the
+        statistics on each mvts and updates the computed stats in a streaming fashion.
 
-        t-digest data structure is used in order to get the quartiles.
+        **Note**: Computing the quantiles of parameters globally require loading the entire data
+        on memory. To avoid this, we use `TDigest` data structure to estimate it, while loading
+        one mvts at a time.
 
-        It populates the summary dataframe of the class with all the required data corresponding
-        to each feature. This statistics are based on the overall MVTS dataset.
+        As it calculates the statistics, it populates `self.summary` dataframe of the class with
+        all the required data corresponding to each parameter. Below are the column names of the
+        summary dataframe::
+            - `Parameter Name`: Contains the timeseries' parameter name,
+            - `Null Count`: Contains the number of null entries per parameter,
+            - `Min`: Contains the minimum value of each parameter (without considering the null/nan
+              values),
+            - `Q1`: Contains the 1-st quartile (25%) of each parameter (without considering
+              the null/nan values),
+            - `Mean`: Contains the `mean` of each parameter (without considering the null/nan
+              values),
+            - `Median`: Contains the `median` of each parameter (without considering the
+              null/nan values),
+            - `Q3`: Contains the 3-rd quartile (75%) of each parameter (without considering
+              the null/nan values),
+            - `Max`: Contains the `min` value of each parameter (without considering the null/nan
+              values)
 
-        Below are the column names of the summary dataframe,
-            - 'Feature Name': Contains the timeseries feature name,
-            - 'Null Count': Contains the number of null entries per feature,
-            - 'Min': Contains the minimum value of the feature(Without considering the null/nan
-              value),
-            - 'Q1': Contains the first quartile(25%) of the feature values(Without considering
-              the null/nan  value),
-            - 'Mean': Contains the mean of the feature values(Without considering the null/nan
-              value),
-            - 'Median': Contains the median of the feature values(Without considering the
-              null/nan  value),
-            - 'Q3': Contains the third quartile(75%) of the feature values(Without considering
-              the null/nan  value),
-            - 'Max': Contains the minimum value of the feature(Without considering the null/nan
-              value)
-
-        :param first_k: (Optional) If provided, then only the fist k mvts will be processed. This is
+        :param first_k: (Optional) If provided, only the fist `k` mvts will be processed. This is
                         mainly for getting some preliminary results in case the number of mvts
                         files is very large.
-        :param feature_list: (Optional) User may specify the list of features for which statistical
-                            analysis is needed. If no feature_list is provided by the user
-                            then all existing numeric features are included in the list.
-        :return: dataframe with data analysis summary
+        :param parameters_list: (Optional) User may specify the list of parameters for which
+                            statistical analysis is needed. If no parameters_list is provided by the
+                            user then all existing numeric parameters are included in the list.
+        :return: None.
         """
 
         if first_k is not None:
@@ -119,16 +100,22 @@ class MVTSDataAnalysis:
             all_csv_files = self.path_to_all_mvts
         n = len(all_csv_files)
 
-        # If feature_list is not provided all the physical parameter with
-        # numeric datatype will be considered
-        if feature_list is None:
-            abs_path = os.path.join(self.path_to_dataset, all_csv_files[0])
-            df: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
-            feature_list = df.select_dtypes([np.number]).columns
+        # If parameters_list is not provided all the physical parameters listed in the
+        # configuration
+        # file, with numeric datatype will be considered.
+        if parameters_list is None:
+            # read one csv as an example
+            df = pd.read_csv(os.path.join(self.path_to_dataset, self.path_to_all_mvts[0]), sep='\t')
+            # get the columns of interest
+            df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
+            # get a list of numeric columns
+            parameters_list = df.select_dtypes([np.number]).columns
 
-        total_param = feature_list.__len__()
+        total_param = parameters_list.__len__()
 
         param_seq = [""] * total_param
+        # TODO: Line below produces objects with similar id!! Is this OK? (object.__repr__(
+        #  digests[0])
         digests = [TDigest() for i in range(total_param)]
         null_counts = [0] * total_param
         col_counts = [0] * total_param
@@ -138,16 +125,19 @@ class MVTSDataAnalysis:
             console_str = '-->\t[{}/{}] \t\t File: {}'.format(i, n, f)
             sys.stdout.write("\r" + console_str)
             sys.stdout.flush()
-            # Only .csv file needs to be processed
+            # Only .csv files should be processed
             if f.lower().find('.csv') != -1:
                 sys.stdout.flush()
                 i += 1
-
                 abs_path = os.path.join(self.path_to_dataset, f)
                 df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
+
+                # needs interpolation to make up for the nan values. Otherwise tDigest won't
+                # be able to process the data.
+                df_mvts = utils.interpolate_missing_vals(df_mvts)
                 # keep the requested params only
                 try:
-                    df_req = pd.DataFrame(df_mvts[feature_list]).select_dtypes([np.number])
+                    df_req = pd.DataFrame(df_mvts[parameters_list]).select_dtypes([np.number])
                 except:
                     raise ValueError(
                         """
@@ -155,6 +145,7 @@ class MVTSDataAnalysis:
                         """
                     )
                 j = 0
+                # Iterate the mvts by column, and compute tDigest on each column.
                 for (param, series) in df_req.iteritems():
                     temp_null_count = int(series.isnull().sum())
                     temp_count = int(series.count())
@@ -175,9 +166,9 @@ class MVTSDataAnalysis:
         all_columns.insert(0, _summary_keywords['count_col'])
         all_columns.insert(0, _summary_keywords['params_col'])
 
-        eda_dict = pd.DataFrame(columns=all_columns)
+        summary_stat_df = pd.DataFrame(columns=all_columns)
 
-        for i in range(0, j):
+        for i in range(total_param):
             attname = param_seq[i]
             count_col = col_counts[i]
             col_miss = null_counts[i]
@@ -189,25 +180,70 @@ class MVTSDataAnalysis:
                 col_Q3 = digests[i].percentile(75)
                 col_max = digests[i].percentile(100)
 
-            eda_dict.loc[i] = [attname, count_col, col_miss, col_min, col_Q1, col_mean, col_Q3,
-                               col_max]
+            summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_Q1, col_mean,
+                                      col_Q3, col_max]
 
-        if eda_dict.empty:
+        if summary_stat_df.empty:
             raise ValueError(
                 """
                 Unable to get MVTS Data Analysis. Please check the parameter list or the dataset files.
                 """
             )
-        eda_dict.reset_index(inplace=True)
-        eda_dict.drop(labels='index', inplace=True, axis=1)
+        summary_stat_df.reset_index(inplace=True)
+        summary_stat_df.drop(labels='index', inplace=True, axis=1)
 
-        self.summary = eda_dict
+        self.summary = summary_stat_df
+
+    def get_number_of_mvts(self):
+        """
+        :return: the number of mvts files located at the root directory listed in the
+        configuration file.
+        """
+        return len(self.path_to_all_mvts)
+
+    def get_average_mvts_size(self):
+        """
+        :return: the average size (in bytes) of the mvts files located at the root directory
+        listed in the configuration file.
+        """
+        all_sizes_in_bytes = []
+        for f in self.path_to_all_mvts:
+            if f.lower().find('.csv') != -1:
+                f = os.path.join(f, self.path_to_dataset)
+                all_sizes_in_bytes.append(os.stat(f).st_size)
+        return np.mean(all_sizes_in_bytes)
+
+    def get_total_mvts_size(self):
+        """
+        :return: the total size (in butes) of the mvts files located at the root directory
+        listed in the configuration file.
+        """
+        all_sizes_in_bytes = []
+        for f in self.path_to_all_mvts:
+            if f.lower().find('.csv') != -1:
+                f = os.path.join(f, self.path_to_dataset)
+                all_sizes_in_bytes.append(os.stat(f).st_size)
+        return np.sum(all_sizes_in_bytes)
+
+    def print_stat_of_directory(self):
+        """
+        Prints a summary of the mvts files located at the root directory listed in the
+        configuration file.
+        :return: None.
+        """
+        print('----------------------------------------')
+        print('Directory:\t\t\t\t\t{}'.format(self.path_to_dataset))
+        print('Total number of mvts files:\t{}'.format(self.get_number_of_mvts()))
+        print('Total size:\t\t\t\t\t{}'.format(size(self.get_total_mvts_size())))
+        print('Total average:\t\t\t\t{}'.format(size(self.get_average_mvts_size())))
+        print('----------------------------------------')
 
     def get_missing_values(self) -> pd.DataFrame:
         """
-        Gets the missing value counts for each feature.
+        Gets the missing values counts for each parameter in the mvts files.
 
-        :return: a dataframe with two columns feature name and the counts of missing values.
+        :return: a dataframe with two columns, namely the parameters names and the counts of the
+        corresponding missing values.
         """
         if self.summary.empty:
             raise ValueError(
@@ -220,10 +256,10 @@ class MVTSDataAnalysis:
 
     def get_five_num_summary(self) -> pd.DataFrame:
         """
-        Gets the five number summary of each feature.
+        Gets the five-number summary of each parameter in the mvts files.
 
-        :return: a dataframe where the rows are [min, 25%, 50%, 75%, max] and the columns are the
-                 features in the given dataframe.
+        :return: a dataframe where the rows are `min`, `25th`, `50th`, `75th`, `max` and the columns
+        are the parameters of the given dataframe.
         """
         if self.summary.empty:
             raise ValueError(
@@ -275,12 +311,13 @@ class MVTSDataAnalysis:
 
 
 def main():
-    path_to_dataset = os.path.join(CONST.ROOT, 'pet_datasets/subset_partition3')
-    mvts = MVTSDataAnalysis(path_to_dataset)
+    path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
+
+    mvts = MVTSDataAnalysis(path_to_config)
     mvts.print_stat_of_directory()
 
     mvts.compute_summary(first_k=50)
-    # mvts.compute_summary(CONST.CANDIDATE_PHYS_PARAMETERS)
+    mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params.csv')
     # todo where to keep this candidate_phys_parameters
 
     print(mvts.summary.columns)
