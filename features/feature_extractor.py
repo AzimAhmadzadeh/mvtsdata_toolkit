@@ -16,7 +16,7 @@ class FeatureExtractor:
     Below are the column names of the summary dataframe:
         * `PATH_TO_MVTS`: path to where the csv (mvts) files are stored.
         * `MVTS_PARAMETERS`: a list of time series name; only those listed here will be processed.
-        * `STATISTICAL_FEATURES`: a list of statistical features to be extracted from each time
+        * `STATISTICAL_FEATURES`: a list of statistical features to be computed on each time
            series.
         * `META_DATA_TAGS`: a list of tags used in the mvts file names; to be used for extraction of
            some metadata from file names.
@@ -54,24 +54,33 @@ class FeatureExtractor:
 
         self.path_to_root = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
         self.path_to_output = os.path.join(CONST.ROOT, configs['PATH_TO_EXTRACTED_FEATURES'])
-        self.statistical_features: list = \
-            extractor_utils.get_methods_for_names(configs['STATISTICAL_FEATURES'])
+        self.statistical_features: list = configs['STATISTICAL_FEATURES']
         self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.metadata_tags: list = configs['META_DATA_TAGS']
         self.df_all_features = pd.DataFrame()
 
-    def calculate_all(self, params_index_list: list = None, need_interp: bool = True):
+    def calculate_all(self, parameters_list: list = None, params_index_list: list = None,
+                      statistical_features_list: list = None, first_k: int = None, need_interp: bool = True):
         """
         Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
         class-field `df_all_features`.
 
-        :param params_index_list: A list of column indices, that can be used instead of the list
-                                  `STATISTICAL_FEATURES` that is read from the configuration file
-                                  in the constructor. The numbers in this list (instead of
-                                  strings in STATISTICAL_FEATUES) can be used to confine the
-                                  feature extraction to a subset of time series (columns) in the
+        :param parameters_list: (Optional) A list of column names, that can be used instead of
+                                the list `STATISTICAL_FEATURES` that is read from the
+                                configuration file in the constructor.
+        :param params_index_list: (Optional) A list of column indices, that can be used instead
+                                  of the list `STATISTICAL_FEATURES` that is read from the
+                                  configuration file in the constructor. The numbers in this list
+                                  (instead of strings in STATISTICAL_FEATUES) can be used to confine
+                                  the feature extraction to a subset of time series (columns) in the
                                   mvts data.
+        :param statistical_features_list: (Optional) A list of statistical features to be calculated on all
+                              time series of each mvts file. The statistical features are the
+                              function names present in `features.feature_collection.py'.
+        :param first_k: (Optional) If provided, only the fist `first_k` mvts files will be
+                        processed. This is mainly for getting some preliminary results in case the
+                        number of mvts files is too large.
         :param need_interp: True if a linear interpolation is needed to alter the missing numerical
                             values. This only takes care of the missing values and will not
                             affect the existing ones. Set it to False otherwise. Default is True.
@@ -81,7 +90,7 @@ class FeatureExtractor:
         # -----------------------------------------
         # Verify arguments
         # -----------------------------------------
-        has_param_name_arg = (self.mvts_parameters is not None) and (len(self.mvts_parameters) > 0)
+        has_param_name_arg = (parameters_list is not None) and (len(parameters_list) > 0)
         has_param_index_arg = (params_index_list is not None) and (len(params_index_list) > 0)
         if has_param_name_arg == has_param_index_arg:  # mutual exclusive
             raise ValueError(
@@ -90,26 +99,51 @@ class FeatureExtractor:
                 be provided.
                 """
             )
-
-        if len(self.statistical_features) == 0:
+        stat_features_in_config = (len(self.statistical_features) > 0)
+        stat_features_in_args = statistical_features_list is not None
+        if not stat_features_in_config and not stat_features_in_args:  # absent in both
             raise ValueError(
                 """
-                The argument 'self.statistical_features' cannot be empty!
+                Either in the configuration file or by the argument `feature_list`, a list of 
+                statistical featues must be provided!
                 """
             )
+
+        if stat_features_in_args:
+            self.statistical_features = statistical_features_list
+
         # -----------------------------------------
-        # Get all file names in the root directory
+        # Get all files (or the first first_k ones) in the root directory.
         # -----------------------------------------
         print(self.path_to_root)
         dirpath, _, all_csv_files = next(walk(self.path_to_root))
+        if first_k is not None:
+            all_csv_files = all_csv_files[:first_k]
+
         n = len(all_csv_files)
         n_features = len(self.statistical_features)
         i = 1
 
+        # -----------------------------------------
+        # If params are provided using one of the optional arguments
+        # override self.mvts_parameters with the given list.
+        # -----------------------------------------
+        if has_param_name_arg:
+            self.mvts_parameters = parameters_list
+        elif has_param_index_arg:
+            all_params = list(pd.read_csv(path.join(dirpath, all_csv_files[0]), sep='\t'))
+            self.mvts_parameters = [all_params[i] for i in params_index_list]
+
+        p_parameters = len(self.mvts_parameters)
+        t_tags = len(self.metadata_tags)
         print('\n\n\t-----------------------------------'.format())
-        print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
         print('\t\tTotal No. of time series:\t{}'.format(n))
-        print('\t\tOutput TS dimensionality ({} X {}):\t{}'.format(n, n_features, n * n_features))
+        print('\t\tTotal No. of Parameters:\t\t{}'.format(p_parameters))
+        print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
+        print('\t\tTotal No. of Metadata Pieces:\t\t{}'.format(t_tags))
+        print('\t\tOutput dimensionality (N:{} X (F:{} X P:{} + T:{})):\t{}'
+              .format(n, n_features, p_parameters, t_tags,
+                      n * (n_features * p_parameters + t_tags)))
         print('\t-----------------------------------\n'.format())
 
         # -----------------------------------------
@@ -117,7 +151,8 @@ class FeatureExtractor:
         # -----------------------------------------
         for f in all_csv_files:
             if f.lower().find('.csv') != -1:
-                print('\t >>> Total Processed: {0} / {1} <<<\r'.format(i, n))
+                console_str = '\t >>> Total Processed: {0} / {1} <<<\r'.format(i, n)
+                sys.stdout.write("\r" + console_str)
                 sys.stdout.flush()
 
                 abs_path = path.join(dirpath, f)
@@ -126,11 +161,7 @@ class FeatureExtractor:
                 # -----------------------------------------
                 # Keep the requested time series of mvts only.
                 # -----------------------------------------
-                df_raw = pd.DataFrame()
-                if has_param_name_arg:
-                    df_raw = pd.DataFrame(df_mvts[self.mvts_parameters], dtype=float)
-                elif has_param_index_arg:
-                    df_raw = pd.DataFrame(df_mvts.iloc[:, params_index_list], dtype=float)
+                df_raw = pd.DataFrame(df_mvts[self.mvts_parameters], dtype=float)
 
                 # -----------------------------------------
                 # Interpolate to get rid of the NaN values.
@@ -141,8 +172,10 @@ class FeatureExtractor:
                 # -----------------------------------------
                 # Extract all the features from each column of mvts.
                 # -----------------------------------------
+                callable_features = extractor_utils.get_methods_for_names(
+                    self.statistical_features)
                 extracted_features_df = \
-                    extractor_utils.calculate_one_mvts(df_raw, self.statistical_features)
+                    extractor_utils.calculate_one_mvts(df_raw, callable_features)
 
                 # -----------------------------------------
                 # Extract the given meta data from this mvts name.
@@ -209,7 +242,8 @@ class FeatureExtractor:
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
     pc = FeatureExtractor(path_to_config)
-    pc.calculate_all()
+    pc.calculate_all(statistical_features_list=['get_min', 'get_max', 'get_median', 'get_mean'],
+                     params_index_list=[5, 6, 7], first_k=50)
     pc.store_extracted_features('extracted_features_3_pararams_3_featues.csv')
 
 

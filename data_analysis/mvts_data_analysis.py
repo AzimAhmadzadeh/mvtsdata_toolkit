@@ -52,7 +52,7 @@ class MVTSDataAnalysis:
             configs = yaml.load(file, Loader=yaml.FullLoader)
 
         self.path_to_dataset = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
-        _, _, self.path_to_all_mvts = next(walk(self.path_to_dataset))
+        _, _, self.all_mvts_paths = next(walk(self.path_to_dataset))
         self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.summary = pd.DataFrame()
 
@@ -87,7 +87,7 @@ class MVTSDataAnalysis:
 
         :param first_k: (Optional) If provided, only the fist `k` mvts will be processed. This is
                         mainly for getting some preliminary results in case the number of mvts
-                        files is very large.
+                        files is too large.
         :param parameters_list: (Optional) User may specify the list of parameters for which
                             statistical analysis is needed. If no parameters_list is provided by the
                             user then all existing numeric parameters are included in the list.
@@ -95,9 +95,9 @@ class MVTSDataAnalysis:
         """
 
         if first_k is not None:
-            all_csv_files = self.path_to_all_mvts[:first_k]
+            all_csv_files = self.all_mvts_paths[:first_k]
         else:
-            all_csv_files = self.path_to_all_mvts
+            all_csv_files = self.all_mvts_paths
         n = len(all_csv_files)
 
         # If parameters_list is not provided all the physical parameters listed in the
@@ -105,7 +105,7 @@ class MVTSDataAnalysis:
         # file, with numeric datatype will be considered.
         if parameters_list is None:
             # read one csv as an example
-            df = pd.read_csv(os.path.join(self.path_to_dataset, self.path_to_all_mvts[0]), sep='\t')
+            df = pd.read_csv(os.path.join(self.path_to_dataset, self.all_mvts_paths[0]), sep='\t')
             # get the columns of interest
             df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
             # get a list of numeric columns
@@ -119,7 +119,7 @@ class MVTSDataAnalysis:
         digests = [TDigest() for i in range(total_param)]
         null_counts = [0] * total_param
         col_counts = [0] * total_param
-        i = 0
+        i = 1
         j = 0
         for f in all_csv_files:
             console_str = '-->\t[{}/{}] \t\t File: {}'.format(i, n, f)
@@ -172,16 +172,16 @@ class MVTSDataAnalysis:
             attname = param_seq[i]
             count_col = col_counts[i]
             col_miss = null_counts[i]
-            col_min = col_Q1 = col_mean = col_Q3 = col_max = 0
+            col_min = col_q1 = col_mean = col_q3 = col_max = 0
             if digests[i]:
                 col_min = digests[i].percentile(0)
-                col_Q1 = digests[i].percentile(25)
+                col_q1 = digests[i].percentile(25)
                 col_mean = digests[i].percentile(50)
-                col_Q3 = digests[i].percentile(75)
+                col_q3 = digests[i].percentile(75)
                 col_max = digests[i].percentile(100)
 
-            summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_Q1, col_mean,
-                                      col_Q3, col_max]
+            summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_q1, col_mean,
+                                      col_q3, col_max]
 
         if summary_stat_df.empty:
             raise ValueError(
@@ -199,7 +199,7 @@ class MVTSDataAnalysis:
         :return: the number of mvts files located at the root directory listed in the
         configuration file.
         """
-        return len(self.path_to_all_mvts)
+        return len(self.all_mvts_paths)
 
     def get_average_mvts_size(self):
         """
@@ -207,7 +207,7 @@ class MVTSDataAnalysis:
         listed in the configuration file.
         """
         all_sizes_in_bytes = []
-        for f in self.path_to_all_mvts:
+        for f in self.all_mvts_paths:
             if f.lower().find('.csv') != -1:
                 f = os.path.join(f, self.path_to_dataset)
                 all_sizes_in_bytes.append(os.stat(f).st_size)
@@ -219,7 +219,7 @@ class MVTSDataAnalysis:
         listed in the configuration file.
         """
         all_sizes_in_bytes = []
-        for f in self.path_to_all_mvts:
+        for f in self.all_mvts_paths:
             if f.lower().find('.csv') != -1:
                 f = os.path.join(f, self.path_to_dataset)
                 all_sizes_in_bytes.append(os.stat(f).st_size)
@@ -317,13 +317,11 @@ def main():
     mvts.print_stat_of_directory()
 
     mvts.compute_summary(first_k=50)
-    mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params.csv')
-    # todo where to keep this candidate_phys_parameters
-
-    print(mvts.summary.columns)
-    mvts.print_summary()
-    print(mvts.get_five_num_summary())
-    print(mvts.get_missing_values())
+    # mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params.csv')
+    # print(mvts.summary.columns)
+    # mvts.print_summary()
+    # print(mvts.get_five_num_summary())
+    # print(mvts.get_missing_values())
 
 
 if __name__ == '__main__':

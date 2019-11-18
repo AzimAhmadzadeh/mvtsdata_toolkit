@@ -17,21 +17,6 @@ def get_methods_for_names(method_names: list):
     return callable_methods
 
 
-def __get_methods_for_names(method_names: list):  # TODO: there are two version of this. Drop one!
-    """
-    for a given method-name, it finds it in `feature_collection` and returns it as a callable
-    method.
-
-    :param method_names: name of the method of interest that exists in `feature_collection`.
-    :return: a callable instance of the method whose name is given.
-    """
-    callable_methods = []
-    for m in method_names:
-        callable_m = getattr(fc, m)
-        callable_methods.append(callable_m)
-    return callable_methods
-
-
 def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFrame:
     """
     This method computes a list of F statistical features on the given multivariate time series
@@ -48,8 +33,8 @@ def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFra
     needed only over some of the time series, then only those selected columns should be passed in.
 
     :param df_mvts: a mvts dataframe from which the features are to be extracted.
-    :param features_list : a list of all functions (from `features.feature_collection`) to be
-           executed on the given mvts.
+    :param features_list : a list of all callable functions (from `features.feature_collection`)
+           to be executed on the given mvts.
     :return: a dataframe with the parameters as rows, and statistical features as columns.
     """
     col_names = list(df_mvts)
