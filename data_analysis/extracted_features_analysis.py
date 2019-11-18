@@ -23,26 +23,27 @@ class ExtractedFeaturesAnalysis:
     These summaries can be stored in a CSV file as well.
     """
 
-    def __init__(self, mvts_df: pd.DataFrame, exclude: list):
+    def __init__(self, extracted_features_df: pd.DataFrame, exclude: list = None):
         """
         A constructor that initializes the class variables.
 
-        :param mvts_df: the extracted features as it was produced by `FeatureExtractor` in
-                        `features.feature_extractor` or `FeatureExtractorParallel` in
-                        `features.feature_extractor_parallel.
-        :param exclude: a list of column-names indicating which columns should be excluded from
-                        this analysis. All non-numeric columns will automatically be removed. But
-                        this argument can be used to drop some numeric columns (e.g., ID) whose
-                        numerical statistics makes no sense.
+        :param extracted_features_df: the extracted features as it was produced by
+                                      `FeatureExtractor` in `features.feature_extractor` or
+                                      `FeatureExtractorParallel` in
+                                      `features.feature_extractor_parallel.
+        :param exclude: (Optional) a list of column-names indicating which columns should be
+                        excluded from this analysis. All non-numeric columns will automatically
+                        be removed. But this argument can be used to drop some numeric columns (
+                        e.g., ID) whose numerical statistics makes no sense.
         """
-        self.df = mvts_df
+        self.df = extracted_features_df
         self.summary = pd.DataFrame()
         self.excluded_colnames = exclude
 
     def compute_summary(self):
         """
         Using the extracted data this method calculates all the basic analysis with respect to
-        each statistical feature (each column of `mvts_df`).
+        each statistical feature (each column of `extracted_features_df`).
 
         It populates the summary dataframe of the class with all the required data corresponding
         to each feature.
@@ -68,7 +69,13 @@ class ExtractedFeaturesAnalysis:
 
         The computed summary will be stored in the class field `summary`.
         """
+        df_desc = pd.DataFrame(self.df)
 
+        # drop the columns that were requested to be excluded
+        if self.excluded_colnames is not None:
+            df_desc.drop(labels=self.excluded_colnames, inplace=True, axis=1)
+
+        # drop any non-numeric column
         if not self.df.empty:
             df_desc = self.df.describe(include=[np.number])
         else:
@@ -87,7 +94,6 @@ class ExtractedFeaturesAnalysis:
                 '''
             )
 
-        df_desc.drop(labels=self.excluded_colnames, inplace=True, axis=1)
         df_desc = df_desc.T
         df_desc.insert(0, _summary_keywords['params_col'], df_desc.index)
         df_desc.insert(2, _summary_keywords['null_col'], self.df.isnull().sum())
@@ -111,7 +117,7 @@ class ExtractedFeaturesAnalysis:
         """
         Gets the missing value counts for each feature.
 
-        :return: a dataframe of two columns, one for the column name of `mvts_df` and the other
+        :return: a dataframe of two columns, one for the column name of `extracted_features_df` and the other
                  for the counts of missing values corresponding to each column, will be returned.
         """
         if self.summary.empty:
@@ -185,16 +191,16 @@ def main():
     from normalizing import normalizer
 
     f_path = os.path.join(CONST.ROOT,
-                          'pet_datasets/extracted_features/non_unittest_extracted_features.csv')
+                          'data/extracted_features/extracted_features_3_pararams_3_featues.csv')
     mvts_df = pd.read_csv(f_path, sep='\t')
     # Normalizer Test on extracted feature dataset
-    # excluded_col = mvts_df.select_dtypes(exclude=np.number).columns.to_list()
+    # excluded_col = extracted_features_df.select_dtypes(exclude=np.number).columns.to_list()
     excluded_col = ['id']  # .insert(0,'id')
-    # df_norm = normalizer.negativeone_one_normalize(mvts_df,excluded_col)
-    # df_norm = normalizer.robust_standardize(mvts_df,excluded_col)
-    # df_norm = normalizer.standardize(mvts_df,excluded_col)
-    df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
-    print(df_norm)
+    # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
+    # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
+    # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
+    # df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
+    # print(df_norm)
 
     efa = ExtractedFeaturesAnalysis(mvts_df, ['id'])
     efa.compute_summary()

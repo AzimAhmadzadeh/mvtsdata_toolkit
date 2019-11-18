@@ -141,7 +141,7 @@ class FeatureExtractor:
         print('\t\tTotal No. of Parameters:\t\t{}'.format(p_parameters))
         print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
         print('\t\tTotal No. of Metadata Pieces:\t\t{}'.format(t_tags))
-        print('\t\tOutput dimensionality (N:{} X (F:{} X P:{} + T:{}).):\t{}'
+        print('\t\tOutput dimensionality (N:{} X (F:{} X P:{} + T:{})):\t{}'
               .format(n, n_features, p_parameters, t_tags,
                       n * (n_features * p_parameters + t_tags)))
         print('\t-----------------------------------\n'.format())
