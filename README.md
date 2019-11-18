@@ -4,7 +4,7 @@ Multivariate Time Series Data Toolkit is a python package that works on multivar
  - over 50 time series statistical features collected from a number of research studies of different domains,
  - an automated feature extraction process, provided in both sequential and parallel fashions,
  - a set of generic sampling methodologies,
- - a set of different normalization transformation on mvts data,
+ - a set of different normalization transformations on mvts data,
  - an automated data analysis process that provides basic summary on both mvts data and the extracted features.
 
 ----
@@ -51,28 +51,29 @@ has the time stamp of each value. (A mvts data with `t` time
 series, each of length `d`, has a dimension of `d X (t+1)`)
 
 2. File names should have the following naming convention,  
-   i. LABEL: located between 'lab[' and the first occurrence of ']' after that.  
-   ii. ID: located between 'id[' and the first occurrence of ']' after that.  
-   iii. START TIME: located between 'st[' and the first occurrence of ']' after that.  
-   iv. END TIME: located between 'et[' and the first occurrence of ']' after that.
+   i. LABEL: located between `'lab['` and the first occurrence of `']'` after that.  
+   ii. ID: located between `'id['` and the first occurrence of `']'` after that.  
+   iii. START TIME: located between `'st['` and the first occurrence of `']'` after that.  
+   iv. END TIME: located between `'et['` and the first occurrence of `']'` after that.
    
-   So, an example would be:
-   lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv
+   So, an example would be:  
+   ```lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv```
   
-3. If the embedded values(label,ID..) contain paired braces '[]' within the string , 
-like for start date: st[2011-01-24T[03:24:00]], then the methods will be able to extract correctly
-but for unpaired brace it will raise an exception.
+3. If the embedded values (`label`, `id`, ...) contain paired braces `'[]'` within the string, 
+(e.g. for start date, `st[2011-01-24T[03:24:00]]`, then the methods will be able to extract
+ correctly but for unpaired brace it will raise an exception.
  
 4. It is optional to embed the id of each mvts in their filename. 
 The order of the embedding doesn't matter as long as the starting expression and braces'[]' are placed correctly. 
 
 #### Extracted Features Files
-It is assumed that the features extracted from all MVTS follow
+It is assumed that the features extracted from all mvts data follow
 these assumptions:
 
 1. The extracted features will be stored in a `tab` delimited,
-csv file. Each row summarized one mvts with a list of features.
-The first four columns of this file are reserved for: `ID`,
+csv file.
+2. Each row summarizes one mvts with a list of features.
+3. The first four columns of this file are reserved for: `ID`,
 `LABEL`,`START_TIME`, and `END_TIME`. The dimension of the
 extracted features dataframe will be `n X f` where `n` is the
 number of mvts, and `f` is the number of chosen features.
