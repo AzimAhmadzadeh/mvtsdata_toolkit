@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 import sys
 from os import path, walk
@@ -6,6 +7,39 @@ import utils
 from features import extractor_utils
 import yaml
 import CONSTANTS as CONST
+
+
+def _evaluate_args(params_name: list, params_index: list,
+                   features_list: list, feature_index: list):
+    """
+    This method throws an exception if both of `params_name` and `params_index`, or both of
+    `features_list` and features_index` are provided.
+    :param params_name:
+    :param params_index:
+    :param features_list:
+    :param feature_index:
+    :return:
+    """
+    has_param_name_in_arg = (params_name is not None) and (len(params_name) > 0)
+    has_param_index_in_arg = (params_index is not None) and (len(params_index) > 0)
+    has_feature_name_in_arg = (features_list is not None) and (len(features_list) > 0)
+    has_feature_index_in_arg = (feature_index is not None) and (len(feature_index) > 0)
+
+    if has_param_name_in_arg and has_param_index_in_arg:
+        raise ValueError(
+            """
+            One and only one of the two arguments (params_name_list, params_index) must
+            be provided.
+            """
+        )
+    if has_feature_name_in_arg and has_feature_index_in_arg:
+        raise ValueError(
+            """
+            Either in the configuration file or by the argument `feature_list`, a list of 
+            statistical features must be provided!
+            """
+        )
+    return True
 
 
 class FeatureExtractor:
@@ -59,25 +93,28 @@ class FeatureExtractor:
         self.metadata_tags: list = configs['META_DATA_TAGS']
         self.df_all_features = pd.DataFrame()
 
-    def calculate_all(self, parameters_list: list = None, params_index_list: list = None,
-                      statistical_features_list: list = None, first_k: int = None, need_interp: bool = True):
+    def calculate_all(self, params_name: list = None, params_index: list = None,
+                      features_name: list = None, features_index: list = None,
+                      first_k: int = None, need_interp: bool = True):
         """
         Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
         class-field `df_all_features`.
 
-        :param parameters_list: (Optional) A list of column names, that can be used instead of
+        :param params_name: (Optional) A list of column names, that can be used instead of
                                 the list `STATISTICAL_FEATURES` that is read from the
                                 configuration file in the constructor.
-        :param params_index_list: (Optional) A list of column indices, that can be used instead
+        :param params_index: (Optional) A list of column indices, that can be used instead
                                   of the list `STATISTICAL_FEATURES` that is read from the
                                   configuration file in the constructor. The numbers in this list
                                   (instead of strings in STATISTICAL_FEATUES) can be used to confine
                                   the feature extraction to a subset of time series (columns) in the
                                   mvts data.
-        :param statistical_features_list: (Optional) A list of statistical features to be calculated on all
+        :param features_name: (Optional) A list of statistical features to be calculated on all
                               time series of each mvts file. The statistical features are the
                               function names present in `features.feature_collection.py'.
+        :param features_index: (Optional) A list of indices corresponding to the features
+                               provided in the configuration file.
         :param first_k: (Optional) If provided, only the fist `first_k` mvts files will be
                         processed. This is mainly for getting some preliminary results in case the
                         number of mvts files is too large.
@@ -90,27 +127,16 @@ class FeatureExtractor:
         # -----------------------------------------
         # Verify arguments
         # -----------------------------------------
-        has_param_name_arg = (parameters_list is not None) and (len(parameters_list) > 0)
-        has_param_index_arg = (params_index_list is not None) and (len(params_index_list) > 0)
-        if has_param_name_arg == has_param_index_arg:  # mutual exclusive
-            raise ValueError(
-                """
-                One and only one of the two arguments (params_name_list, params_index_list) must
-                be provided.
-                """
-            )
-        stat_features_in_config = (len(self.statistical_features) > 0)
-        stat_features_in_args = statistical_features_list is not None
-        if not stat_features_in_config and not stat_features_in_args:  # absent in both
-            raise ValueError(
-                """
-                Either in the configuration file or by the argument `feature_list`, a list of 
-                statistical featues must be provided!
-                """
-            )
+        _evaluate_args(params_name, params_index, features_name, features_index)
 
-        if stat_features_in_args:
-            self.statistical_features = statistical_features_list
+        # -----------------------------------------
+        # If features are provided using one of the optional arguments
+        # override self.statistical_features with the given list.
+        # -----------------------------------------
+        if features_name is not None:
+            self.statistical_features = features_name
+        elif features_index is not None:
+            self.statistical_features = [self.statistical_features[i] for i in features_index]
 
         # -----------------------------------------
         # Get all files (or the first first_k ones) in the root directory.
@@ -128,11 +154,11 @@ class FeatureExtractor:
         # If params are provided using one of the optional arguments
         # override self.mvts_parameters with the given list.
         # -----------------------------------------
-        if has_param_name_arg:
-            self.mvts_parameters = parameters_list
-        elif has_param_index_arg:
+        if params_name is not None:
+            self.mvts_parameters = params_name
+        elif params_index is not None:
             all_params = list(pd.read_csv(path.join(dirpath, all_csv_files[0]), sep='\t'))
-            self.mvts_parameters = [all_params[i] for i in params_index_list]
+            self.mvts_parameters = [all_params[i] for i in params_index]
 
         p_parameters = len(self.mvts_parameters)
         t_tags = len(self.metadata_tags)
@@ -151,7 +177,7 @@ class FeatureExtractor:
         # -----------------------------------------
         for f in all_csv_files:
             if f.lower().find('.csv') != -1:
-                console_str = '\t >>> Total Processed: {0} / {1} <<<\r'.format(i, n)
+                console_str = '\t >>> Total Processed: {0} / {1} <<<'.format(i, n)
                 sys.stdout.write("\r" + console_str)
                 sys.stdout.flush()
 
@@ -172,7 +198,7 @@ class FeatureExtractor:
                 # -----------------------------------------
                 # Extract all the features from each column of mvts.
                 # -----------------------------------------
-                callable_features = extractor_utils.get_methods_for_names(
+                callable_features = extractor_utils.get_methods_for_names(  # <<<<<<<<<<<<<<<
                     self.statistical_features)
                 extracted_features_df = \
                     extractor_utils.calculate_one_mvts(df_raw, callable_features)
@@ -242,9 +268,11 @@ class FeatureExtractor:
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
     pc = FeatureExtractor(path_to_config)
-    pc.calculate_all(statistical_features_list=['get_min', 'get_max', 'get_median', 'get_mean'],
-                     params_index_list=[5, 6, 7], first_k=50)
-    pc.store_extracted_features('extracted_features_3_pararams_3_featues.csv')
+    # pc.calculate_all()
+    pc.calculate_all(#features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+                    features_index=[1, 4, 6],
+                     params_index=[5, 6, 7], first_k=50)
+    # pc.store_extracted_features('extracted_features_3_pararams_3_featues.csv')
 
 
 if __name__ == '__main__':

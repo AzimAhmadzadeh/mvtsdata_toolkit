@@ -40,7 +40,7 @@ class FeatureExtractorParallel:
         for partition in partitions:  # one partition per process
             pc = FeatureExtractorParallel(features_list=features_list,
                                           params_name_list=params_name_list,
-                                          params_index_list=None,
+                                          params_index=None,
                                           need_interp=True)
             process = multiprocessing.Process(target=pc.calculate_all,
                                               args=(proc_id, partition, extracted_features))
@@ -77,7 +77,7 @@ class FeatureExtractorParallel:
                       params_index_list: list = None,
                       need_interp: bool = True):
         """
-        #Todo check params_index_list whether needed or not
+        #Todo check params_index whether needed or not
         Computes all the give statistical features on each of the csv files in 'path_to_root'
         and stores the result in the form of a single csv file.
 
@@ -103,7 +103,7 @@ class FeatureExtractorParallel:
         if has_param_name_arg == has_param_index_arg:  # mutual exclusive
             raise ValueError(
                 """
-                One and only one of the two arguments (params_name_list, params_index_list) must
+                One and only one of the two arguments (params_name_list, params_index) must
                 be provided.
                 """
             )

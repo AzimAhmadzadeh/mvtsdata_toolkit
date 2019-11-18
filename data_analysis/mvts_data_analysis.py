@@ -17,6 +17,28 @@ _summary_keywords: dict = {"params_col": 'Parameter-Name',
 _5num_colnames: list = ['min', '25th', '50th', '75th', 'max']
 
 
+def _evaluate_args(params_name: list, params_index: list):
+    """
+    This method throws an exception if both of `params_name` and `params_index` are provided.
+    :param params_name:
+    :param params_index:
+
+    :return:
+    """
+    has_param_name_in_arg = (params_name is not None) and (len(params_name) > 0)
+    has_param_index_in_arg = (params_index is not None) and (len(params_index) > 0)
+
+    if has_param_name_in_arg and has_param_index_in_arg:
+        raise ValueError(
+            """
+            One and only one of the two arguments (params_name_list, params_index) must
+            be provided.
+            """
+        )
+
+    return True
+
+
 class MVTSDataAnalysis:
     """
     This class walks through a directory of csv files (each being a mvts) and calculates
@@ -44,9 +66,7 @@ class MVTSDataAnalysis:
         analysis of the MVTS dataset.
 
         :param path_to_config: path to the yml configuration file
-
         """
-
         path_to_config = os.path.join(CONST.ROOT, path_to_config)
         with open(path_to_config) as file:
             configs = yaml.load(file, Loader=yaml.FullLoader)
@@ -56,7 +76,8 @@ class MVTSDataAnalysis:
         self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.summary = pd.DataFrame()
 
-    def compute_summary(self, parameters_list: list = None, first_k: int = None):
+    def compute_summary(self, params_name: list = None, params_index: list = None,
+                        first_k: int = None):
         """
         By reading each csv file from the path listed in the configuration file, this method
         calculates all the basic statistics with respect to each parameter (each column of the
@@ -88,11 +109,18 @@ class MVTSDataAnalysis:
         :param first_k: (Optional) If provided, only the fist `k` mvts will be processed. This is
                         mainly for getting some preliminary results in case the number of mvts
                         files is too large.
-        :param parameters_list: (Optional) User may specify the list of parameters for which
-                            statistical analysis is needed. If no parameters_list is provided by the
-                            user then all existing numeric parameters are included in the list.
+        :param params_name: (Optional) User may specify the list of parameters for which
+                                statistical analysis is needed. If no params_name is provided by
+                                the user then all existing numeric parameters are included in the
+                                list.
+        :param params_index: (Optional) User may specify the list of indices corresponding to the
+                             parameters provided in the configuration file.
         :return: None.
         """
+        # -----------------------------------------
+        # Verify arguments
+        # -----------------------------------------
+        _evaluate_args(params_name, params_index)
 
         if first_k is not None:
             all_csv_files = self.all_mvts_paths[:first_k]
@@ -100,18 +128,23 @@ class MVTSDataAnalysis:
             all_csv_files = self.all_mvts_paths
         n = len(all_csv_files)
 
-        # If parameters_list is not provided all the physical parameters listed in the
-        # configuration
-        # file, with numeric datatype will be considered.
-        if parameters_list is None:
-            # read one csv as an example
-            df = pd.read_csv(os.path.join(self.path_to_dataset, self.all_mvts_paths[0]), sep='\t')
-            # get the columns of interest
-            df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
-            # get a list of numeric columns
-            parameters_list = df.select_dtypes([np.number]).columns
+        # if parameters are provided through arguments, use them.
+        if params_name is not None:
+            self.mvts_parameters = params_name
+        if params_index is not None:
+            self.mvts_parameters = [self.mvts_parameters[i] for i in params_index]
 
-        total_param = parameters_list.__len__()
+        # -----------------------------------------
+        # Drop any non-numeric columns from the columns of interest.
+        # -----------------------------------------
+        # read one csv as an example
+        df = pd.read_csv(os.path.join(self.path_to_dataset, self.all_mvts_paths[0]), sep='\t')
+        # get the columns of interest
+        df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
+        # get a list of numeric column-names
+        params_name = df.select_dtypes([np.number]).columns
+
+        total_param = params_name.__len__()
 
         param_seq = [""] * total_param
         # TODO: Line below produces objects with similar id!! Is this OK? (object.__repr__(
@@ -137,7 +170,7 @@ class MVTSDataAnalysis:
                 df_mvts = utils.interpolate_missing_vals(df_mvts)
                 # keep the requested params only
                 try:
-                    df_req = pd.DataFrame(df_mvts[parameters_list]).select_dtypes([np.number])
+                    df_req = pd.DataFrame(df_mvts[params_name]).select_dtypes([np.number])
                 except:
                     raise ValueError(
                         """
@@ -311,15 +344,15 @@ class MVTSDataAnalysis:
 
 
 def main():
-    path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
+    path_to_config = CONST.PATH_TO_CONFIG
 
     mvts = MVTSDataAnalysis(path_to_config)
     mvts.print_stat_of_directory()
-
     mvts.compute_summary(first_k=50)
+    mvts.print_summary()
     # mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params.csv')
     # print(mvts.summary.columns)
-    # mvts.print_summary()
+
     # print(mvts.get_five_num_summary())
     # print(mvts.get_missing_values())
 
