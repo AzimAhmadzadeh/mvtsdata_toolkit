@@ -8,8 +8,9 @@ Multivariate Time Series Data Toolkit is a python package that works on multivar
  - an automated data analysis process that provides basic summary on both mvts data and the extracted features.
 
 ----
-[![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg)](https://pypi.org/project/TimeSeriesAnalyzer/)
-[![PyPI license](https://img.shields.io/badge/PiPY-0.0.1-orange)](https://pypi.org/project/TimeSeriesAnalyzer/)
+[![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://pypi.org/project/TimeSeriesAnalyzer/)
+[![PyPI license](https://img.shields.io/badge/PiPY-0.0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/TimeSeriesAnalyzer/)
+[![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
 ----
  
 #### Requirements
@@ -22,14 +23,23 @@ Click on the badge below to try the demo provided in the notebook `demo.ipynb`:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvtsdata_toolkit/87636b0eca70ba0ebac2629ad02f5c08932c86f2)
 
-
 ----
 #### Install it from PyPI
 You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
 
 ```pip install mvts_data_toolkit```
 
+[![PyPI license](https://img.shields.io/badge/PiPY-0.0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/TimeSeriesAnalyzer/)
+
+
 ----
+#### See Documentation
+Check out the documentation of the project here:
+
+[![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
+
+----
+
 ### Multivariate Timeseries (MVTS) Data
 ## Data Rules:
 #### MVTS Files
