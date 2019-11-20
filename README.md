@@ -121,7 +121,7 @@ stat_features = CONST.CANDIDATE_STAT_FEATURES
 phys_parameters = CONST.CANDIDATE_PHYS_PARAMETERS
 
 pc = FeatureExtractor(path_to_root, path_to_dest, output_filename)
-pc.calculate_all(features_list=stat_features, params_name_list=phys_parameters)
+pc.do_extraction(features_list=stat_features, params_name_list=phys_parameters)
 
 ```
 

@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import os
 import sys
 from os import path, walk
@@ -42,6 +41,17 @@ def _evaluate_args(params_name: list, params_index: list,
     return True
 
 
+def unwrap_self_do_extraction(arg, **kwarg):
+    """
+    This unwraps a class method so that it can perform independently and thus, can be called in
+    parallel.
+    :param arg:
+    :param kwarg:
+    :return:
+    """
+    return FeatureExtractor.do_extraction(*arg, **kwarg)
+
+
 class FeatureExtractor:
     """
     This class loads the configuration file `feature_extraction_configs.yml`, and reads the
@@ -78,14 +88,14 @@ class FeatureExtractor:
 
     def __init__(self, path_to_config: str):
         """
-        This constructor loads all necessary information from the config file provided by the
-        given path.
+        This constructor loads all necessary information from the config file provided by
+        `path_to_config`.
 
         :param path_to_config: path to where the corresponding configuration (YAML) file is located.
         """
         with open(path_to_config) as file:
             configs = yaml.load(file, Loader=yaml.FullLoader)
-
+        self.path_to_config = path_to_config
         self.path_to_root = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
         self.path_to_output = os.path.join(CONST.ROOT, configs['PATH_TO_EXTRACTED_FEATURES'])
         self.statistical_features: list = configs['STATISTICAL_FEATURES']
@@ -93,13 +103,82 @@ class FeatureExtractor:
         self.metadata_tags: list = configs['META_DATA_TAGS']
         self.df_all_features = pd.DataFrame()
 
-    def calculate_all(self, params_name: list = None, params_index: list = None,
+    def do_extraction_in_parallel(self, n_jobs: int, params_name: list = None,
+                                  params_index: list = None,
+                                  features_name: list = None, features_index: list = None,
+                                  first_k: int = None, need_interp: bool = True):
+        """
+        This method calls `do_extraction` in parallel (using `multiprocessing` library) with
+        `n_jobs` processes.
+
+        For more info about this method and each of its arguments, see documentation of
+        `do_extraction`.
+
+        :param n_jobs: the number of processes to be employed. This number will be used to partition
+                       the dataset in a way that each process gets approximately the same number
+                       of files to extract features from.
+
+        :return: None
+        """
+        import multiprocessing as mp
+        # ------------------------------------------------------------
+        # Collect all files (only the absolute paths)
+        # ------------------------------------------------------------
+        all_files = list()
+        dirpath, _, all_csv = next(walk(self.path_to_root))
+
+        for f in all_csv:
+            abs_path = path.join(dirpath, f)
+            all_files.append(abs_path)
+
+        # ------------------------------------------------------------
+        # partition the files to be distributed among processes.
+        # ------------------------------------------------------------
+        partitions = extractor_utils.split(all_files, n_jobs)
+
+        # ------------------------------------------------------------
+        # Assign a partition to each process
+        # ------------------------------------------------------------
+        proc_id = 0
+        manager = mp.Manager()
+        extracted_features = manager.list()
+        jobs = []
+        for partition in partitions:
+            process = mp.Process(target=unwrap_self_do_extraction,
+                                 args=(params_name, params_index, features_name, features_index,
+                                       first_k, need_interp, partition, proc_id,
+                                       extracted_features))
+
+            jobs.append(process)
+            proc_id = proc_id + 1
+
+        for j in jobs:
+            j.start()
+
+        for j in jobs:
+            j.join()
+
+        print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
+
+    def do_extraction(self, params_name: list = None, params_index: list = None,
                       features_name: list = None, features_index: list = None,
-                      first_k: int = None, need_interp: bool = True):
+                      first_k: int = None, need_interp: bool = True,
+                      partition: list = None, proc_id: int = None, output_list: list = None):
         """
         Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
         class-field `df_all_features`.
+
+        Note that only if the configuration file passed to the class constructor contains a list
+        of all desired parameters and features the optional arguments can be skipped. So,
+        please keep in mind the followings:
+
+            * For parameters: A selected list of parameters (i.e., column names in mvts data)
+            must be provided either through the configuration file or `params_name`. Also
+            `params_index` can be used to use  a smaller list if all lists are provided in the
+            configuration file.
+            * For features: A selected list of parameteres (i.e., statistical features available in
+            `features.feature_collection.py`) MUST be provided, as mentioned above.
 
         :param params_name: (Optional) A list of column names, that can be used instead of
                                 the list `STATISTICAL_FEATURES` that is read from the
@@ -121,9 +200,14 @@ class FeatureExtractor:
         :param need_interp: True if a linear interpolation is needed to alter the missing numerical
                             values. This only takes care of the missing values and will not
                             affect the existing ones. Set it to False otherwise. Default is True.
-
+        :param partition: (only used for internal use)
+        :param proc_id: (only for internal use)
+        :param output_list: (only for internal use)
         :return: None
         """
+        is_parallel = False
+        if proc_id is not None and output_list is not None:
+            is_parallel = True
         # -----------------------------------------
         # Verify arguments
         # -----------------------------------------
@@ -160,7 +244,12 @@ class FeatureExtractor:
         n = len(all_csv_files)
         p_parameters = len(self.mvts_parameters)
         t_tags = len(self.metadata_tags)
-        print('\n\n\t-----------------------------------'.format())
+
+        if is_parallel:
+            print('\n\n\t-------------PID--{}---------------'.format(proc_id))
+        else:
+            print('\n\n\t-----------------------------------'.format())
+
         print('\t\tTotal No. of time series:\t{}'.format(n))
         print('\t\tTotal No. of Parameters:\t\t{}'.format(p_parameters))
         print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
@@ -177,9 +266,13 @@ class FeatureExtractor:
         for f in all_csv_files:
             if not f.endswith('.csv'):
                 continue
-            console_str = '\t >>> Total Processed: {0} / {1} <<<'.format(i, n)
-            sys.stdout.write("\r" + console_str)
-            sys.stdout.flush()
+
+            if is_parallel:
+                print('\t PID:{} --> Total Processed: {} / {}'.format(proc_id, i, n))
+            else:
+                console_str = '\t >>> Total Processed: {0} / {1} <<<'.format(i, n)
+                sys.stdout.write("\r" + console_str)
+                sys.stdout.flush()
 
             abs_path = path.join(dirpath, f)
             df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
@@ -230,13 +323,18 @@ class FeatureExtractor:
                 self.df_all_features = pd.DataFrame(row_df)
             else:
                 # add this row to the end of the dataframe 'df_all_features'
-                self.df_all_features.append(row_df)
+                self.df_all_features = self.df_all_features.append(row_df)
             i = i + 1
             # LOOP ENDS HERE
 
+        if is_parallel:
+            print('\n\t^^^^^^^^^^^^^^^^^^^^PID: {0}^^^^^^^^^^^^^^^^^^^^^'.format(proc_id))
         print('\n\t{0} files have been processed.'.format(i - 1))
         print('\tAs a result, a dataframe of dimension {} X {} is created.'.
               format(self.df_all_features.shape[0], self.df_all_features.shape[1]))
+
+        if is_parallel:
+            output_list.append(self.df_all_features)
 
     def store_extracted_features(self, output_filename):
         """
@@ -266,11 +364,15 @@ class FeatureExtractor:
 
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
-    pc = FeatureExtractor(path_to_config)
-    # pc.do_extraction()
-    pc.calculate_all(#features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-                    features_index=[1, 4, 6],
-                     params_index=[5, 6, 7], first_k=50)
+    fe = FeatureExtractor(path_to_config)
+    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+
+    fe.do_extraction_in_parallel(n_jobs=4, features_name=['get_min', 'get_max', 'get_median',
+                                                          'get_mean'],
+                                 params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+
+    print(fe.df_all_features.shape)
     # pc.store_extracted_features('extracted_features_3_pararams_3_featues.csv')
 
 

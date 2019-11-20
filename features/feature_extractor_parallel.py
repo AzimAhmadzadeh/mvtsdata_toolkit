@@ -42,7 +42,7 @@ class FeatureExtractorParallel:
                                           params_name_list=params_name_list,
                                           params_index=None,
                                           need_interp=True)
-            process = multiprocessing.Process(target=pc.calculate_all,
+            process = multiprocessing.Process(target=pc.do_extraction,
                                               args=(proc_id, partition, extracted_features))
             jobs.append(process)
             proc_id = proc_id + 1
@@ -232,6 +232,7 @@ def main():
     # partition the files to be distributed among processes.
     # ------------------------------------------------------------
     partitions = extractor_utils.split(all_files, n_procs)
+
     # ------------------------------------------------------------
     # Assign a partition to each process
     # ------------------------------------------------------------
@@ -255,7 +256,6 @@ def main():
     print('A-----------> {}'.format(type(extracted_features)))
     print('B-----------> {}'.format(len(extracted_features)))
     print('C-----------> {}'.format(type(extracted_features[0])))
-    #
     print('All {} processes have finished their tasks.'.format([n_procs]))
     # -----------------------------------------
     # Store the csv of all features to 'path_to_dest'.

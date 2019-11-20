@@ -60,7 +60,7 @@ class FeatureExtractorParallel:
     def calculate_all(self, proc_id: int, all_csvs: list, output_list: list,
                       params_name: list = None, params_index: list = None,
                       features_name: list = None, features_index: list = None,
-                      need_interp: bool = True):
+                      first_k: int = None, need_interp: bool = True):
         """
 
         :param proc_id:
@@ -70,6 +70,7 @@ class FeatureExtractorParallel:
         :param params_index:
         :param features_name:
         :param features_index:
+        :param first_k:
         :param need_interp:
         :return:
         """
@@ -92,8 +93,102 @@ class FeatureExtractorParallel:
         # -----------------------------------------
         print(self.path_to_root)
         dirpath, _, all_csv_files = next(walk(self.path_to_root))
-        # if first_k is not None:
-        #     all_csv_files = all_csv_files[:first_k]
+        if first_k is not None:
+            all_csv_files = all_csv_files[:first_k]
+
+        # -----------------------------------------
+        # If params are provided using one of the optional arguments,
+        # override self.mvts_parameters with the given list.
+        # -----------------------------------------
+        if params_name is not None:
+            self.mvts_parameters = params_name
+        elif params_index is not None:
+            all_params = list(pd.read_csv(path.join(dirpath, all_csv_files[0]), sep='\t'))
+            self.mvts_parameters = [all_params[i] for i in params_index]
+
+        n_features = len(self.statistical_features)
+        n = len(all_csv_files)
+        p_parameters = len(self.mvts_parameters)
+        t_tags = len(self.metadata_tags)
+        print('\n\n\t--------------PID--{}-------------------'.format(proc_id))
+        print('\t\tTotal No. of time series:\t{}'.format(n))
+        print('\t\tTotal No. of Parameters:\t\t{}'.format(p_parameters))
+        print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
+        print('\t\tTotal No. of Metadata Pieces:\t\t{}'.format(t_tags))
+        print('\t\tOutput Dimensionality (N:{} X (F:{} X P:{} + T:{})):\t{}'
+              .format(n, n_features, p_parameters, t_tags,
+                      n * (n_features * p_parameters + t_tags)))
+        print('\t-----------------------------------\n'.format())
+
+        i = 1
+        # -----------------------------------------
+        # Loop through each csv file and extract the features
+        # -----------------------------------------
+        for f in all_csvs:
+            print('\t PID:{} --> Total Processed: {} / {}'.format(proc_id, i, n))
+
+            abs_path = path.join(dirpath, f)
+            df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
+
+            # -----------------------------------------
+            # Keep the requested time series of mvts only.
+            # -----------------------------------------
+            df_raw = pd.DataFrame(df_mvts[self.mvts_parameters], dtype=float)
+
+            # -----------------------------------------
+            # Interpolate to get rid of the NaN values.
+            # -----------------------------------------
+            if need_interp:
+                df_raw = utils.interpolate_missing_vals(df_raw)
+
+            # -----------------------------------------
+            # Extract all the features from each column of mvts.
+            # -----------------------------------------
+            callable_features = extractor_utils.get_methods_for_names(self.statistical_features)
+            extracted_features_df = extractor_utils.calculate_one_mvts(df_raw, callable_features)
+
+            # -----------------------------------------
+            # Extract the given meta data from this mvts name.
+            # -----------------------------------------
+            tags_dict = dict()
+            for tag in self.metadata_tags:
+                tags_dict.update({tag: utils.extract_tagged_info(f, tag)})
+
+            # -----------------------------------------
+            # Flatten the resultant dataframe and add the metadata. Suppose in the meta data,
+            # some pieces of information such as id, class label, start time and end time are
+            # provided. The row_df will then have these columns:
+            #   ID | LAB | ST | ET | FEATURE_1 | ... | FEATURE_n
+            # -----------------------------------------
+            row_dfs = []
+            for tag, extracted_info in tags_dict.items():
+                row_dfs.append(pd.DataFrame({tag: [extracted_info]}))
+
+            features_df = extractor_utils.flatten_to_row_df(extracted_features_df)
+            row_dfs.append(features_df)
+            row_df = pd.concat(row_dfs, axis=1)
+
+            # -----------------------------------------
+            # Append this row to 'df_all_features'
+            # -----------------------------------------
+            # if this is the first file, create the main dataframe, i.e., 'df_all_features'
+            if i == 1:
+                self.df_all_features = pd.DataFrame(row_df)
+            else:
+                # add this row to the end of the dataframe 'df_all_features'
+                self.df_all_features = self.df_all_features.append(row_df)
+            i = i + 1
+            # LOOP ENDS HERE
+
+        print('\n\t^^^^^^^^^^^^^^^^^^^^PID: {}^^^^^^^^^^^^^^^^^^^^^'.format(proc_id))
+        print('\tDone! {} files have been processed.'.format(i - 1))
+        print('\tIn total, a dataframe of dimension {} X {} is created.'.format(
+            self.df_all_features.shape[0],
+            self.df_all_features.shape[1]))
+        print('\t^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n'.format(proc_id))
+
+        output_list.append(self.df_all_features)
+
 
 def main():
     pass
