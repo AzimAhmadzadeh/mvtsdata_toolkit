@@ -6,6 +6,7 @@ import utils
 from features import extractor_utils
 import yaml
 import CONSTANTS as CONST
+import time
 
 
 def _evaluate_args(params_name: list, params_index: list,
@@ -41,7 +42,7 @@ def _evaluate_args(params_name: list, params_index: list,
     return True
 
 
-def unwrap_self_do_extraction(arg, **kwarg):
+def unwrap_self_do_extraction(*arg, **kwarg):
     """
     This unwraps a class method so that it can perform independently and thus, can be called in
     parallel.
@@ -104,9 +105,9 @@ class FeatureExtractor:
         self.df_all_features = pd.DataFrame()
 
     def do_extraction_in_parallel(self, n_jobs: int, params_name: list = None,
-                                  params_index: list = None,
-                                  features_name: list = None, features_index: list = None,
-                                  first_k: int = None, need_interp: bool = True):
+                                  params_index: list = None, features_name: list = None,
+                                  features_index: list = None, first_k: int = None,
+                                  need_interp: bool = True):
         """
         This method calls `do_extraction` in parallel (using `multiprocessing` library) with
         `n_jobs` processes.
@@ -117,19 +118,24 @@ class FeatureExtractor:
         :param n_jobs: the number of processes to be employed. This number will be used to partition
                        the dataset in a way that each process gets approximately the same number
                        of files to extract features from.
-
+        :param params_name:
+        :param params_index:
+        :param features_name:
+        :param features_index:
+        :param first_k:
+        :param need_interp:
         :return: None
         """
         import multiprocessing as mp
         # ------------------------------------------------------------
         # Collect all files (only the absolute paths)
         # ------------------------------------------------------------
-        all_files = list()
         dirpath, _, all_csv = next(walk(self.path_to_root))
 
-        for f in all_csv:
-            abs_path = path.join(dirpath, f)
-            all_files.append(abs_path)
+        if first_k is not None:
+            all_csv = all_csv[:first_k]
+
+        all_files = [path.join(dirpath, f) for f in all_csv]
 
         # ------------------------------------------------------------
         # partition the files to be distributed among processes.
@@ -145,9 +151,16 @@ class FeatureExtractor:
         jobs = []
         for partition in partitions:
             process = mp.Process(target=unwrap_self_do_extraction,
-                                 args=(params_name, params_index, features_name, features_index,
-                                       first_k, need_interp, partition, proc_id,
-                                       extracted_features))
+                                 kwargs=({'self': self,
+                                          'params_name': params_name,
+                                          'params_index': params_index,
+                                          'features_name': features_name,
+                                          'features_index': features_index,
+                                          'first_k': first_k,
+                                          'need_interp': need_interp,
+                                          'partition': partition,
+                                          'proc_id': proc_id,
+                                          'output_list': extracted_features}))
 
             jobs.append(process)
             proc_id = proc_id + 1
@@ -158,26 +171,29 @@ class FeatureExtractor:
         for j in jobs:
             j.join()
 
+        self.df_all_features = pd.concat(extracted_features)
         print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
 
     def do_extraction(self, params_name: list = None, params_index: list = None,
                       features_name: list = None, features_index: list = None,
                       first_k: int = None, need_interp: bool = True,
-                      partition: list = None, proc_id: int = None, output_list: list = None):
+                      partition: list = None, proc_id: int = None,
+                      output_list: list = None):  # TODO; last arg is actually a `ListProxy`
         """
         Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
-        class-field `df_all_features`.
+        public class field `df_all_features`.
 
         Note that only if the configuration file passed to the class constructor contains a list
-        of all desired parameters and features the optional arguments can be skipped. So,
+        of the desired parameters and features the optional arguments can be skipped. So,
         please keep in mind the followings:
 
-            * For parameters: A selected list of parameters (i.e., column names in mvts data)
-            must be provided either through the configuration file or `params_name`. Also
-            `params_index` can be used to use  a smaller list if all lists are provided in the
+            * For parameters: a selected list of parameters (i.e., column names in mvts data)
+            must be provided either through the configuration file or the method
+            argument `params_name`. Also the argument `params_index` can be used to work with a
+            smaller list of parameters if a list of parameters is already provided in the
             configuration file.
-            * For features: A selected list of parameteres (i.e., statistical features available in
+            * For features: A selected list of parameters (i.e., statistical features available in
             `features.feature_collection.py`) MUST be provided, as mentioned above.
 
         :param params_name: (Optional) A list of column names, that can be used instead of
@@ -186,9 +202,9 @@ class FeatureExtractor:
         :param params_index: (Optional) A list of column indices, that can be used instead
                                   of the list `STATISTICAL_FEATURES` that is read from the
                                   configuration file in the constructor. The numbers in this list
-                                  (instead of strings in STATISTICAL_FEATUES) can be used to confine
-                                  the feature extraction to a subset of time series (columns) in the
-                                  mvts data.
+                                  (instead of strings in `STATISTICAL_FEATURES`) can be used to
+                                  confine the feature extraction to a subset of time series (
+                                  columns) in the mvts data.
         :param features_name: (Optional) A list of statistical features to be calculated on all
                               time series of each mvts file. The statistical features are the
                               function names present in `features.feature_collection.py'.
@@ -200,7 +216,7 @@ class FeatureExtractor:
         :param need_interp: True if a linear interpolation is needed to alter the missing numerical
                             values. This only takes care of the missing values and will not
                             affect the existing ones. Set it to False otherwise. Default is True.
-        :param partition: (only used for internal use)
+        :param partition: (only for internal use)
         :param proc_id: (only for internal use)
         :param output_list: (only for internal use)
         :return: None
@@ -223,13 +239,19 @@ class FeatureExtractor:
             self.statistical_features = [self.statistical_features[i] for i in features_index]
 
         # -----------------------------------------
-        # Get all files (or the first first_k ones) in the root directory.
+        # Get all files (or the first first_k ones).
         # -----------------------------------------
-        print(self.path_to_root)
-        dirpath, _, all_csv_files = next(walk(self.path_to_root))
-        if first_k is not None:
-            all_csv_files = all_csv_files[:first_k]
+        all_csv_files = []
+        if is_parallel:
+            # Use the given `partition` instead of all csv files.
+            all_csv_files = partition
 
+        else:
+            _, _, all_csv_files = next(walk(self.path_to_root))
+            if first_k is not None:
+                # Note: If `fist_k` was used in parallel version, it was already taken into account
+                # in `do_execution_in_parallel`. No need to do it again.
+                all_csv_files = all_csv_files[:first_k]
         # -----------------------------------------
         # If params are provided using one of the optional arguments,
         # override self.mvts_parameters with the given list.
@@ -237,7 +259,7 @@ class FeatureExtractor:
         if params_name is not None:
             self.mvts_parameters = params_name
         elif params_index is not None:
-            all_params = list(pd.read_csv(path.join(dirpath, all_csv_files[0]), sep='\t'))
+            all_params = list(pd.read_csv(path.join(self.path_to_root, all_csv_files[0]), sep='\t'))
             self.mvts_parameters = [all_params[i] for i in params_index]
 
         n_features = len(self.statistical_features)
@@ -261,7 +283,7 @@ class FeatureExtractor:
 
         i = 1
         # -----------------------------------------
-        # Loop through each csv file and extract the features
+        # Loop through each csv file and extract its features
         # -----------------------------------------
         for f in all_csv_files:
             if not f.endswith('.csv'):
@@ -274,7 +296,7 @@ class FeatureExtractor:
                 sys.stdout.write("\r" + console_str)
                 sys.stdout.flush()
 
-            abs_path = path.join(dirpath, f)
+            abs_path = path.join(self.path_to_root, f)
             df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
 
             # -----------------------------------------
@@ -368,12 +390,12 @@ def main():
     # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
     #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
 
-    fe.do_extraction_in_parallel(n_jobs=4, features_name=['get_min', 'get_max', 'get_median',
-                                                          'get_mean'],
+    fe.do_extraction_in_parallel(n_jobs=4,
+                                 features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
                                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
 
     print(fe.df_all_features.shape)
-    # pc.store_extracted_features('extracted_features_3_pararams_3_featues.csv')
+    fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
 
 
 if __name__ == '__main__':
