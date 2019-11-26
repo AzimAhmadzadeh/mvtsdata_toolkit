@@ -8,11 +8,12 @@ from hurry.filesize import size
 import utils
 import yaml
 import CONSTANTS as CONST
+from features import extractor_utils
 
 _summary_keywords: dict = {"params_col": 'Parameter-Name',
                            "null_col": "Null-Count",
                            "count_col": "Count",
-                           "label_col": "Label"}
+                           "tdigest_col": "TDigest"}
 
 _5num_colnames: list = ['min', '25th', '50th', '75th', 'max']
 
@@ -37,6 +38,20 @@ def _evaluate_args(params_name: list, params_index: list):
         )
 
     return True
+
+
+def _unwrap_self_compute_summary(*arg, **kwarg):
+    """
+    This unwraps a class method so that it can perform independently and thus, can be called in
+    parallel. More specifically, we need to be able to call `compute_summary` both sequentially and
+    in parallel. In case of a parallel call, when it is called in a child process, the child process
+    gets its own separate copy of the class instance. So, the class method needs to be unwrapped
+    to a non-class method so that the class variables don't overlap.
+    :param arg:
+    :param kwarg:
+    :return:
+    """
+    return MVTSDataAnalysis.compute_summary(*arg, **kwarg)
 
 
 class MVTSDataAnalysis:
@@ -76,8 +91,91 @@ class MVTSDataAnalysis:
         self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.summary = pd.DataFrame()
 
+    def compute_summary_in_parallel(self, n_jobs: int, params_name: list = None,
+                                    params_index: list = None, first_k: int = None,
+                                    need_interp: bool = True):
+        """
+
+        :param n_jobs:
+        :param params_name:
+        :param params_index:
+        :param first_k:
+        :param need_interp:
+        :return:
+        """
+        import multiprocessing as mp
+        # ------------------------------------------------------------
+        # Collect all files (only the absolute paths)
+        # ------------------------------------------------------------
+        dirpath, _, all_csv = next(walk(self.path_to_dataset))
+
+        if first_k is not None:
+            all_csv = all_csv[:first_k]
+
+        all_files = [path.join(dirpath, f) for f in all_csv]
+
+        # ------------------------------------------------------------
+        # partition the files to be distributed among processes.
+        # ------------------------------------------------------------
+        partitions = extractor_utils.split(all_files, n_jobs)
+        # ------------------------------------------------------------
+        # Assign a partition to each process
+        # ------------------------------------------------------------
+        proc_id = 0
+        manager = mp.Manager()
+        summary_stats = manager.list()
+        jobs = []
+        for partition in partitions:
+            process = mp.Process(target=_unwrap_self_compute_summary,
+                                 kwargs=({'self': self,
+                                          'params_name': params_name,
+                                          'params_index': params_index,
+                                          'first_k': first_k,
+                                          'need_interp': need_interp,
+                                          'partition': partition,
+                                          'proc_id': proc_id,
+                                          'output_list': summary_stats}))
+            jobs.append(process)
+            proc_id = proc_id + 1
+
+        for j in jobs:
+            j.start()
+
+        for j in jobs:
+            j.join()
+
+        # -----------------------
+        df = summary_stats[0]
+        null_count = df['Null-Count']
+        col_count = df['Count']
+        t_digest = df['TDigest']
+        for i in range(1, n_jobs - 1):  # TODO: Bad coding. The 0-th iteration must be here as well.
+            df_next = summary_stats[i]
+            null_count += df_next['Null-Count']
+            col_count += df_next['Count']
+            t_digest += df_next['TDigest']
+
+        all_columns = _5num_colnames[:]
+        five_sum = pd.DataFrame(columns=all_columns)
+        i = 0
+
+        for td in t_digest:
+            five_sum.loc[i] = [td.percentile(0), td.percentile(25), td.percentile(50),
+                               td.percentile(75), td.percentile(100)]
+            i += 1
+
+        df['Null Count'] = null_count
+        df['Count'] = col_count
+        df[all_columns] = five_sum
+        df = df.drop(['TDigest'], axis=1)
+        self.summary = df
+        # -----------------------
+        # self.summary = pd.concat(summary_stats)
+        # print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
+
     def compute_summary(self, params_name: list = None, params_index: list = None,
-                        first_k: int = None):
+                        first_k: int = None, need_interp: bool = True, partition: list = None,
+                        proc_id: int = None, output_list: list = None):
         """
         By reading each csv file from the path listed in the configuration file, this method
         calculates all the basic statistics with respect to each parameter (each column of the
@@ -115,17 +213,36 @@ class MVTSDataAnalysis:
                                 list.
         :param params_index: (Optional) User may specify the list of indices corresponding to the
                              parameters provided in the configuration file.
+        :param need_interp:
+        :param partition:
+        :param proc_id:
+        :param output_list:
         :return: None.
         """
+        is_parallel = False
+        if proc_id is not None and output_list is not None:
+            is_parallel = True
+
         # -----------------------------------------
         # Verify arguments
         # -----------------------------------------
         _evaluate_args(params_name, params_index)
 
-        if first_k is not None:
-            all_csv_files = self.all_mvts_paths[:first_k]
+        # -----------------------------------------
+        # Get all files (or the first first_k ones).
+        # -----------------------------------------
+        all_csv_files = []
+        if is_parallel:
+            # Use the given `partition` instead of all csv files.
+            all_csv_files = partition
+
         else:
             all_csv_files = self.all_mvts_paths
+            if first_k is not None:
+                # Note: If `fist_k` was used in parallel version, it should have already been taken
+                # into account in `do_execution_in_parallel`. So, no need to do it again.
+                all_csv_files = self.all_mvts_paths[:first_k]
+
         n = len(all_csv_files)
 
         # if parameters are provided through arguments, use them.
@@ -144,37 +261,41 @@ class MVTSDataAnalysis:
         # get a list of numeric column-names
         params_name = df.select_dtypes([np.number]).columns
 
-        total_param = params_name.__len__()
+        total_params = params_name.__len__()
 
-        param_seq = [""] * total_param
+        param_seq = [""] * total_params
         # TODO: Line below produces objects with similar id!! Is this OK? (object.__repr__(
-        #  digests[0])
-        digests = [TDigest() for i in range(total_param)]
-        null_counts = [0] * total_param
-        col_counts = [0] * total_param
+        #  digests[0]). If this is OK, it can be replaced with [TDigest()] * total_params.
+        digests = [TDigest() for i in range(total_params)]
+        null_counts = [0] * total_params
+        col_counts = [0] * total_params
         i = 1
         j = 0
         for f in all_csv_files:
-            console_str = '-->\t[{}/{}] \t\t File: {}'.format(i, n, f)
-            sys.stdout.write("\r" + console_str)
-            sys.stdout.flush()
-            # Only .csv files should be processed
-            if f.lower().find('.csv') != -1:
+            if is_parallel:
+                print('\t[PID:{} --> {}/{}] \t\t File: {}'.format(proc_id, i, n, f))
+            else:
+                console_str = '-->\t[{}/{}] \t\t File: {}'.format(i, n, f)
+                sys.stdout.write("\r" + console_str)
                 sys.stdout.flush()
+
+            if f.lower().find('.csv') != -1:  # Only .csv files should be processed
                 i += 1
                 abs_path = os.path.join(self.path_to_dataset, f)
                 df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
 
                 # needs interpolation to make up for the nan values. Otherwise tDigest won't
                 # be able to process the data.
-                df_mvts = utils.interpolate_missing_vals(df_mvts)
-                # keep the requested params only
-                try:
+                if need_interp:
+                    df_mvts = utils.interpolate_missing_vals(df_mvts)
+
+                try:  # to keep the requested params only
                     df_req = pd.DataFrame(df_mvts[params_name]).select_dtypes([np.number])
                 except:
                     raise ValueError(
                         """
-                        Please check the parameter list.
+                        Please check the parameter list. Perhaps a non-existing parameter name is
+                        given in the list `params_name`.
                         """
                     )
                 j = 0
@@ -193,39 +314,57 @@ class MVTSDataAnalysis:
                         digests[j].compress()
 
                     j += 1
+        # END OF LOOP OVER all_csv_files
 
-        all_columns = _5num_colnames[:]
-        all_columns.insert(0, _summary_keywords['null_col'])
-        all_columns.insert(0, _summary_keywords['count_col'])
-        all_columns.insert(0, _summary_keywords['params_col'])
+        if not is_parallel:  # percentiles can be retrieved from tDigest objects
+            all_columns = _5num_colnames[:]
+            all_columns.insert(0, _summary_keywords['null_col'])
+            all_columns.insert(0, _summary_keywords['count_col'])
+            all_columns.insert(0, _summary_keywords['params_col'])
+            summary_stat_df = pd.DataFrame(columns=all_columns)
 
-        summary_stat_df = pd.DataFrame(columns=all_columns)
+            for i in range(total_params):
+                attname = param_seq[i]
+                count_col = col_counts[i]
+                col_miss = null_counts[i]
+                col_min = col_q1 = col_mean = col_q3 = col_max = 0
+                if digests[i]:
+                    col_min = digests[i].percentile(0)
+                    col_q1 = digests[i].percentile(25)
+                    col_mean = digests[i].percentile(50)
+                    col_q3 = digests[i].percentile(75)
+                    col_max = digests[i].percentile(100)
 
-        for i in range(total_param):
-            attname = param_seq[i]
-            count_col = col_counts[i]
-            col_miss = null_counts[i]
-            col_min = col_q1 = col_mean = col_q3 = col_max = 0
-            if digests[i]:
-                col_min = digests[i].percentile(0)
-                col_q1 = digests[i].percentile(25)
-                col_mean = digests[i].percentile(50)
-                col_q3 = digests[i].percentile(75)
-                col_max = digests[i].percentile(100)
+                summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_q1, col_mean,
+                                          col_q3, col_max]
 
-            summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_q1, col_mean,
-                                      col_q3, col_max]
+            # END OF FOR over mvts parameters
 
-        if summary_stat_df.empty:
-            raise ValueError(
-                """
-                Unable to get MVTS Data Analysis. Please check the parameter list or the dataset files.
-                """
-            )
-        summary_stat_df.reset_index(inplace=True)
-        summary_stat_df.drop(labels='index', inplace=True, axis=1)
+            if summary_stat_df.empty:
+                raise ValueError(
+                    """
+                    Unable to get MVTS Data Analysis. Please check the parameter list or the dataset files.
+                    """
+                )
+            summary_stat_df.reset_index(inplace=True)
+            summary_stat_df.drop(labels='index', inplace=True, axis=1)
 
-        self.summary = summary_stat_df
+            self.summary = summary_stat_df
+            return
+
+        else:  # parallel case: needs tDigest objects and not the percentiles.
+            all_columns = _summary_keywords.values()
+            summary_stat_df = pd.DataFrame(columns=all_columns)
+
+            for i in range(total_params):
+                attname = param_seq[i]
+                count_col = col_counts[i]
+                col_miss = null_counts[i]
+                col_digest = None
+                if digests[i]:
+                    col_digest = digests[i]
+                summary_stat_df.loc[i] = [attname, col_miss, count_col, col_digest]
+            output_list.append(summary_stat_df)
 
     def get_number_of_mvts(self):
         """
@@ -348,9 +487,11 @@ def main():
 
     mvts = MVTSDataAnalysis(path_to_config)
     mvts.print_stat_of_directory()
-    mvts.compute_summary(first_k=50)
+    mvts.compute_summary(first_k=50, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
+    # mvts.compute_summary_in_parallel(n_jobs=3, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'],
+    #                                  first_k=50)
     mvts.print_summary()
-    # mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params.csv')
+    mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params_sequential.csv')
     # print(mvts.summary.columns)
 
     # print(mvts.get_five_num_summary())
