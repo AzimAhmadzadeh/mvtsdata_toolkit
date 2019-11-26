@@ -59,7 +59,7 @@ def _unwrap_self_do_extraction(*arg, **kwarg):
 class FeatureExtractor:
     """
     An instance of this class can extract a set of given statistical features from a large number of
-    mvts data, in both sequential or parallel fashion. It loads the configuration file
+    mvts data, in both sequential and parallel fashions. It loads the configuration file
     `feature_extraction_configs.yml`, and reads the following pieces of information from it.
 
     Below are the column names of the summary dataframe:
@@ -270,8 +270,7 @@ class FeatureExtractor:
         if params_name is not None:
             self.mvts_parameters = params_name
         elif params_index is not None:
-            all_params = list(pd.read_csv(path.join(self.path_to_root, all_csv_files[0]), sep='\t'))
-            self.mvts_parameters = [all_params[i] for i in params_index]
+            self.mvts_parameters = [self.mvts_parameters[i] for i in params_index]
 
         n_features = len(self.statistical_features)
         n = len(all_csv_files)
@@ -398,15 +397,42 @@ class FeatureExtractor:
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
     fe = FeatureExtractor(path_to_config)
-    fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-                     params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
 
+    # --------------------------- Sequential Cases -----------------------------------
+    # ------------- Usage 1:
+    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+    # ------------- Usage 2:
+    # fe.do_extraction(features_index=[0, 1, 2, 3],
+    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+    # ------------- Usage 3:
+    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+    #                  params_index=[0, 1, 2], first_k=50)
+    # ------------- Usage 4:
+    # fe.do_extraction(features_index=[0, 1, 2, 3],
+    #                  params_index=[0, 1, 2], first_k=50)
+    # -------------------------------------------------------------------------------
+
+    # --------------------------- Parallel Cases ------------------------------------
+    # ------------- Usage 1:
     # fe.do_extraction_in_parallel(n_jobs=4,
     #                              features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
     #                              params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+    # ------------- Usage 2:
+    # fe.do_extraction_in_parallel(n_jobs=4,
+    #                              features_index=[0, 1, 2, 3],
+    #                              params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+    # ------------- Usage 3:
+    # fe.do_extraction_in_parallel(n_jobs=4,
+    #                              features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+    #                              params_index=[0, 1, 2], first_k=50)
+    # ------------- Usage 4:
+    fe.do_extraction_in_parallel(n_jobs=4,
+                                 features_index=[0, 1, 2, 3],
+                                 params_index=[0, 1, 2], first_k=50)
 
     print(fe.df_all_features.shape)
-    fe.store_extracted_features('extracted_features_sequential_3_pararams_4_features.csv')
+    fe.store_extracted_features('extracted_features_parallel_3_pararams_[i]_4_features_[i].csv')
 
 
 if __name__ == '__main__':
