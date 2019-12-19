@@ -432,7 +432,7 @@ def main():
                                  params_index=[0, 1, 2], first_k=50)
 
     print(fe.df_all_features.shape)
-    fe.store_extracted_features('extracted_features_parallel_3_pararams_[i]_4_features_[i].csv')
+    fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
 
 
 if __name__ == '__main__':

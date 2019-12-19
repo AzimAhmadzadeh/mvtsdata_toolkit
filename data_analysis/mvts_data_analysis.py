@@ -11,8 +11,9 @@ import CONSTANTS as CONST
 from features import extractor_utils
 
 _summary_keywords: dict = {"params_col": 'Parameter-Name',
+                           "count_col": "Val-Count",
                            "null_col": "Null-Count",
-                           "count_col": "Count",
+                           "mean_col": "Mean",
                            "tdigest_col": "TDigest"}
 
 _5num_colnames: list = ['min', '25th', '50th', '75th', 'max']
@@ -145,15 +146,19 @@ class MVTSDataAnalysis:
             j.join()
 
         # -----------------------
-        df = summary_stats[0]
-        null_count = df['Null-Count']
-        col_count = df['Count']
-        t_digest = df['TDigest']
-        for i in range(1, n_jobs - 1):  # TODO: Bad coding. The 0-th iteration must be here as well.
+        df: pd.DataFrame = summary_stats[0]
+
+        null_count = df[_summary_keywords['null_col']]
+        col_count = df[_summary_keywords['count_col']]
+        col_means = df[_summary_keywords['mean_col']]
+        t_digest = df[_summary_keywords['tdigest_col']]
+
+        for i in range(1, n_jobs):
             df_next = summary_stats[i]
-            null_count += df_next['Null-Count']
-            col_count += df_next['Count']
-            t_digest += df_next['TDigest']
+            null_count += df_next[_summary_keywords['null_col']]
+            col_count += df_next[_summary_keywords['count_col']]
+            col_means += df_next[_summary_keywords['mean_col']]
+            t_digest += df_next[_summary_keywords['tdigest_col']]
 
         all_columns = _5num_colnames[:]
         five_sum = pd.DataFrame(columns=all_columns)
@@ -164,10 +169,11 @@ class MVTSDataAnalysis:
                                td.percentile(75), td.percentile(100)]
             i += 1
 
-        df['Null Count'] = null_count
-        df['Count'] = col_count
+        df[_summary_keywords['null_col']] = null_count
+        df[_summary_keywords['count_col']] = col_count
+        df[_summary_keywords['mean_col']] = col_means / n_jobs
         df[all_columns] = five_sum
-        df = df.drop(['TDigest'], axis=1)
+        df = df.drop([_summary_keywords['tdigest_col']], axis=1)
         self.summary = df
         # -----------------------
         # self.summary = pd.concat(summary_stats)
@@ -183,13 +189,14 @@ class MVTSDataAnalysis:
         statistics on each mvts and updates the computed stats in a streaming fashion.
 
         **Note**: Computing the quantiles of parameters globally require loading the entire data
-        on memory. To avoid this, we use `TDigest` data structure to estimate it, while loading
+        into memory. To avoid this, we use `TDigest` data structure to estimate it, while loading
         one mvts at a time.
 
         As it calculates the statistics, it populates `self.summary` dataframe of the class with
         all the required data corresponding to each parameter. Below are the column names of the
         summary dataframe::
             - `Parameter Name`: Contains the timeseries' parameter name,
+            - `Val-Count`: Contains the count of the values of all processed time series,
             - `Null Count`: Contains the number of null entries per parameter,
             - `Min`: Contains the minimum value of each parameter (without considering the null/nan
               values),
@@ -269,6 +276,7 @@ class MVTSDataAnalysis:
         digests = [TDigest() for i in range(total_params)]
         null_counts = [0] * total_params
         col_counts = [0] * total_params
+        col_means = [0] * total_params
         i = 1
         j = 0
         for f in all_csv_files:
@@ -305,6 +313,7 @@ class MVTSDataAnalysis:
                     temp_count = int(series.count())
                     null_counts[j] += temp_null_count
                     col_counts[j] += temp_count
+                    col_means[j] += np.mean(series)
                     if series.isnull().sum() != 0:
                         series = series.dropna()
                     if not series.empty:
@@ -318,25 +327,28 @@ class MVTSDataAnalysis:
 
         if not is_parallel:  # percentiles can be retrieved from tDigest objects
             all_columns = _5num_colnames[:]
+            all_columns.insert(0, _summary_keywords['mean_col'])
             all_columns.insert(0, _summary_keywords['null_col'])
             all_columns.insert(0, _summary_keywords['count_col'])
             all_columns.insert(0, _summary_keywords['params_col'])
+
             summary_stat_df = pd.DataFrame(columns=all_columns)
 
             for i in range(total_params):
                 attname = param_seq[i]
-                count_col = col_counts[i]
+                col_count = col_counts[i]
                 col_miss = null_counts[i]
-                col_min = col_q1 = col_mean = col_q3 = col_max = 0
+                col_mean = col_means[i] / len(all_csv_files)
+                col_min = col_q1 = col_q2 = col_q3 = col_max = 0
                 if digests[i]:
                     col_min = digests[i].percentile(0)
                     col_q1 = digests[i].percentile(25)
-                    col_mean = digests[i].percentile(50)
+                    col_q2 = digests[i].percentile(50)
                     col_q3 = digests[i].percentile(75)
                     col_max = digests[i].percentile(100)
 
-                summary_stat_df.loc[i] = [attname, count_col, col_miss, col_min, col_q1, col_mean,
-                                          col_q3, col_max]
+                summary_stat_df.loc[i] = [attname, col_count, col_miss, col_mean,
+                                          col_min, col_q1, col_q2, col_q3, col_max]
 
             # END OF FOR over mvts parameters
 
@@ -358,12 +370,13 @@ class MVTSDataAnalysis:
 
             for i in range(total_params):
                 attname = param_seq[i]
-                count_col = col_counts[i]
+                col_count = col_counts[i]
                 col_miss = null_counts[i]
+                col_average = col_means[i] / len(all_csv_files)
                 col_digest = None
                 if digests[i]:
                     col_digest = digests[i]
-                summary_stat_df.loc[i] = [attname, col_miss, count_col, col_digest]
+                summary_stat_df.loc[i] = [attname, col_count, col_miss, col_average, col_digest]
             output_list.append(summary_stat_df)
 
     def get_number_of_mvts(self):
@@ -404,10 +417,10 @@ class MVTSDataAnalysis:
         :return: None.
         """
         print('----------------------------------------')
-        print('Directory:\t\t\t\t\t{}'.format(self.path_to_dataset))
-        print('Total number of mvts files:\t{}'.format(self.get_number_of_mvts()))
-        print('Total size:\t\t\t\t\t{}'.format(size(self.get_total_mvts_size())))
-        print('Total average:\t\t\t\t{}'.format(size(self.get_average_mvts_size())))
+        print('Directory:\t\t\t{}'.format(self.path_to_dataset))
+        print('Total no. of files:\t{}'.format(self.get_number_of_mvts()))
+        print('Total size:\t\t\t{}'.format(size(self.get_total_mvts_size())))
+        print('Total average:\t\t{}'.format(size(self.get_average_mvts_size())))
         print('----------------------------------------')
 
     def get_missing_values(self) -> pd.DataFrame:
@@ -455,6 +468,7 @@ class MVTSDataAnalysis:
                 '''
             )
         else:
+            print()
             print(self.summary.to_string())
 
     def summary_to_csv(self, output_path, file_name):
@@ -484,17 +498,29 @@ class MVTSDataAnalysis:
 
 def main():
     path_to_config = CONST.PATH_TO_CONFIG
-
     mvts = MVTSDataAnalysis(path_to_config)
     mvts.print_stat_of_directory()
-    mvts.compute_summary(first_k=50, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
-    # mvts.compute_summary_in_parallel(n_jobs=3, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'],
-    #                                  first_k=50)
-    mvts.print_summary()
-    mvts.summary_to_csv(output_path='.',
-                        file_name='../data/data_analysis_features_3_pararams_3_featues.csv')
-    # print(mvts.summary.columns)
 
+    # --------------------------- Sequential Cases -----------------------------------
+    # ------------- Usage 1:
+    # mvts.compute_summary(first_k=50, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
+    # ------------- Usage 2:
+    # mvts.compute_summary(first_k=50, params_index=[0, 1, 2])
+    # ------------- Usage 2:
+    # mvts.compute_summary(first_k=50, params_index=[0, 1, 2], proc_id=0)
+    # mvts.print_summary()
+
+    # --------------------------- Parallel Cases -------------------------------------
+    # ------------- Usage 2:
+    mvts.compute_summary_in_parallel(n_jobs=2, first_k=50,
+                                     params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
+    mvts.print_summary()
+
+    mvts.summary_to_csv(output_path='.',
+                        file_name='../data/mvts_data_analysis/data_analysis_parallel_params_['
+                                  '3].csv')
+    #
+    # print(mvts.summary.columns)
     # print(mvts.get_five_num_summary())
     # print(mvts.get_missing_values())
 
