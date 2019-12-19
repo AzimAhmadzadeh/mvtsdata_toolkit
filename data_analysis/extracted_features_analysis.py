@@ -195,14 +195,14 @@ def main():
     mvts_df = pd.read_csv(f_path, sep='\t')
     # Normalizer Test on extracted feature dataset
     # excluded_col = extracted_features_df.select_dtypes(exclude=np.number).columns.to_list()
-    excluded_col = ['id']  # .insert(0,'id')
+    excluded_col = ['Parameter-Name']  # .insert(0,'id')
     # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
     # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
     # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
     # df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
     # print(df_norm)
 
-    efa = ExtractedFeaturesAnalysis(mvts_df, ['id'])
+    efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
     efa.compute_summary()
     efa.print_summary()
     print(efa.get_class_population(label='lab'))

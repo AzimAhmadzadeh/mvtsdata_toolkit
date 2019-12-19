@@ -491,7 +491,8 @@ def main():
     # mvts.compute_summary_in_parallel(n_jobs=3, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'],
     #                                  first_k=50)
     mvts.print_summary()
-    mvts.summary_to_csv(output_path='.', file_name='mvts_data_analysis_3_params_sequential.csv')
+    mvts.summary_to_csv(output_path='.',
+                        file_name='../data/data_analysis_features_3_pararams_3_featues.csv')
     # print(mvts.summary.columns)
 
     # print(mvts.get_five_num_summary())
