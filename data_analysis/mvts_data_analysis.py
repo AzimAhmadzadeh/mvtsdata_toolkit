@@ -94,14 +94,14 @@ class MVTSDataAnalysis:
 
     def compute_summary_in_parallel(self, n_jobs: int, params_name: list = None,
                                     params_index: list = None, first_k: int = None,
-                                    need_interp: bool = True):
+                                    need_interp: bool = True, verbose: bool = False):
         """
-
         :param n_jobs:
         :param params_name:
         :param params_index:
         :param first_k:
         :param need_interp:
+        :param verbose:
         :return:
         """
         import multiprocessing as mp
@@ -135,6 +135,7 @@ class MVTSDataAnalysis:
                                           'need_interp': need_interp,
                                           'partition': partition,
                                           'proc_id': proc_id,
+                                          'verbose': verbose,
                                           'output_list': summary_stats}))
             jobs.append(process)
             proc_id = proc_id + 1
@@ -175,13 +176,10 @@ class MVTSDataAnalysis:
         df[all_columns] = five_sum
         df = df.drop([_summary_keywords['tdigest_col']], axis=1)
         self.summary = df
-        # -----------------------
-        # self.summary = pd.concat(summary_stats)
-        # print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
 
     def compute_summary(self, params_name: list = None, params_index: list = None,
                         first_k: int = None, need_interp: bool = True, partition: list = None,
-                        proc_id: int = None, output_list: list = None):
+                        proc_id: int = None, verbose: bool = False, output_list: list = None):
         """
         By reading each csv file from the path listed in the configuration file, this method
         calculates all the basic statistics with respect to each parameter (each column of the
@@ -200,13 +198,13 @@ class MVTSDataAnalysis:
             - `Null Count`: Contains the number of null entries per parameter,
             - `Min`: Contains the minimum value of each parameter (without considering the null/nan
               values),
-            - `Q1`: Contains the 1-st quartile (25%) of each parameter (without considering
+            - `25th`: Contains the 1-st quartile (25%) of each parameter (without considering
               the null/nan values),
             - `Mean`: Contains the `mean` of each parameter (without considering the null/nan
               values),
-            - `Median`: Contains the `median` of each parameter (without considering the
+            - `50th`: Contains the `median` of each parameter (without considering the
               null/nan values),
-            - `Q3`: Contains the 3-rd quartile (75%) of each parameter (without considering
+            - `75th`: Contains the 3-rd quartile (75%) of each parameter (without considering
               the null/nan values),
             - `Max`: Contains the `min` value of each parameter (without considering the null/nan
               values)
@@ -223,6 +221,7 @@ class MVTSDataAnalysis:
         :param need_interp:
         :param partition:
         :param proc_id:
+        :param verbose:
         :param output_list:
         :return: None.
         """
@@ -280,12 +279,13 @@ class MVTSDataAnalysis:
         i = 1
         j = 0
         for f in all_csv_files:
-            if is_parallel:
-                print('\t[PID:{} --> {}/{}] \t\t File: {}'.format(proc_id, i, n, f))
-            else:
-                console_str = '-->\t[{}/{}] \t\t File: {}'.format(i, n, f)
-                sys.stdout.write("\r" + console_str)
-                sys.stdout.flush()
+            if verbose:
+                if is_parallel:
+                    print('\t[PID:{} --> {}/{}] \t\t File: {}'.format(proc_id, i, n, f))
+                else:
+                    console_str = '-->\t[{}/{}] \t\t File: {}'.format(i, n, f)
+                    sys.stdout.write("\r" + console_str)
+                    sys.stdout.flush()
 
             if f.lower().find('.csv') != -1:  # Only .csv files should be processed
                 i += 1
@@ -512,9 +512,9 @@ def main():
 
     # --------------------------- Parallel Cases -------------------------------------
     # ------------- Usage 2:
-    mvts.compute_summary_in_parallel(n_jobs=2, first_k=50,
+    mvts.compute_summary_in_parallel(n_jobs=4, first_k=50, verbose=False,
                                      params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
-    mvts.print_summary()
+    # mvts.print_summary()
 
     mvts.summary_to_csv(output_path='.',
                         file_name='../data/mvts_data_analysis/data_analysis_parallel_params_['

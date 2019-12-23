@@ -118,7 +118,7 @@ class FeatureExtractor:
     def do_extraction_in_parallel(self, n_jobs: int, params_name: list = None,
                                   params_index: list = None, features_name: list = None,
                                   features_index: list = None, first_k: int = None,
-                                  need_interp: bool = True):
+                                  need_interp: bool = True, verbose: bool = False):
         """
         This method calls `do_extraction` in parallel (using `multiprocessing` library) with
         `n_jobs` processes.
@@ -135,6 +135,7 @@ class FeatureExtractor:
         :param features_index:
         :param first_k:
         :param need_interp:
+        :param verbose:
         :return: None
         """
         import multiprocessing as mp
@@ -171,6 +172,7 @@ class FeatureExtractor:
                                           'need_interp': need_interp,
                                           'partition': partition,
                                           'proc_id': proc_id,
+                                          'verbose': verbose,
                                           'output_list': extracted_features}))
 
             jobs.append(process)
@@ -183,13 +185,15 @@ class FeatureExtractor:
             j.join()
 
         self.df_all_features = pd.concat(extracted_features)
-        print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
+        if verbose:
+            print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
 
     def do_extraction(self, params_name: list = None, params_index: list = None,
                       features_name: list = None, features_index: list = None,
                       first_k: int = None, need_interp: bool = True,
-                      partition: list = None, proc_id: int = None,
-                      output_list: list = None):  # TODO; last arg is actually a `ListProxy`
+                      partition: list = None, proc_id: int = None, verbose: bool = False,
+                      output_list: list = None):
+        # TODO: the argument output_list is actually a `ListProxy`
         """
         Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
@@ -229,6 +233,8 @@ class FeatureExtractor:
                             affect the existing ones. Set it to False otherwise. Default is True.
         :param partition: (only for internal use)
         :param proc_id: (only for internal use)
+        :param verbose: if set to True, the program prints on the console which files are being
+        processed and what processes (if parallel) are doing the work. The default value is False.
         :param output_list: (only for internal use)
         :return: None
         """
@@ -277,19 +283,20 @@ class FeatureExtractor:
         p_parameters = len(self.mvts_parameters)
         t_tags = len(self.metadata_tags)
 
-        if is_parallel:
-            print('\n\n\t-------------PID--{}---------------'.format(proc_id))
-        else:
-            print('\n\n\t-----------------------------------'.format())
+        if verbose:
+            if is_parallel:
+                print('\n\n\t-------------PID--{}---------------'.format(proc_id))
+            else:
+                print('\n\n\t-----------------------------------'.format())
 
-        print('\t\tTotal No. of time series:\t{}'.format(n))
-        print('\t\tTotal No. of Parameters:\t\t{}'.format(p_parameters))
-        print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
-        print('\t\tTotal No. of Metadata Pieces:\t\t{}'.format(t_tags))
-        print('\t\tOutput Dimensionality (N:{} X (F:{} X P:{} + T:{})):\t{}'
-              .format(n, n_features, p_parameters, t_tags,
-                      n * (n_features * p_parameters + t_tags)))
-        print('\t-----------------------------------\n'.format())
+            print('\t\tTotal No. of time series:\t{}'.format(n))
+            print('\t\tTotal No. of Parameters:\t\t{}'.format(p_parameters))
+            print('\t\tTotal No. of Features:\t\t{}'.format(n_features))
+            print('\t\tTotal No. of Metadata Pieces:\t\t{}'.format(t_tags))
+            print('\t\tOutput Dimensionality (N:{} X (F:{} X P:{} + T:{})):\t{}'
+                  .format(n, n_features, p_parameters, t_tags,
+                          n * (n_features * p_parameters + t_tags)))
+            print('\t-----------------------------------\n'.format())
 
         i = 1
         # -----------------------------------------
@@ -299,12 +306,13 @@ class FeatureExtractor:
             if not f.endswith('.csv'):
                 continue
 
-            if is_parallel:
-                print('\t PID:{} --> Total Processed: {} / {}'.format(proc_id, i, n))
-            else:
-                console_str = '\t >>> Total Processed: {0} / {1} <<<'.format(i, n)
-                sys.stdout.write("\r" + console_str)
-                sys.stdout.flush()
+            if verbose:
+                if is_parallel:
+                    print('\t PID:{} --> Total Processed: {} / {}'.format(proc_id, i, n))
+                else:
+                    console_str = '\t >>> Total Processed: {0} / {1} <<<'.format(i, n)
+                    sys.stdout.write("\r" + console_str)
+                    sys.stdout.flush()
 
             abs_path = path.join(self.path_to_root, f)
             df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
@@ -359,11 +367,12 @@ class FeatureExtractor:
             i = i + 1
             # LOOP ENDS HERE
 
-        if is_parallel:
-            print('\n\t^^^^^^^^^^^^^^^^^^^^PID: {0}^^^^^^^^^^^^^^^^^^^^^'.format(proc_id))
-        print('\n\t{0} files have been processed.'.format(i - 1))
-        print('\tAs a result, a dataframe of dimension {} X {} is created.'.
-              format(self.df_all_features.shape[0], self.df_all_features.shape[1]))
+        if verbose:
+            if is_parallel:
+                print('\n\t^^^^^^^^^^^^^^^^^^^^PID: {0}^^^^^^^^^^^^^^^^^^^^^'.format(proc_id))
+            print('\n\t{0} files have been processed.'.format(i - 1))
+            print('\tAs a result, a dataframe of dimension {} X {} is created.'.
+                  format(self.df_all_features.shape[0], self.df_all_features.shape[1]))
 
         if is_parallel:
             output_list.append(self.df_all_features)
@@ -400,8 +409,8 @@ def main():
 
     # --------------------------- Sequential Cases -----------------------------------
     # ------------- Usage 1:
-    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+    fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+                     params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
     # ------------- Usage 2:
     # fe.do_extraction(features_index=[0, 1, 2, 3],
     #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
@@ -427,9 +436,9 @@ def main():
     #                              features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
     #                              params_index=[0, 1, 2], first_k=50)
     # ------------- Usage 4:
-    fe.do_extraction_in_parallel(n_jobs=4,
-                                 features_index=[0, 1, 2, 3],
-                                 params_index=[0, 1, 2], first_k=50)
+    # fe.do_extraction_in_parallel(n_jobs=4,
+    #                              features_index=[0, 1, 2, 3],
+    #                              params_index=[0, 1, 2], first_k=50)
 
     print(fe.df_all_features.shape)
     fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')

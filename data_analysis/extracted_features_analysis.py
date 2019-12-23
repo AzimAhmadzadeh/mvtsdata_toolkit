@@ -3,12 +3,12 @@ from os import path, makedirs
 import pandas as pd
 import numpy as np
 
-_summary_keywords: dict = {"params_col": 'Feature Name',
-                           "null_col": "Null Count",
-                           "count_col": "Count",
+_summary_keywords: dict = {"params_col": 'Feature-Name',
+                           "null_col": "Null-Count",
+                           "count_col": "Val-Count",
                            "label_col": "Label"}
 
-_5num_colnames: list = ['min', '25%', '50%', '75%', 'max']
+_5num_colnames: list = ['mean', 'std', 'min', '25th', '50th', '75th', 'max']
 
 
 class ExtractedFeaturesAnalysis:
@@ -54,13 +54,13 @@ class ExtractedFeaturesAnalysis:
             * 'Null Count': Contains the number of null entries per feature,
             * 'Min': Contains the minimum value of the feature(Without considering the null or
               nan value),
-            * 'Q1': Contains the first quartile(25%) of the feature values(Without considering the
+            * '25th': Contains the first quartile(25%) of the feature values(Without considering the
               null or nan  value),
             * 'Mean': Contains the mean of the feature values(Without considering the null/nan
               value),
-            * 'Median': Contains the median of the feature values(Without considering the null/nan
+            * '50th': Contains the median of the feature values(Without considering the null/nan
               value),
-            * 'Q3': Contains the third quartile(75%) of the feature values(Without considering the
+            * '75th': Contains the third quartile(75%) of the feature values(Without considering the
               null/nan value),
             * 'Max': Contains the minimum value of the feature(Without considering the null/nan
               value),
@@ -77,7 +77,7 @@ class ExtractedFeaturesAnalysis:
 
         # drop any non-numeric column
         if not self.df.empty:
-            df_desc = self.df.describe(include=[np.number])
+            df_desc = df_desc.describe(include=[np.number])
         else:
             raise ValueError(
                 '''
@@ -97,6 +97,10 @@ class ExtractedFeaturesAnalysis:
         df_desc = df_desc.T
         df_desc.insert(0, _summary_keywords['params_col'], df_desc.index)
         df_desc.insert(2, _summary_keywords['null_col'], self.df.isnull().sum())
+        # New colnames: [Feature-Name, Val-Count, Null-Count, mean, std, min, 25th, 50th, 75th, max]
+        df_desc.columns = [_summary_keywords['params_col'],
+                           _summary_keywords['count_col'],
+                           _summary_keywords['null_col']] + _5num_colnames
         df_desc.reset_index(inplace=True)
         df_desc.drop(labels='index', inplace=True, axis=1)
         self.summary = df_desc
@@ -109,7 +113,7 @@ class ExtractedFeaturesAnalysis:
         :return: a dictionary of labels (as keys) and class populations (as values).
         """
         population_df = self.df[label].value_counts()
-        population_df = population_df.to_frame('Count')
+        population_df = population_df.to_frame(_summary_keywords['count_col'])
         population_df.insert(0, 'Label', population_df.index)
         return population_df.set_index('Label')
 
@@ -126,7 +130,7 @@ class ExtractedFeaturesAnalysis:
                 Execute `compute_summary` before getting the missing values.
                 """
             )
-        count_df = self.summary[[_summary_keywords["null_col"]]]
+        count_df = self.summary[[_summary_keywords['null_col']]]
         return count_df
 
     def get_five_num_summary(self) -> pd.DataFrame:
@@ -134,8 +138,8 @@ class ExtractedFeaturesAnalysis:
         Gets the five number summary of each feature. This method does not compute the five-number
         statistics. It only returns what was already computed in `compute_summary` method.
 
-        :return: a dataframe where the rows are [min, 25%, 50%, 75%, max] and the columns are the
-                 features in the given dataframe.
+        :return: a dataframe where the columns are [mean, std, min, 25th, 50th, 75th, max] and each
+                 row corresponds to one of the extracted features.
         """
         if self.summary.empty:
             raise ValueError(
@@ -191,11 +195,11 @@ def main():
     from normalizing import normalizer
 
     f_path = os.path.join(CONST.ROOT,
-                          'data/extracted_features/extracted_features_3_pararams_3_featues.csv')
+                          'data/extracted_features/extracted_features_parallel_3_pararams_4_features.csv')
     mvts_df = pd.read_csv(f_path, sep='\t')
     # Normalizer Test on extracted feature dataset
     # excluded_col = extracted_features_df.select_dtypes(exclude=np.number).columns.to_list()
-    excluded_col = ['Parameter-Name']  # .insert(0,'id')
+    excluded_col = ['id']
     # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
     # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
     # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
@@ -204,11 +208,11 @@ def main():
 
     efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
     efa.compute_summary()
-    efa.print_summary()
-    print(efa.get_class_population(label='lab'))
+    # efa.print_summary()
+    # print(efa.get_class_population(label='lab'))
     print(efa.get_five_num_summary())
-    print(efa.get_missing_values())
-    efa.summary_to_csv(CONST.ROOT, 'summary.csv')
+    # print(efa.get_missing_values())
+    # efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/extracted_feature_analysis.csv')
 
 
 if __name__ == '__main__':

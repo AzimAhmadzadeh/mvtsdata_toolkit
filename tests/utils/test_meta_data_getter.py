@@ -1,7 +1,4 @@
 import unittest
-import CONSTANTS as CONST
-import os
-import pandas as pd
 import utils.meta_data_getter as mdg
 
 # todo test exception as per python
