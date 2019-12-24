@@ -185,6 +185,7 @@ class FeatureExtractor:
             j.join()
 
         self.df_all_features = pd.concat(extracted_features)
+        self.df_all_features.reset_index(drop=True, inplace=True)
         if verbose:
             print('\n\n\t\tAll {} processes have finished their tasks.'.format([n_jobs]))
 
@@ -366,6 +367,8 @@ class FeatureExtractor:
                 self.df_all_features = self.df_all_features.append(row_df)
             i = i + 1
             # LOOP ENDS HERE
+
+        self.df_all_features.reset_index(drop=True, inplace=True)
 
         if verbose:
             if is_parallel:

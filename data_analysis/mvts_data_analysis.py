@@ -13,7 +13,7 @@ from features import extractor_utils
 _summary_keywords: dict = {"params_col": 'Parameter-Name',
                            "count_col": "Val-Count",
                            "null_col": "Null-Count",
-                           "mean_col": "Mean",
+                           "mean_col": "mean",
                            "tdigest_col": "TDigest"}
 
 _5num_colnames: list = ['min', '25th', '50th', '75th', 'max']

@@ -32,24 +32,28 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.Dat
     """
     from sklearn.preprocessing import MinMaxScaler
 
+    colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
-    numeric_colnames = [colname for colname in list(df) if colname not in excluded_colnames]
+    included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
-    df_numeric = df[numeric_colnames].select_dtypes(include=np.number)
-    excluded_colnames.extend(df[numeric_colnames].select_dtypes(exclude=np.number).columns)
-    df_ids_labels = df[excluded_colnames]
+    df_numeric = df[included_cnames].select_dtypes(include=np.number)
+    # set-difference between the original and numeric columns
+    excluded_cnames = list(set(colnames_original_order) - set(list(df_numeric)))
+    df_excluded = df[excluded_cnames]
 
     # prepare normalizer and normalize
     scaler = MinMaxScaler()
-    res_ndarray = scaler.fit_transform(df_numeric)  # type:np.ndarray
-    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)  # type:pd.DataFrame
+    res_ndarray = scaler.fit_transform(df_numeric)
+    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)
 
     # Reset the indices (so that they match)
-    df_ids_labels.reset_index()
+    df_excluded.reset_index()
     df_numeric.reset_index()
 
     # Add the excluded columns back
-    df_norm = df_ids_labels.join(df_numeric)
+    df_norm = df_excluded.join(df_numeric)
+    # Restore the original oder of columns
+    df_norm = df_norm[colnames_original_order]
 
     return df_norm
 
@@ -79,24 +83,28 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) ->
     """
     from sklearn.preprocessing import MinMaxScaler
 
+    colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
-    numeric_colnames = [colname for colname in list(df) if colname not in excluded_colnames]
+    included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
-    df_numeric = df[numeric_colnames].select_dtypes(include=np.number)
-    excluded_colnames.extend(df[numeric_colnames].select_dtypes(exclude=np.number).columns)
-    df_ids_labels = df[excluded_colnames]
+    df_numeric = df[included_cnames].select_dtypes(include=np.number)
+    # set-difference between the original and numeric columns
+    excluded_cnames = list(set(colnames_original_order) - set(list(df_numeric)))
+    df_excluded = df[excluded_cnames]
 
     # prepare normalizer and normalize
     scaler = MinMaxScaler((-1, 1))
-    res_ndarray = scaler.fit_transform(df_numeric)  # type:np.ndarray
-    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)  # type:pd.DataFrame
+    res_ndarray = scaler.fit_transform(df_numeric)
+    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)
 
     # Reset the indices (so that they match)
-    df_ids_labels.reset_index()
+    df_excluded.reset_index()
     df_numeric.reset_index()
 
     # Add the excluded columns back
-    df_norm = df_ids_labels.join(df_numeric)
+    df_norm = df_excluded.join(df_numeric)
+    # Restore the original oder of columns
+    df_norm = df_norm[colnames_original_order]
 
     return df_norm
 
@@ -128,24 +136,28 @@ def standardize(df: pd.DataFrame, excluded_colnames: list= []) -> pd.DataFrame:
     """
     from sklearn.preprocessing import StandardScaler
 
+    colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
-    numeric_colnames = [colname for colname in list(df) if colname not in excluded_colnames]
+    included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
-    df_numeric = df[numeric_colnames].select_dtypes(include=np.number)
-    excluded_colnames.extend(df[numeric_colnames].select_dtypes(exclude=np.number).columns)
-    df_ids_labels = df[excluded_colnames]
+    df_numeric = df[included_cnames].select_dtypes(include=np.number)
+    # set-difference between the original and numeric columns
+    excluded_cnames = list(set(colnames_original_order) - set(list(df_numeric)))
+    df_excluded = df[excluded_cnames]
 
     # prepare normalizer and normalize
     scaler = StandardScaler()
-    res_ndarray = scaler.fit_transform(df_numeric)  # type:np.ndarray
-    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)  # type:pd.DataFrame
+    res_ndarray = scaler.fit_transform(df_numeric)
+    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)
 
     # Reset the indices (so that they match)
-    df_ids_labels.reset_index()
+    df_excluded.reset_index()
     df_numeric.reset_index()
 
     # Add the excluded columns back
-    df_norm = df_ids_labels.join(df_numeric)
+    df_norm = df_excluded.join(df_numeric)
+    # Restore the original oder of columns
+    df_norm = df_norm[colnames_original_order]
 
     return df_norm
 
@@ -173,23 +185,27 @@ def robust_standardize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.Dat
     """
     from sklearn.preprocessing import RobustScaler
 
+    colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
-    numeric_colnames = [colname for colname in list(df) if colname not in excluded_colnames]
+    included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
-    df_numeric = df[numeric_colnames].select_dtypes(include=np.number)
-    excluded_colnames.extend(df[numeric_colnames].select_dtypes(exclude=np.number).columns)
-    df_ids_labels = df[excluded_colnames]
+    df_numeric = df[included_cnames].select_dtypes(include=np.number)
+    # set-difference between the original and numeric columns
+    excluded_cnames = list(set(colnames_original_order) - set(list(df_numeric)))
+    df_excluded = df[excluded_cnames]
 
     # prepare normalizer and normalize
     scaler = RobustScaler()
-    res_ndarray = scaler.fit_transform(df_numeric)  # type:np.ndarray
-    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)  # type:pd.DataFrame
+    res_ndarray = scaler.fit_transform(df_numeric)
+    df_numeric = pd.DataFrame(res_ndarray, columns=list(df_numeric), dtype=float)
 
     # Reset the indices (so that they match)
-    df_ids_labels.reset_index()
+    df_excluded.reset_index()
     df_numeric.reset_index()
 
     # Add the excluded columns back
-    df_norm = df_ids_labels.join(df_numeric)
+    df_norm = df_excluded.join(df_numeric)
+    # Restore the original oder of columns
+    df_norm = df_norm[colnames_original_order]
 
     return df_norm
