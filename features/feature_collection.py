@@ -207,14 +207,14 @@ def get_dderivative_mean(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 
     :return: the mean of the difference derivative of univariate time series within the function
              we use step_size to find derivative (default value of step_size is 1).
     """
-    return np.float64(get_mean(__difference_derivative(uni_ts, step_size)))
+    return np.float64(get_mean(_difference_derivative(uni_ts, step_size)))
 
 
 def get_gderivative_mean(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the mean of the gradient derivative of univariate time series.
     """
-    return get_mean(__gradient_derivative(uni_ts))
+    return get_mean(_gradient_derivative(uni_ts))
 
 
 def get_dderivative_stddev(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
@@ -222,42 +222,42 @@ def get_dderivative_stddev(uni_ts: Union[pd.Series, np.ndarray], step_size: int 
     :return: the std.dev of the difference derivative of univariate time series within the
              function we use step_size to find derivative (default value of step_size is 1).
     """
-    return get_stddev(__difference_derivative(uni_ts, step_size))
+    return get_stddev(_difference_derivative(uni_ts, step_size))
 
 
 def get_gderivative_stddev(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the std.dev of the gradient derivative of univariate time series.
     """
-    return get_stddev(__gradient_derivative(uni_ts))
+    return get_stddev(_gradient_derivative(uni_ts))
 
 
 def get_dderivative_skewness(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
     :return: the skewness of the difference derivative of univariate time series within the
              function we use step_size to find derivative (default value of step_size is 1)."""
-    return get_skewness(__difference_derivative(uni_ts, step_size))
+    return get_skewness(_difference_derivative(uni_ts, step_size))
 
 
 def get_gderivative_skewness(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the skewness of the gradient derivative of univariate time series.
     """
-    return get_skewness(__gradient_derivative(uni_ts))
+    return get_skewness(_gradient_derivative(uni_ts))
 
 
 def get_dderivative_kurtosis(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
     :return: the kurtosis of the difference derivative of univariate time series within the
              function we use step_size to find derivative (default value of step_size is 1)."""
-    return get_kurtosis(__difference_derivative(uni_ts, step_size))
+    return get_kurtosis(_difference_derivative(uni_ts, step_size))
 
 
 def get_gderivative_kurtosis(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the kurtosis of the gradient derivative of univariate time series.
     """
-    return get_kurtosis(__gradient_derivative(uni_ts))
+    return get_kurtosis(_gradient_derivative(uni_ts))
 
 
 def get_linear_weighted_average(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
@@ -298,7 +298,7 @@ def get_average_absolute_change(uni_ts: Union[pd.Series, np.ndarray]) -> np.floa
     """
     :return: the average absolute first difference of a univariate time series.
     """
-    return np.float64(np.mean(np.abs(__difference_derivative(uni_ts))))
+    return np.float64(np.mean(np.abs(_difference_derivative(uni_ts))))
 
 
 def get_average_absolute_derivative_change(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
@@ -357,7 +357,7 @@ def get_longest_positive_run(uni_ts: Union[pd.Series, np.ndarray]) -> np.int64:
     """
     :return: the longest positive run in a univariate time series.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(uni_ts))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(uni_ts))]
     signs = np.array([signature for run, signature in ts_encode])
     runs = np.array([run for run, signature in ts_encode])
     if runs[signs == 1].size == 0:  # empty array
@@ -369,7 +369,7 @@ def get_longest_negative_run(uni_ts: Union[pd.Series, np.ndarray]) -> np.int64:
     """
     :return: the longest negative run in a univariate time series.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(uni_ts))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(uni_ts))]
     signs = np.array([signature for run, signature in ts_encode])
     runs = np.array([run for run, signature in ts_encode])
     if runs[signs == -1].size == 0:  # empty array
@@ -396,7 +396,7 @@ def get_slope_of_longest_mono_increase(uni_ts: Union[pd.Series, np.ndarray]) -> 
     Identifies the longest monotonic increase and gets the slope.
     :return: the slope of the longest monotonic increase in `uni_ts`.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -419,7 +419,7 @@ def get_slope_of_longest_mono_decrease(uni_ts: Union[pd.Series, np.ndarray]) -> 
     Identifies the longest monotonic decrease and gets the slope.
     :return: the slope of the longest monotonic decrease in `uni_ts`.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -441,7 +441,7 @@ def get_avg_mono_increase_slope(uni_ts: Union[pd.Series, np.ndarray]) -> np.floa
     """
     :return: the average slope of monotonically increasing segments.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -463,7 +463,7 @@ def get_avg_mono_decrease_slope(uni_ts: Union[pd.Series, np.ndarray]) -> np.floa
     """
     :return: the average slope of monotonically decreasing segments.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -486,16 +486,16 @@ def get_avg_mono_decrease_slope(uni_ts: Union[pd.Series, np.ndarray]) -> np.floa
 # -----------------------------------------------------------
 
 
-def __difference_derivative(uni_ts: Union[pd.Series, np.ndarray], N: int = 1):
+def _difference_derivative(uni_ts: Union[pd.Series, np.ndarray], N: int = 1):
     if N < 1:
         return None
     else:
-        return np.array([uni_ts[x + N] - uni_ts[x] for x in range(len(uni_ts) - N)])
+        return np.subtract(uni_ts[N:], uni_ts[:-N])
 
 
-def __gradient_derivative(uni_ts: Union[pd.Series, np.ndarray]):
+def _gradient_derivative(uni_ts: Union[pd.Series, np.ndarray]):
     return np.gradient(uni_ts)
 
 
-def __sign(uni_ts: Union[pd.Series, np.ndarray]):
+def _sign(uni_ts: Union[pd.Series, np.ndarray]):
     return np.sign(uni_ts)

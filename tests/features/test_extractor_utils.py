@@ -39,8 +39,6 @@ class TestExtractorUtils(unittest.TestCase):
         df_expected = pd.DataFrame([[1, 2, 3]], index=[0],
                                    columns=['row1_param1', 'row2_param1', 'row3_param1'])
         df_flattened = ex_util.flatten_to_row_df(df_input)
-        print(df_flattened)
-        print(df_expected)
         assert_frame_equal(df_expected, df_flattened, check_dtype=False)
 
     def test_split(self):
