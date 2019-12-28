@@ -9,7 +9,7 @@ import utils
 import yaml
 import CONSTANTS as CONST
 from features import extractor_utils
-
+from configs.config_reader import ConfigReader
 _summary_keywords: dict = {"params_col": 'Parameter-Name',
                            "count_col": "Val-Count",
                            "null_col": "Null-Count",
@@ -84,8 +84,9 @@ class MVTSDataAnalysis:
         :param path_to_config: path to the yml configuration file
         """
         path_to_config = os.path.join(CONST.ROOT, path_to_config)
-        with open(path_to_config) as file:
-            configs = yaml.load(file, Loader=yaml.FullLoader)
+
+        cr = ConfigReader(path_to_config)
+        configs = cr.read()
 
         self.path_to_dataset = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
         _, _, self.all_mvts_paths = next(walk(self.path_to_dataset))

@@ -6,6 +6,7 @@ import utils
 from features import extractor_utils
 import yaml
 import CONSTANTS as CONST
+from configs.config_reader import ConfigReader
 
 
 def _evaluate_args(params_name: list, params_index: list, features_list: list, feature_index: list):
@@ -100,13 +101,14 @@ class FeatureExtractor:
 
     def __init__(self, path_to_config: str):
         """
-        This constructor loads all necessary information from the config file provided by
+        This constructor loads all necessary information from the config file located at
         `path_to_config`.
 
         :param path_to_config: path to where the corresponding configuration (YAML) file is located.
         """
-        with open(path_to_config) as file:
-            configs = yaml.load(file, Loader=yaml.FullLoader)
+        cr = ConfigReader(path_to_config)
+        configs = cr.read()
+
         self.path_to_config = path_to_config
         self.path_to_root = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
         self.path_to_output = os.path.join(CONST.ROOT, configs['PATH_TO_EXTRACTED_FEATURES'])
@@ -194,7 +196,6 @@ class FeatureExtractor:
                       first_k: int = None, need_interp: bool = True,
                       partition: list = None, proc_id: int = None, verbose: bool = False,
                       output_list: list = None):
-        # TODO: the argument output_list is actually a `ListProxy`
         """
         Computes (based on the meta data loaded in the constructor) all of the statistical
         features on the mvts data (per time series; column-wise) and stores the results in the
