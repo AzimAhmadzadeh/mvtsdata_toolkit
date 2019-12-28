@@ -6,7 +6,8 @@ import numpy as np
 _summary_keywords: dict = {"params_col": 'Feature-Name',
                            "null_col": "Null-Count",
                            "count_col": "Val-Count",
-                           "label_col": "Label"}
+                           "label_col": "Label",
+                           "population": "Population"}
 
 _5num_colnames: list = ['mean', 'std', 'min', '25th', '50th', '75th', 'max']
 
@@ -109,20 +110,20 @@ class ExtractedFeaturesAnalysis:
         """
         Gets the per-class population of the original dataset.
 
-        :param label: Column name corresponding to the labels.
-        :return: a dictionary of labels (as keys) and class populations (as values).
+        :param label: The column-name corresponding to the labels.
+        :return: a dataframe of two columns; labels and class counts.
         """
         population_df = self.df[label].value_counts()
-        population_df = population_df.to_frame(_summary_keywords['count_col'])
-        population_df.insert(0, 'Label', population_df.index)
-        return population_df.set_index('Label')
+        population_df = population_df.to_frame(_summary_keywords['population'])
+        population_df.insert(0, label, population_df.index)
+        return population_df.reset_index(drop=True)
 
     def get_missing_values(self) -> pd.DataFrame:
         """
-        Gets the missing value counts for each feature.
+        Gets the missing-value counts for each extracted feature.
 
-        :return: a dataframe of two columns, one for the column name of `extracted_features_df` and the other
-                 for the counts of missing values corresponding to each column, will be returned.
+        :return: a dataframe of two columns; the extracted features (i.e., column names of
+        `extracted_features_df`) and the missing-value counts.
         """
         if self.summary.empty:
             raise ValueError(
@@ -130,16 +131,16 @@ class ExtractedFeaturesAnalysis:
                 Execute `compute_summary` before getting the missing values.
                 """
             )
-        count_df = self.summary[[_summary_keywords['null_col']]]
-        return count_df
+        count_df = self.summary[[_summary_keywords['params_col'], _summary_keywords['null_col']]]
+        return count_df.reset_index(drop=True)
 
     def get_five_num_summary(self) -> pd.DataFrame:
         """
-        Gets the five number summary of each feature. This method does not compute the five-number
-        statistics. It only returns what was already computed in `compute_summary` method.
+        returns the seven number summary of each extracted feature. This method does not compute
+        the statistics, but only returns what was already computed in `compute_summary` method.
 
-        :return: a dataframe where the columns are [mean, std, min, 25th, 50th, 75th, max] and each
-                 row corresponds to one of the extracted features.
+        :return: a dataframe where the columns are [Feature-Name, mean, std, min, 25th, 50th, 75th,
+        max] and each row corresponds to the statistics on one of the extracted features.
         """
         if self.summary.empty:
             raise ValueError(
@@ -149,7 +150,7 @@ class ExtractedFeaturesAnalysis:
             )
         _5num_colnames.insert(0, _summary_keywords['params_col'])
         five_num_df = self.summary[_5num_colnames]
-        return five_num_df
+        return five_num_df.reset_index(drop=True)
 
     def print_summary(self):
         """
@@ -203,16 +204,20 @@ def main():
     # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
     # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
     # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
-    df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
-    print(df_norm)
+    # df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
+    # print(df_norm)
 
-    # efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
-    # efa.compute_summary()
+    efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
+    efa.compute_summary()
     # efa.print_summary()
+
+    d = efa.get_five_num_summary()
+    print(d[d['Feature-Name'] == 'TOTUSJH_median'].values)
+    print(list(d))
     # print(efa.get_class_population(label='lab'))
     # print(efa.get_five_num_summary())
     # print(efa.get_missing_values())
-    # efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/extracted_feature_analysis.csv')
+    efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/xxxxx.csv')
 
 
 if __name__ == '__main__':
