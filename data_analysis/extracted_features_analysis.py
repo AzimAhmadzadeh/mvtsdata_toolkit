@@ -148,8 +148,9 @@ class ExtractedFeaturesAnalysis:
                 Execute `compute_summary` before getting the five number summary.
                 """
             )
-        _5num_colnames.insert(0, _summary_keywords['params_col'])
-        five_num_df = self.summary[_5num_colnames]
+        colname_copy = _5num_colnames.copy()  # copy: we don't want to change `_5num_colnames`
+        colname_copy.insert(0, _summary_keywords['params_col'])
+        five_num_df = self.summary[colname_copy]
         return five_num_df.reset_index(drop=True)
 
     def print_summary(self):

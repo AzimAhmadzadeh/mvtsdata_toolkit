@@ -48,12 +48,9 @@ class TestExtractedFeaturesAnalysis(unittest.TestCase):
         self.assertListEqual(actual_values, expected_values, 'Expected != Actual')
 
     def test_2x_get_five_num_summary(self):
-        expected_colnames = ['Feature-Name', 'mean', 'std', 'min', '25th', '50th', '75th',
-                             'max']
+        expected_colnames = ['Feature-Name', 'mean', 'std', 'min', '25th', '50th', '75th', 'max']
         df_summary = self.efa.get_five_num_summary()
         actual_colnames = list(df_summary)
-        print(expected_colnames)
-        print(actual_colnames)
         self.assertListEqual(actual_colnames, expected_colnames, 'Expected != Actual')
 
 
