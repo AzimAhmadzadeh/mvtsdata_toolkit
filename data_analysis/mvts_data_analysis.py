@@ -381,9 +381,9 @@ class MVTSDataAnalysis:
         """
         all_sizes_in_bytes = []
         for f in self.all_mvts_paths:
-            if f.lower().find('.csv') != -1:
-                f = os.path.join(f, self.path_to_dataset)
-                all_sizes_in_bytes.append(os.stat(f).st_size)
+            if f.lower().endswith('.csv'):
+                f_path = os.path.join(self.path_to_dataset, f)
+                all_sizes_in_bytes.append(os.stat(f_path).st_size)
         return np.mean(all_sizes_in_bytes)
 
     def get_total_mvts_size(self):
