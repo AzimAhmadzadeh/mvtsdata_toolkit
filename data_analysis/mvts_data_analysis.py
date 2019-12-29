@@ -10,6 +10,7 @@ import yaml
 import CONSTANTS as CONST
 from features import extractor_utils
 from configs.config_reader import ConfigReader
+
 _summary_keywords: dict = {"params_col": 'Parameter-Name',
                            "count_col": "Val-Count",
                            "null_col": "Null-Count",
@@ -95,13 +96,12 @@ class MVTSDataAnalysis:
 
     def compute_summary_in_parallel(self, n_jobs: int, params_name: list = None,
                                     params_index: list = None, first_k: int = None,
-                                    need_interp: bool = True, verbose: bool = False):
+                                    verbose: bool = False):
         """
         :param n_jobs:
         :param params_name:
         :param params_index:
         :param first_k:
-        :param need_interp:
         :param verbose:
         :return:
         """
@@ -133,7 +133,6 @@ class MVTSDataAnalysis:
                                           'params_name': params_name,
                                           'params_index': params_index,
                                           'first_k': first_k,
-                                          'need_interp': need_interp,
                                           'partition': partition,
                                           'proc_id': proc_id,
                                           'verbose': verbose,
@@ -179,8 +178,8 @@ class MVTSDataAnalysis:
         self.summary = df
 
     def compute_summary(self, params_name: list = None, params_index: list = None,
-                        first_k: int = None, need_interp: bool = True, partition: list = None,
-                        proc_id: int = None, verbose: bool = False, output_list: list = None):
+                        first_k: int = None, partition: list = None, proc_id: int = None,
+                        verbose: bool = False, output_list: list = None):
         """
         By reading each csv file from the path listed in the configuration file, this method
         calculates all the basic statistics with respect to each parameter (each column of the
@@ -219,7 +218,6 @@ class MVTSDataAnalysis:
                                 list.
         :param params_index: (Optional) User may specify the list of indices corresponding to the
                              parameters provided in the configuration file.
-        :param need_interp:
         :param partition:
         :param proc_id:
         :param verbose:
@@ -266,17 +264,17 @@ class MVTSDataAnalysis:
         # get the columns of interest
         df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
         # get a list of numeric column-names
-        params_name = df.select_dtypes([np.number]).columns
+        numeric_params_name = df.select_dtypes(include=[np.number]).columns
 
-        total_params = params_name.__len__()
+        total_params = len(numeric_params_name)
 
         param_seq = [""] * total_params
         # TODO: Line below produces objects with similar id!! Is this OK? (object.__repr__(
         #  digests[0]). If this is OK, it can be replaced with [TDigest()] * total_params.
         digests = [TDigest() for i in range(total_params)]
-        null_counts = [0] * total_params
-        col_counts = [0] * total_params
-        col_means = [0] * total_params
+        null_counts = np.array(np.zeros(total_params), dtype=int)
+        col_counts = np.array(np.zeros(total_params), dtype=int)
+        col_means = np.array(np.zeros(total_params), dtype=float)
         i = 1
         j = 0
         for f in all_csv_files:
@@ -288,42 +286,31 @@ class MVTSDataAnalysis:
                     sys.stdout.write("\r" + console_str)
                     sys.stdout.flush()
 
-            if f.lower().find('.csv') != -1:  # Only .csv files should be processed
-                i += 1
-                abs_path = os.path.join(self.path_to_dataset, f)
-                df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
+            # Only .csv files should be processed
+            if not f.lower().endswith('.csv'):
+                continue
 
-                # needs interpolation to make up for the nan values. Otherwise tDigest won't
-                # be able to process the data.
-                if need_interp:
-                    df_mvts = utils.interpolate_missing_vals(df_mvts)
+            i += 1
+            abs_path = os.path.join(self.path_to_dataset, f)
+            df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
 
-                try:  # to keep the requested params only
-                    df_req = pd.DataFrame(df_mvts[params_name]).select_dtypes([np.number])
-                except:
-                    raise ValueError(
-                        """
-                        Please check the parameter list. Perhaps a non-existing parameter name is
-                        given in the list `params_name`.
-                        """
-                    )
-                j = 0
-                # Iterate the mvts by column, and compute tDigest on each column.
-                for (param, series) in df_req.iteritems():
-                    temp_null_count = int(series.isnull().sum())
-                    temp_count = int(series.count())
-                    null_counts[j] += temp_null_count
-                    col_counts[j] += temp_count
-                    col_means[j] += np.mean(series)
-                    if series.isnull().sum() != 0:
-                        series = series.dropna()
-                    if not series.empty:
-                        series = np.array(series.values.flatten())
-                        param_seq[j] = param
-                        digests[j].batch_update(series)
-                        digests[j].compress()
+            df_req = df_mvts[numeric_params_name]  # keep only the numeric columns!
 
-                    j += 1
+            null_counts += df_req.isna().sum().to_list()
+            col_counts += df_req.count().to_list()
+            col_means += np.nanmean(df, axis=0).tolist()
+            j = 0
+            # Iterate over mvts by column, and compute tDigest on each column.
+            for (param, series) in df_req.iteritems():
+                if series.isnull().sum() != 0:
+                    # Drop NA's since tDigest can't handle them.
+                    series = series.dropna()
+                if not series.empty:
+                    series = np.array(series.values.flatten())
+                    param_seq[j] = param
+                    digests[j].batch_update(series)
+                    digests[j].compress()
+                j += 1
         # END OF LOOP OVER all_csv_files
 
         if not is_parallel:  # percentiles can be retrieved from tDigest objects
@@ -350,13 +337,13 @@ class MVTSDataAnalysis:
 
                 summary_stat_df.loc[i] = [attname, col_count, col_miss, col_mean,
                                           col_min, col_q1, col_q2, col_q3, col_max]
-
             # END OF FOR over mvts parameters
 
             if summary_stat_df.empty:
                 raise ValueError(
                     """
-                    Unable to get MVTS Data Analysis. Please check the parameter list or the dataset files.
+                    Unable to get MVTS Data Analysis. Please check the parameter list or the dataset
+                    files.
                     """
                 )
             summary_stat_df.reset_index(inplace=True)
@@ -504,7 +491,7 @@ def main():
 
     # --------------------------- Sequential Cases -----------------------------------
     # ------------- Usage 1:
-    # mvts.compute_summary(first_k=50, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
+    mvts.compute_summary(first_k=50, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
     # ------------- Usage 2:
     # mvts.compute_summary(first_k=50, params_index=[0, 1, 2])
     # ------------- Usage 2:
@@ -513,17 +500,17 @@ def main():
 
     # --------------------------- Parallel Cases -------------------------------------
     # ------------- Usage 2:
-    mvts.compute_summary_in_parallel(n_jobs=4, first_k=50, verbose=False,
-                                     params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
-    # mvts.print_summary()
+    # mvts.compute_summary_in_parallel(n_jobs=4, first_k=50, verbose=False,
+    #                                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
+    mvts.print_summary()
 
-    mvts.summary_to_csv(output_path='.',
-                        file_name='../data/mvts_data_analysis/data_analysis_parallel_params_['
-                                  '3].csv')
+    # mvts.summary_to_csv(output_path='.',
+    #                     file_name='../data/mvts_data_analysis/data_analysis_parallel_params_['
+    #                               '3].csv')
     #
-    # print(mvts.summary.columns)
-    # print(mvts.get_five_num_summary())
-    # print(mvts.get_missing_values())
+    print(mvts.summary.columns)
+    print(mvts.get_five_num_summary())
+    print(mvts.get_missing_values())
 
 
 if __name__ == '__main__':
