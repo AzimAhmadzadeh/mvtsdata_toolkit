@@ -68,7 +68,7 @@ class MVTSDataAnalysis:
         2. Perform Exploratory Data Analysis(EDA) on the MVTS dataset
             a. Histogram of classes
             b. Missing Value count
-            c. Five-Number summary of each physical parameter(Estimated Values)
+            c. Six-Number summary of each physical parameter(Estimated Values)
         3. Summary report can be saved in .CSV file in output folder,
            i.e., /pet_datasets/mvts_analysis using summary_to_csv() method.
 
@@ -394,8 +394,8 @@ class MVTSDataAnalysis:
         all_sizes_in_bytes = []
         for f in self.all_mvts_paths:
             if f.lower().find('.csv') != -1:
-                f = os.path.join(f, self.path_to_dataset)
-                all_sizes_in_bytes.append(os.stat(f).st_size)
+                f_path = os.path.join(self.path_to_dataset, f)
+                all_sizes_in_bytes.append(os.stat(f_path).st_size)
         return np.sum(all_sizes_in_bytes)
 
     def print_stat_of_directory(self):
@@ -421,35 +421,39 @@ class MVTSDataAnalysis:
         if self.summary.empty:
             raise ValueError(
                 """
-                Execute `compute_summary` before getting the missing values.
+                The summary is empty. The method `compute_summary` needs to be executed before 
+                getting the missing values.
                 """
             )
         count_df = self.summary[[_summary_keywords["params_col"], _summary_keywords["null_col"]]]
         return count_df
 
-    def get_five_num_summary(self) -> pd.DataFrame:
+    def get_six_num_summary(self) -> pd.DataFrame:
         """
-        Gets the five-number summary of each parameter in the mvts files.
+        Gets the six-number summary of each parameter in the mvts files.
 
-        :return: a dataframe where the rows are `min`, `25th`, `50th`, `75th`, `max` and the columns
-        are the parameters of the given dataframe.
+        :return: a dataframe where the rows are `mean`, `min`, `25th`, `50th`, `75th`, `max` and
+        the columns are the parameters of the given dataframe.
         """
         if self.summary.empty:
             raise ValueError(
                 """
-                Execute `compute_summary` before getting the five number summary.
+                The summary is empty. The method `compute_summary` needs to be executed before 
+                getting the 6-num summary.
                 """
             )
-        _5num_colnames.insert(0, _summary_keywords['params_col'])
-        five_num_df = self.summary[_5num_colnames]
-        return five_num_df
+        colnames = _5num_colnames.copy()
+        colnames.insert(0, _summary_keywords['params_col'])
+        colnames.insert(1, _summary_keywords['mean_col'])
+        six_num_df = self.summary[colnames]
+        return six_num_df
 
     def print_summary(self):
         """
         Prints the summary dataframe to the console.
         """
         if self.summary.empty:
-            print(
+            raise ValueError(
                 '''
                 The summary is empty. The method `compute_summary` needs to be executed before 
                 printing the results.
@@ -466,12 +470,13 @@ class MVTSDataAnalysis:
         :param output_path: path to where the summary should be stored.
         :param file_name: name of the csv file. If the extension is not given, '.csv' will be
                appended to the given name.
-        :return:
+        :return: None
         """
         if self.summary.empty:
             raise ValueError(
                 '''
-                Execute `compute_summary` before storing the results.
+                The summary is empty. The method `compute_summary` needs to be executed before 
+                saving it as a csv file.
                 '''
             )
         if not path.exists(output_path):
@@ -502,15 +507,15 @@ def main():
     # ------------- Usage 2:
     # mvts.compute_summary_in_parallel(n_jobs=4, first_k=50, verbose=False,
     #                                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
-    mvts.print_summary()
+    # mvts.print_summary()
 
     # mvts.summary_to_csv(output_path='.',
     #                     file_name='../data/mvts_data_analysis/data_analysis_parallel_params_['
     #                               '3].csv')
     #
-    print(mvts.summary.columns)
-    print(mvts.get_five_num_summary())
-    print(mvts.get_missing_values())
+    # print(mvts.summary.columns)
+    print(mvts.get_six_num_summary())
+    # print(mvts.get_missing_values())
 
 
 if __name__ == '__main__':

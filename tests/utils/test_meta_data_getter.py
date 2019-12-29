@@ -1,7 +1,7 @@
 import unittest
 import utils.meta_data_getter as mdg
 
-# todo test exception as per python
+
 class TestMetaDataGetter(unittest.TestCase):
 
     good_file_name = None

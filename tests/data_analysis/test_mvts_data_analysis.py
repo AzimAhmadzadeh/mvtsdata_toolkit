@@ -22,8 +22,13 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         self.assertEqual(actual_count, expected_count)
 
     def test_get_average_mvts_size(self):
-        expected_size = 40234.166
+        expected_size = 40234.166  # bytes
         actual_size = self.mvts.get_average_mvts_size()
+        self.assertAlmostEqual(actual_size, expected_size, places=2)
+
+    def test_get_total_mvts_size(self):
+        expected_size = 482810  # bytes
+        actual_size = self.mvts.get_total_mvts_size()
         self.assertAlmostEqual(actual_size, expected_size, places=2)
 
     def test_get_missing_values(self):
@@ -36,6 +41,58 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         pd.testing.assert_frame_equal(actual_class_population, expected_class_population)
         pd.testing.assert_series_equal(actual_class_population['Null-Count'],
                                        expected_class_population['Null-Count'])
+
+    def test_1x_get_six_num_summary(self):
+        expected_colnames = ['Parameter-Name', 'mean', 'min', '25th', '50th', '75th', 'max']
+        actual_colnames = list(self.mvts.get_six_num_summary())
+        self.assertListEqual(actual_colnames, expected_colnames)
+
+    def test_2x_get_six_num_summary(self):
+        """ Test if proper exception will be raised if `compute_summary` has not been executed."""
+        _backup = self.mvts.summary.copy()
+        self.mvts.summary = pd.DataFrame()  # summary is an empty dataframe now
+        with self.assertRaises(ValueError) as context:
+            self.mvts.get_six_num_summary()
+            self.assertTrue(
+                '''
+                The summary is empty. The method `compute_summary` needs to be executed before 
+                getting the 6-num summary.
+                '''
+                in context.exception)
+
+        self.mvts.summary = _backup.copy()  # this is needed for the rest of the tests.
+
+    def test_print_summary(self):
+        """ Test if proper exception will be raised if `compute_summary` has not been executed."""
+        _backup = self.mvts.summary.copy()
+        self.mvts.summary = pd.DataFrame()  # summary is an empty dataframe now
+        with self.assertRaises(ValueError) as context:
+            self.mvts.print_summary()
+            self.assertTrue(
+                '''
+                The summary is empty. The method `compute_summary` needs to be executed before 
+                printing the results.
+                '''
+                in context.exception)
+
+        self.mvts.summary = _backup.copy()  # this is needed for the rest of the tests.
+
+    def test_summary_to_scv(self):
+        """ Test if proper exception will be raised if `compute_summary` has not been executed."""
+        _backup = self.mvts.summary.copy()
+        self.mvts.summary = pd.DataFrame()  # summary is an empty dataframe now
+        with self.assertRaises(ValueError) as context:
+            self.mvts.summary_to_csv(output_path='xxx/', file_name='yyy.csv')
+            self.assertTrue(
+                '''
+                The summary is empty. The method `compute_summary` needs to be executed before 
+                saving it as a csv file.
+                '''
+                in context.exception)
+        self.mvts.summary = _backup.copy()  # this is needed for the rest of the tests.
+
+    def test_x(self):
+        print(self.mvts.summary)
 
 
 if __name__ == '__main__':
