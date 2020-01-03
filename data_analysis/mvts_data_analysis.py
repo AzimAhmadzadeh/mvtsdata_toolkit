@@ -298,7 +298,8 @@ class MVTSDataAnalysis:
 
             null_counts += df_req.isna().sum().to_list()
             col_counts += df_req.count().to_list()
-            col_means += np.nanmean(df, axis=0).tolist()
+            col_means += np.nanmean(df_req, axis=0).tolist()
+
             j = 0
             # Iterate over mvts by column, and compute tDigest on each column.
             for (param, series) in df_req.iteritems():
@@ -509,10 +510,10 @@ def main():
     #                                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
     # mvts.print_summary()
 
-    # mvts.summary_to_csv(output_path='.',
-    #                     file_name='../data/mvts_data_analysis/data_analysis_parallel_params_['
-    #                               '3].csv')
-    #
+    mvts.summary_to_csv(output_path='.',
+                        file_name='../data/mvts_data_analysis/data_analysis_sequential_params_['
+                                  '3].csv')
+
     # print(mvts.summary.columns)
     print(mvts.get_six_num_summary())
     # print(mvts.get_missing_values())
