@@ -1,0 +1,4 @@
+
+What is this?
+This txt file is created only to assist a test-case in 'config_reader_tests.py'. The content of this
+file does not matter. What matters is that it is a 'txt' file, and not a 'yml' file.

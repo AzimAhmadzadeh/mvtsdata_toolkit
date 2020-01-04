@@ -16,6 +16,7 @@ class TestExtractorUtils(unittest.TestCase):
         pass
 
     def test_get_methods_for_names(self):
+        """ Tests whether callable methods can be retrieved based on method names."""
         method_names = ['get_min', 'get_max']
         callable_methods = ex_util.get_methods_for_names(method_names)
         is_callable = [callable(m) for m in callable_methods]

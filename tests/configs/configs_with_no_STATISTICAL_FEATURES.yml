@@ -5,6 +5,4 @@ MVTS_PARAMETERS:
   - 'TOTUSJH'
   - 'TOTBSQ'
 STATISTICAL_FEATURES:
-  - 'get_min'
-  - 'get_max'
 

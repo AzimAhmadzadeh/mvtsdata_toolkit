@@ -9,8 +9,10 @@ class TestMetaDataGetter(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.good_file_name = 'lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv'
-        cls.bad_file_name = 'lab[[B]]1.0@1053_id[345[]]_st[2011-01-24T[03:24:00]]_et[2011-01-24T[11:12:00]].csv'
+        cls.good_file_name = \
+            'lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv'
+        cls.bad_file_name = \
+            'lab[[B]]1.0@1053_id[345[]]_st[2011-01-24T[03:24:00]]_et[2011-01-24T[11:12:00]].csv'
 
     @classmethod
     def tearDownClass(cls) -> None:

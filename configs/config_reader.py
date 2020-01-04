@@ -7,17 +7,24 @@ _config_keys = ['PATH_TO_MVTS', 'PATH_TO_EXTRACTED_FEATURES',
 
 class ConfigReader:
     """
-    This is a simple class to read the configuration file and meanwhile assert its content. This
-    class, instead of direct reading of the configuration file, must be used whenever the
-    configuration file is needed.
+    This is a simple class to read the configuration file and meanwhile verifies its content. This
+    class, must be used whenever the configuration file is needed, instead of the direct reading of
+    the configuration file.
 
-    Note: Should any new entry be added to the main structure of the configuration file, it must be
-    considered in this class as well.
+    Note: Should any new entry be added to the main structure of the configuration file,
+    this class or the constants provided in this module, must be carefully reviewed and likely
+    modified.
     """
     def __init__(self, path_to_config: str):
         self.path_to_config = path_to_config
 
     def read(self) -> dict:
+        """ Evaluates the file before reading it in the following steps:
+
+           - (1) checks if the file exists,
+           - (2) checks if it is a 'yml' file,
+           - (3) checks if it has all of the keys and nothing extra.
+        """
         configs = None
         file_assessment = self.__assert_file()
         if file_assessment is True:
@@ -43,25 +50,28 @@ class ConfigReader:
             return False
 
     def __invalid_path_msg(self):
+        """ if os.path.isfile() fails, this method will raise a proper exception."""
         raise FileNotFoundError(
             '''
-            The given configuration file does NOT exists:
+            The given file does NOT exist:
             \t{}
             A configuration file must be provided. For help, call `instruction()`.
             '''.format(self.path_to_config))
 
     def __invalid_file_msg(self):
+        """ if the given path exists but it does not end with '.yml', this method will raise a
+        proper exception."""
         raise FileNotFoundError(
             '''
-            The given configuration file it NOT a YAML file:
+            The given configuration file is NOT a YAML file:
             \t{}
             A configuration file must be a YAML file. For help, call `instruction()`.
             '''.format(self.path_to_config)
         )
 
     def __invalid_content_msg(self):
-        print('Some of the keys are invalid or missing in the given configuration file:\n'
-              '\t{}'.format(self.path_to_config))
+        """ if the keys in the given config file has some extra ones or is missing one or more,
+        this method will raise a proper exception."""
         raise AssertionError(
             '''
             The keys in the following configuration file does NOT match
@@ -74,16 +84,18 @@ class ConfigReader:
 
     def instruction(self):
         print("""
-        The content of the configuration file MUST have all of the following items:
+        Below, an example configuration file is provided. All of the keys must be
+        present in the file, while the values shown here are just examples.
         ---------------------------------------------------------------------------
-            PATH_TO_MVTS: '/relative/path/to/data/'
-            PATH_TO_EXTRACTED_FEATURES: '/relative/path/to/extracted_features/'
-            META_DATA_TAGS: ['id', 'lab']
-            MVTS_PARAMETERS:
+            PATH_TO_MVTS: # a string path, e.g., '/relative/path/to/data/'
+            PATH_TO_EXTRACTED_FEATURES:  # a string path e.g., 
+            '/relative/path/to/extracted_features/'
+            META_DATA_TAGS:  # a list of string tags, e.g., ['id', 'lab']
+            MVTS_PARAMETERS:  # a list of parameter-names, as shown below 
                 - 'param 1'
                 - 'param 2'
                 - 'param 3'
-            STATISTICAL_FEATURES:
+            STATISTICAL_FEATURES:  # a list of feature-names, as shown below
                 - 'get_min'
                 - 'get_max'
         ---------------------------------------------------------------------------
@@ -92,8 +104,9 @@ class ConfigReader:
         `features.features_collection` module (i.e., 'get_min' and 'get_max').
         
         Note 1: The values under MVTS_PARAMETERS must be identical to those used in
-        the dataset as the column-names. Users may want to list only those parameters
-        which are needed. Those that are not mentioned, will be ignored in processes.
+        the mvts dataset as the column-names. Users may want to list only those
+        parameters which are needed. Those that are not mentioned, will be ignored in
+        processes.
         
         Note 2: PATH_TO_EXTRACTED_FEATURES points to where the extracted features
         will be stored after they are computed using `features.feature_extractor`

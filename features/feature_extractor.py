@@ -4,42 +4,92 @@ import sys
 from os import path, walk
 import utils
 from features import extractor_utils
-import yaml
 import CONSTANTS as CONST
 from configs.config_reader import ConfigReader
 
 
-def _evaluate_args(params_name: list, params_index: list, features_list: list, feature_index: list):
+def _evaluate_features(features_name: list, features_index: list, config_features_available: bool):
     """
-    This method throws an exception if both of `params_name` and `params_index`, or both of
-    `features_list` and features_index` are provided.
+    This ensures that (1) if feature names are provided in the config file, one and only one of the
+    arguments, `features_name` or `features_index`, might be given, and (2) if feature names are
+    NOT provided in the config file, one and only one of the arguments MUST be given.
+    :param features_name: see the same argument in `do_extraction`.
+    :param features_index: see the same argument in `do_extraction`.
+    :param config_features_available: `True` if the key `STATISTICAL_FEATURES` in the config file,
+           is associated with a list of features, and `False` otherwise.
+    :return: True, if no exception was raised.
+    """
+    if features_index is None: features_index = []
+    if features_name is None: features_name = []
+    given_by_list, given_by_index = False, False
+    if len(features_name) > 0:
+        given_by_list = True
+    if len(features_index) > 0:
+        given_by_index = True
 
+    if not config_features_available:  # if features in config file are not provided
+        if given_by_list and not given_by_index:
+            return True
+        else:
+            # if (1) both args are given, or (2) if none of them are provided, or (3) if
+            # params_index is given
+            raise ValueError(
+                """
+                If a list of feature names is not provided by the config file, 
+                the arg `features_name` and only that MUST be given.
+                """
+            )
+    else:
+        if given_by_list + given_by_index > 1:  # if both args are provided
+            raise ValueError(
+                """
+                Both of the arguments, `features_name` and `features_index`, cannot be given at the 
+                same time.
+                """
+            )
+    return True
+
+
+def _evaluate_params(params_name: list, params_index: list, config_params_available: bool):
+    """
+    This ensures that (1) if parameter names are provided in the config file, one and only one of
+    the arguments, `params_name` or `params_index`, might be given, and (2) if parameter names are
+    NOT provided in the config file, the arg `params_name` and only that MUST be given.
     :param params_name: see the same argument in `do_extraction`.
     :param params_index: see the same argument in `do_extraction`.
-    :param features_list: see the same argument in `do_extraction`.
-    :param feature_index: see the same argument in `do_extraction`.
-
-    :return: always True.
+    :param config_params_available: `True` if the key `MVTS_PARAMETERS` in the config file, is
+           associated with a list of parameters, and `False` otherwise.
+    :return: True, if no exception was raised.
     """
-    has_param_name_in_arg = (params_name is not None) and (len(params_name) > 0)
-    has_param_index_in_arg = (params_index is not None) and (len(params_index) > 0)
-    has_feature_name_in_arg = (features_list is not None) and (len(features_list) > 0)
-    has_feature_index_in_arg = (feature_index is not None) and (len(feature_index) > 0)
+    if params_index is None: params_index = []
+    if params_name is None: params_name = []
 
-    if has_param_name_in_arg and has_param_index_in_arg:
-        raise ValueError(
-            """
-            One and only one of the two arguments (params_name_list, params_index) must
-            be provided.
-            """
-        )
-    if has_feature_name_in_arg and has_feature_index_in_arg:
-        raise ValueError(
-            """
-            Either in the configuration file or by the argument `feature_list`, a list of 
-            statistical features must be provided!
-            """
-        )
+    given_by_list, given_by_index = False, False
+    if len(params_name) > 0:
+        given_by_list = True
+    if len(params_index) > 0:
+        given_by_index = True
+
+    if not config_params_available:  # if parameters in config file are not provided
+        if given_by_list and not given_by_index:
+            return True
+        else:
+            # if (1) both args are given, or (2) if none of them are provided, or (3) if
+            # params_index is given
+            raise ValueError(
+                """
+                If a list of parameter names is not provided by the config file, 
+                the arg `params_name` and only that MUST be given.
+                """
+            )
+    else:
+        if given_by_list + given_by_index > 1:  # if both args are provided
+            raise ValueError(
+                """
+                Both of the arguments, `params_name` and `params_index`, cannot be given at the 
+                same time.
+                """
+            )
     return True
 
 
@@ -205,28 +255,30 @@ class FeatureExtractor:
         of the desired parameters and features the optional arguments can be skipped. So,
         please keep in mind the followings:
 
-            * For parameters: a selected list of parameters (i.e., column names in mvts data)
-            must be provided either through the configuration file or the method
-            argument `params_name`. Also the argument `params_index` can be used to work with a
-            smaller list of parameters if a list of parameters is already provided in the
-            configuration file.
-            * For features: A selected list of parameters (i.e., statistical features available in
-            `features.feature_collection.py`) MUST be provided, as mentioned above.
+            * For parameters: a selected list of parameters (i.e., column names in mvts data) must
+              be provided either through the configuration file or the method argument
+              `params_name`. Also the argument `params_index` can be used to work with a smaller
+              list of parameters if a list of parameters is already provided in the config file.
+            * For features: A selected list of parameters (i.e., statistical features available
+              in `features.feature_collection.py`) MUST be provided, as mentioned above.
 
-        :param params_name: (Optional) A list of column names, that can be used instead of
-                                the list `STATISTICAL_FEATURES` that is read from the
-                                configuration file in the constructor.
-        :param params_index: (Optional) A list of column indices, that can be used instead
-                                  of the list `STATISTICAL_FEATURES` that is read from the
-                                  configuration file in the constructor. The numbers in this list
-                                  (instead of strings in `STATISTICAL_FEATURES`) can be used to
-                                  confine the feature extraction to a subset of time series (
-                                  columns) in the mvts data.
+        :param params_name: (Optional) A list of parameter names of interest that can be used
+                            instead of the list `MVTS_PARAMETERS` given in the config file. If
+                            the list in the config file is NOT provided, then either this or
+                            `params_index` MIST be given.
+        :param params_index: (Optional) A list of column indices of interest, that can be used
+                             instead of the list `MVTS_PARAMETERS` given in the config file.
+                             If the list in the config file is NOT provided, then either this or
+                             `params_name` MUST be given.
         :param features_name: (Optional) A list of statistical features to be calculated on all
                               time series of each mvts file. The statistical features are the
-                              function names present in `features.feature_collection.py'.
+                              function names present in `features.feature_collection.py'. If they
+                              are not provided in the config file (under `STATISTICAL_FEATURES`),
+                              either this or `features_index` MUST be given.
         :param features_index: (Optional) A list of indices corresponding to the features
-                               provided in the configuration file.
+                               provided in the configuration file. If they are not provided in
+                               the config file (under `STATISTICAL_FEATURES`), either this or
+                               `features_names` MUST be given.
         :param first_k: (Optional) If provided, only the fist `first_k` mvts files will be
                         processed. This is mainly for getting some preliminary results in case the
                         number of mvts files is too large.
@@ -236,7 +288,8 @@ class FeatureExtractor:
         :param partition: (only for internal use)
         :param proc_id: (only for internal use)
         :param verbose: if set to True, the program prints on the console which files are being
-        processed and what processes (if parallel) are doing the work. The default value is False.
+                        processed and what processes (if parallel) are doing the work. The default
+                        value is False.
         :param output_list: (only for internal use)
         :return: None
         """
@@ -246,8 +299,10 @@ class FeatureExtractor:
         # -----------------------------------------
         # Verify arguments
         # -----------------------------------------
-        _evaluate_args(params_name, params_index, features_name, features_index)
-
+        _evaluate_params(params_name, params_index,
+                         config_params_available=self.mvts_parameters is not None)
+        _evaluate_features(features_name, features_index,
+                           config_features_available=self.statistical_features is not None)
         # -----------------------------------------
         # If features are provided using one of the optional arguments
         # override self.statistical_features with the given list.
@@ -381,7 +436,7 @@ class FeatureExtractor:
         if is_parallel:
             output_list.append(self.df_all_features)
 
-    def store_extracted_features(self, output_filename):
+    def store_extracted_features(self, output_filename:str, verbose:bool=True):
         """
         stores the dataframe of extracted features, calculated in the method `do_extraction`,
         as a csv file. The output path is read from the configuration file, while the file name
@@ -392,6 +447,8 @@ class FeatureExtractor:
 
         :param output_filename: the name of the output csv file as the calculated data frame. If
                the '.csv' extension is not provided, it will ba appended to the given name.
+        :param verbose: Set to `False` to prevent the output path be printed on console. Default
+                        is set to True.
         """
         # -----------------------------------------
         # Store the csv of all features to 'path_to_dest'.
@@ -404,7 +461,8 @@ class FeatureExtractor:
 
         fname = os.path.join(self.path_to_output, output_filename)
         self.df_all_features.to_csv(fname, sep='\t', header=True, index=False)
-        print('\n\tThe dataframe is stored at: {0}'.format(fname))
+        if verbose:
+            print('\n\tThe dataframe is stored at: {0}'.format(fname))
 
 
 def main():
@@ -413,8 +471,8 @@ def main():
 
     # --------------------------- Sequential Cases -----------------------------------
     # ------------- Usage 1:
-    fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-                     params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
+    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
+    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
     # ------------- Usage 2:
     # fe.do_extraction(features_index=[0, 1, 2, 3],
     #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
@@ -440,12 +498,12 @@ def main():
     #                              features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
     #                              params_index=[0, 1, 2], first_k=50)
     # ------------- Usage 4:
-    # fe.do_extraction_in_parallel(n_jobs=4,
-    #                              features_index=[0, 1, 2, 3],
-    #                              params_index=[0, 1, 2], first_k=50)
+    fe.do_extraction_in_parallel(n_jobs=4,
+                                 features_index=[0, 1, 2, 3],
+                                 params_index=[0, 1, 2], first_k=50)
 
-    print(fe.df_all_features.shape)
-    fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
+    print(fe.df_all_features)
+    # fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
 
 
 if __name__ == '__main__':

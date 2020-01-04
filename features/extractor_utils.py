@@ -10,6 +10,7 @@ def get_methods_for_names(method_names: list):
     :param method_names: name of the method of interest that exists in `feature_collection`.
     :return: a callable instance of the method whose name is given.
     """
+    # TODO: raise proper error if there is any invalid method names.
     callable_methods = []
     for m in method_names:
         callable_m = getattr(fc, m)
