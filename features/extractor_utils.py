@@ -10,10 +10,22 @@ def get_methods_for_names(method_names: list):
     :param method_names: name of the method of interest that exists in `feature_collection`.
     :return: a callable instance of the method whose name is given.
     """
-    # TODO: raise proper error if there is any invalid method names.
     callable_methods = []
     for m in method_names:
-        callable_m = getattr(fc, m)
+        try:
+            callable_m = getattr(fc, m)
+        except AttributeError as e:
+            raise AttributeError(
+                '''
+                The statistical feature '{}' is invalid!
+                Hint: To see all available features, run the following snippet:
+                
+                    import features.feature_collection as fc
+                    help(fc)
+                
+                Any method-name starting with 'get_' can be used as a statistical feature.
+                '''.format(m)
+            )
         callable_methods.append(callable_m)
     return callable_methods
 

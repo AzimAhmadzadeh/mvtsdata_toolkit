@@ -22,6 +22,12 @@ class TestExtractorUtils(unittest.TestCase):
         is_callable = [callable(m) for m in callable_methods]
         self.assertEqual(is_callable, [True] * len(method_names))
 
+    def test_get_methods_for_invalid_names(self):
+        """ Tests whether this method raises proper exception for invalid feature names."""
+        method_names = ['get_miin']
+        with self.assertRaises(AttributeError):
+            ex_util.get_methods_for_names(method_names)
+
     def test_flatten_to_row_df1(self):
         """ Input is a 2X3 dataframe, and the expected output is a 1X6 dataframe. """
         df_input = pd.DataFrame({'param1': [1, 4],
