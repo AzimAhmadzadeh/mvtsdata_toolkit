@@ -7,7 +7,7 @@ import numpy as np
 '''
 
 
-def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.DataFrame:
+def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFrame:
     """
     Applies the MinMaxScaler from the module sklearn.preprocessing to find
     the min and max of each column and transforms the values into the range
@@ -31,6 +31,8 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.Dat
     except that now the numerical values are transformed into a [0, 1]-range.
     """
     from sklearn.preprocessing import MinMaxScaler
+
+    excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
@@ -58,7 +60,7 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.Dat
     return df_norm
 
 
-def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.DataFrame:
+def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFrame:
     """
     Applies the `MinMaxScaler` from the module `sklearn.preprocessing` to find
     the min and max of each column and transforms the values into the range
@@ -82,6 +84,8 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) ->
     except that now the numerical values are transformed into a [-1, 1]-range.
     """
     from sklearn.preprocessing import MinMaxScaler
+
+    excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
@@ -109,7 +113,7 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = []) ->
     return df_norm
 
 
-def standardize(df: pd.DataFrame, excluded_colnames: list= []) -> pd.DataFrame:
+def standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFrame:
     """
     Applies the StandardScaler from the module sklearn.preprocessing by
     removing the mean and scaling to unit variance. The transformation
@@ -135,6 +139,8 @@ def standardize(df: pd.DataFrame, excluded_colnames: list= []) -> pd.DataFrame:
     at 0 and unit standard deviation.
     """
     from sklearn.preprocessing import StandardScaler
+
+    excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)
@@ -162,7 +168,7 @@ def standardize(df: pd.DataFrame, excluded_colnames: list= []) -> pd.DataFrame:
     return df_norm
 
 
-def robust_standardize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.DataFrame:
+def robust_standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFrame:
     """
     Applies the RobustScaler from the module sklearn.preprocessing by
     removing the median and scaling the data according to the quantile
@@ -184,6 +190,8 @@ def robust_standardize(df: pd.DataFrame, excluded_colnames: list = []) -> pd.Dat
     determined by IQR.
     """
     from sklearn.preprocessing import RobustScaler
+
+    excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
     # Separate data (numeric) from those to be excluded (ids and labels)

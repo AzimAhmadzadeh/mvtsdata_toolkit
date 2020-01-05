@@ -66,7 +66,8 @@ class TestMetaDataGetter(unittest.TestCase):
     def test_12_extract_class_label(self):
         with self.assertRaises(Exception) as context:
             mdg.extract_tagged_info(TestMetaDataGetter.bad_file_name, 'lbb')
-            self.assertTrue('Filename format is incorrect. Pair of braces not found after given expression.' in context.exception)
+            self.assertTrue('Filename format is incorrect. Pair of braces not found after given '
+                            'expression.' in context.exception)
 
 
 if __name__ == '__main__':

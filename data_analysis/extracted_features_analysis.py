@@ -205,20 +205,20 @@ def main():
     # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
     # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
     # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
-    # df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
-    # print(df_norm)
+    df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
+    print(df_norm)
 
-    efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
-    efa.compute_summary()
+    # efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
+    # efa.compute_summary()
     # efa.print_summary()
 
-    d = efa.get_five_num_summary()
-    print(d[d['Feature-Name'] == 'TOTUSJH_median'].values)
-    print(list(d))
+    # d = efa.get_five_num_summary()
+    # print(d[d['Feature-Name'] == 'TOTUSJH_median'].values)
+    # print(list(d))
     # print(efa.get_class_population(label='lab'))
     # print(efa.get_five_num_summary())
     # print(efa.get_missing_values())
-    efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/xxxxx.csv')
+    # efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/xxxxx.csv')
 
 
 if __name__ == '__main__':
