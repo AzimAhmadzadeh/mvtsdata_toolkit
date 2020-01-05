@@ -1,5 +1,7 @@
+
+
 def validate_input(class_population: dict = None, desired_ratios: dict = None,
-                   desired_populations: dict = None, ):
+                   desired_populations: dict = None):
     """
 
     :param class_population: Existing classes with population present in dataset
@@ -10,7 +12,7 @@ def validate_input(class_population: dict = None, desired_ratios: dict = None,
     if not desired_populations and not desired_ratios:
         raise ValueError(
             """
-            One argument needs to be passed
+            At least one of the args, `desired_population` or `desired_ratios` MUST be given!
             """
         )
     elif not desired_populations:
@@ -19,7 +21,8 @@ def validate_input(class_population: dict = None, desired_ratios: dict = None,
         if set(class_population.keys()) != set(desired_ratios.keys()):
             raise ValueError(
                 """
-                Please enter correct labels and desired ratio
+                The keys of the passed dictionaries, `class_population` and `desired_ratios` do 
+                not match!
                 """
             )
     elif not desired_ratios:
@@ -27,7 +30,8 @@ def validate_input(class_population: dict = None, desired_ratios: dict = None,
         if set(class_population.keys()) != set(desired_populations.keys()):
             raise ValueError(
                 """
-                Please enter correct labels and desired population
+                The keys of the passed dictionaries, `class_population` and `desired_populations` do 
+                not match!
                 """
             )
         if (desired_populations.values() != -1) and (desired_populations.values() <= 0) and (
