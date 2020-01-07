@@ -16,7 +16,7 @@ class TestNormalizer(unittest.TestCase):
 
         path_to_mvts = os.path.join(CONST.ROOT,
                                     'tests/test_dataset/extracted_features'
-                                    '/extracted_features_TEST_INPUT.csv')
+                                    '/extracted_features_TEST_NORMALIZER.csv')
         cls.df = pd.read_csv(path_to_mvts, sep='\t')
 
     @classmethod

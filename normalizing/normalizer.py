@@ -35,7 +35,7 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.D
     excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
-    # Separate data (numeric) from those to be excluded (ids and labels)
+    # Separate data (numeric) from those to be excluded (ids and class_labels)
     included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
     df_numeric = df[included_cnames].select_dtypes(include=np.number)
@@ -88,7 +88,7 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) 
     excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
-    # Separate data (numeric) from those to be excluded (ids and labels)
+    # Separate data (numeric) from those to be excluded (ids and class_labels)
     included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
     df_numeric = df[included_cnames].select_dtypes(include=np.number)
@@ -143,7 +143,7 @@ def standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFram
     excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
-    # Separate data (numeric) from those to be excluded (ids and labels)
+    # Separate data (numeric) from those to be excluded (ids and class_labels)
     included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
     df_numeric = df[included_cnames].select_dtypes(include=np.number)
@@ -194,7 +194,7 @@ def robust_standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.D
     excluded_colnames = excluded_colnames if excluded_colnames else []
 
     colnames_original_order = list(df)
-    # Separate data (numeric) from those to be excluded (ids and labels)
+    # Separate data (numeric) from those to be excluded (ids and class_labels)
     included_cnames = [colname for colname in list(df) if colname not in excluded_colnames]
     # Exclude all non-numeric columns
     df_numeric = df[included_cnames].select_dtypes(include=np.number)

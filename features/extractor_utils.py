@@ -62,13 +62,13 @@ def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFra
 
 def flatten_to_row_df(df: pd.DataFrame) -> pd.DataFrame:
     """
-    For a given dataframe of dimension P X F, where the row names (i.e., df's indices) are the
+    For a given dataframe of dimension P X F, where the row names (i.e., original_mvts's indices) are the
     time series (i.e., parameters') names, and the column names are the statistical features, this
     method flattens the given dataframe into a single-row dataframe of dimension 1 X (P X F). The
-    columns names in the resultant dataframe is derived from the given dataframe df, by combining
+    columns names in the resultant dataframe is derived from the given dataframe original_mvts, by combining
     the row and column names of the given dataframe.
 
-    For example, for a given df like the one below::
+    For example, for a given original_mvts like the one below::
 
         -----------------------------------------------
             f1    f2    ...

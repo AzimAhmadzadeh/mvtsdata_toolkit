@@ -38,7 +38,7 @@ class TestMetaDataGetter(unittest.TestCase):
 
     def test_08_extract_class_label(self):
         flare_class = mdg.extract_tagged_info(TestMetaDataGetter.good_file_name, 'lab')
-        self.assertEqual(flare_class, 'B', 'Extracted class labels from file name is incorrect.')
+        self.assertEqual(flare_class, 'B', 'Extracted class class_labels from file name is incorrect.')
 
     # bad_file_name --> Filename has extra [] but no unpaired brace ;
     # Below methods test over filename which has extra pair of braces in substrings to be extracted
@@ -60,7 +60,7 @@ class TestMetaDataGetter(unittest.TestCase):
 
     def test_11_extract_class_label(self):
         flare_class = mdg.extract_tagged_info(TestMetaDataGetter.bad_file_name, 'lab')
-        self.assertEqual(flare_class, '[B]', 'Extracted class labels from file name is incorrect.')
+        self.assertEqual(flare_class, '[B]', 'Extracted class class_labels from file name is incorrect.')
 
     # Test of exception --> by providing wrong starting phrase
     def test_12_extract_class_label(self):

@@ -110,8 +110,8 @@ class ExtractedFeaturesAnalysis:
         """
         Gets the per-class population of the original dataset.
 
-        :param label: The column-name corresponding to the labels.
-        :return: a dataframe of two columns; labels and class counts.
+        :param label: The column-name corresponding to the class_labels.
+        :return: a dataframe of two columns; class_labels and class counts.
         """
         population_df = self.df[label].value_counts()
         population_df = population_df.to_frame(_summary_keywords['population'])

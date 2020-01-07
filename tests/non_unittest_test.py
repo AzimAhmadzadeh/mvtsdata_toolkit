@@ -20,7 +20,7 @@ if __name__ == "__main__":
     #s.undersample(['X','M'],['B','NF','C'],'X')
     s.oversample(['X','M'],['B','NF','C'],'C')
     #s.sample(desired_ratios= {'B': 1,'NF': .33, 'M': 1, 'C': -1 , 'X':.15})
-    print(s.desired_dfs.shape[0])
+    print(s.sampled_mvts.shape[0])
     labels = s.get_labels()
     df_dict = s.get_decomposed_mvts()
 
