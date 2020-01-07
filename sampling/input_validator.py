@@ -1,6 +1,7 @@
+import numpy as np
 
 
-def validate_input(class_population: dict = None, desired_ratios: dict = None,
+def validate_input(class_population: dict, desired_ratios: dict = None,
                    desired_populations: dict = None):
     """
 
@@ -9,15 +10,18 @@ def validate_input(class_population: dict = None, desired_ratios: dict = None,
     :param desired_populations: Given input by user(class label with desired population)
     :return:
     """
+    desired_ratios = desired_ratios if desired_ratios else {}
+    desired_populations = desired_populations if desired_populations else {}
+
     if not desired_populations and not desired_ratios:
+        # at least one MUST be given
         raise ValueError(
             """
             At least one of the args, `desired_population` or `desired_ratios` MUST be given!
             """
         )
-    elif not desired_populations:
-
-        # Check whether the argument passed by the user matches with the dataset
+    if desired_ratios:
+        # class labels MUST match.
         if set(class_population.keys()) != set(desired_ratios.keys()):
             raise ValueError(
                 """
@@ -25,29 +29,33 @@ def validate_input(class_population: dict = None, desired_ratios: dict = None,
                 not match!
                 """
             )
-    elif not desired_ratios:
-        # Check whether the argument passed by the user matches with the dataset
+        invalid_count = \
+            np.sum([True for _, count in desired_ratios.items() if count != -1 and count < 0])
+        # no negative count (except -1) is allowed.
+        if invalid_count:
+            raise ValueError(
+                """
+                The dictionary `desired_ratios` CANNOT have negative values except -1.
+                """
+            )
+    if desired_populations:
+        # class labels MUST match.
         if set(class_population.keys()) != set(desired_populations.keys()):
             raise ValueError(
                 """
-                The keys of the passed dictionaries, `class_population` and `desired_populations` do 
-                not match!
+                The class labels in `desired_populations` do not match with those specified in 
+                `class-populations`!
                 """
             )
-        if (desired_populations.values() != -1) and (desired_populations.values() <= 0) and (
-                desired_populations.values() > 1):
+        invalid_count = \
+            np.sum([True for _, count in desired_populations.items() if count != -1 and count < 0])
+        # no negative count (except -1) is allowed.
+        if invalid_count:
             raise ValueError(
                 """
-                Please enter values between 0 to 1 or -1 in desired ratios
+                The dictionary `desired_populations` CANNOT have negative values except -1.
                 """
             )
-
-    else:
-        raise ValueError(
-            """
-            One argument needs to be passed
-            """
-        )
 
 
 def validate_sampling_input(class_population, minority_labels, majority_labels, base):

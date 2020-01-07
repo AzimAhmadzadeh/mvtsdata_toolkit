@@ -1,5 +1,7 @@
 import pandas as pd
-from sampling.input_validator import validate_input,validate_sampling_input
+import numpy as np
+import copy
+from sampling.input_validator import validate_input, validate_sampling_input
 
 
 class Sampler:
@@ -38,12 +40,14 @@ class Sampler:
 
     def __compute_original_ratios(self):
         total = sum(self.class_population.values())
-        class_ratios = [self.class_population[label] / total for label in self.class_population.keys()]
+        class_ratios = [self.class_population[label] / total for label in
+                        self.class_population.keys()]
         return class_ratios
 
     def __decompose_mvts(self):
         """
-        A private method that decomposes the mvts dataframe into several dataframes, one for each class label.
+        A private method that decomposes the mvts dataframe into several dataframes, one for each
+        class label, in the form of a dictionary.
         """
         for key in self.dfs_dict.keys():
             self.dfs_dict[key] = self.df[:][self.df[self.label_col_name] == key]
@@ -71,9 +75,10 @@ class Sampler:
 
     def get_decomposed_mvts(self):
         """
-        Decomposes the dataframe provided to the class into several dataframes, one for each class label.
+        Decomposes the dataframe provided to the class into several dataframes, one for each class
+        label.
         :return: a dictionary of dataframes, with keys being the class labels, and the corresponding
-        dataframes contain instances of those labels only.
+                 dataframes contain instances of those labels only.
         """
         return self.dfs_dict
 
@@ -106,29 +111,32 @@ class Sampler:
         class should remain unchanged.
         :return:
         """
+        self.desired_dfs = pd.DataFrame()  # empty this before appending new dataframes
+        expected_populations = {}
 
-        if not desired_populations:
-            validate_input(self.class_population, desired_ratios=desired_ratios)
-            total_population = sum(self.class_population.values())
-            desired_populations = {}
+        if desired_ratios:
+            validate_input(class_population=self.class_population, desired_ratios=desired_ratios)
+            total_population = np.sum(self.class_population.values())
 
             for label, value in desired_ratios.items():
                 if value == -1:
-                    desired_populations[label] = self.class_population[label]
+                    expected_populations[label] = self.class_population[label]
                 else:
-                    desired_populations[label] = round(value * total_population)
+                    expected_populations[label] = np.round(value * total_population)
 
         else:
+            validate_input(class_population=self.class_population,
+                           desired_populations=desired_populations)
+            for label, value in desired_populations.items():
+                if value == -1:
+                    expected_populations[label] = self.class_population[label]
+                else:
+                    expected_populations[label] = desired_populations[label]
 
-            validate_input(self.class_population, desired_populations=desired_populations)
-
-        for label in self.labels:
-            if desired_populations[label] == -1:
-                self.desired_dfs = self.desired_dfs.append(self.dfs_dict[label])
-            elif value >= 0:
-                count = round(desired_populations[label])
-                output_dfs = self.sample_each_class(self.dfs_dict[label], count)
-                self.desired_dfs = self.desired_dfs.append(output_dfs)
+        for label, value in expected_populations.items():
+            sample_size = np.round(expected_populations[label])
+            output_dfs = self.sample_each_class(self.dfs_dict[label], sample_size)
+            self.desired_dfs = self.desired_dfs.append(output_dfs)
 
         return self.desired_dfs
 
@@ -158,8 +166,9 @@ class Sampler:
         :param base_minority:
         :return:
         """
-        validate_sampling_input(self.class_population,minority_labels= minority_labels, majority_labels= majority_labels
-                                , base= base_minority)
+        validate_sampling_input(self.class_population, minority_labels=minority_labels,
+                                majority_labels=majority_labels
+                                , base=base_minority)
         if base_minority:
             base_count = self.dfs_dict[base_minority].shape[0]
             total_min_count = base_count * len(minority_labels)
@@ -175,6 +184,8 @@ class Sampler:
             for label in majority_labels:
                 output_dfs = self.sample_each_class(self.dfs_dict[label], maj_base_count)
                 self.desired_dfs = self.desired_dfs.append(output_dfs)
+
+            # TODO: return?
 
     def oversample(self, minority_labels: list, majority_labels: list, base_majority: str):
         """
@@ -202,7 +213,8 @@ class Sampler:
         :param base_majority:
         :return:
         """
-        validate_sampling_input(self.class_population, minority_labels=minority_labels, majority_labels=majority_labels,
+        validate_sampling_input(self.class_population, minority_labels=minority_labels,
+                                majority_labels=majority_labels,
                                 base=base_majority)
         if base_majority:
             base_count = self.dfs_dict[base_majority].shape[0]
@@ -220,20 +232,50 @@ class Sampler:
                 output_dfs = self.sample_each_class(self.dfs_dict[label], min_base_count)
                 self.desired_dfs = self.desired_dfs.append(output_dfs)
 
-    def sample_each_class(self, input_dfs: pd.DataFrame, count: int) -> pd.DataFrame:
-        """
-        This method returns output samples based on given dataset and count of desired output sample.
-        If desired sample size is more than input dataset then whole input dataset is used and rest of the samples
-        are created using sampling with replacement from the input dataset.
-        :param input_dfs: Input Dataset
-        :param count: Count of desired output samples
-        :return: Sampled Dataset
-        """
+        # TODO: return?
 
-        if count > input_dfs.shape[0]:
-            output_dfs = input_dfs.append(
-                input_dfs.sample((count - input_dfs.shape[0]), replace=True))
+    def sample_each_class(self, input_dfs: pd.DataFrame, new_sample_size: int) -> pd.DataFrame:
+        """
+        This method samples `new_sample_size` instances from a given dataframe. If the desired
+        sample size is larger than the original population (i.e., `new_sample_size >
+        input_dfs.shape[0]`), then the entire population will be used, as well as the extra samples
+        needed to achieve the desired sample size. The extra instances will be sampled with
+        replacement.
+        :param input_dfs: The input dataset to sample from.
+        :param new_sample_size: The size of the desired sample.
+        :return: The sampled dataframe.
+        """
+        population_size = input_dfs.shape[0]
+        if new_sample_size > population_size:
+            extra_samples = input_dfs.sample(new_sample_size - population_size, replace=False)
+            output_dfs = input_dfs.append(extra_samples, ignore_index=True)
         else:
-            output_dfs = input_dfs.sample(count)
-
+            output_dfs = input_dfs.sample(new_sample_size, replace=False)
         return output_dfs
+
+
+def main():
+    import os
+    import pandas as pd
+    import CONSTANTS as CONST
+
+    path_to_extracted_features = os.path.join(CONST.ROOT,
+                                              'tests/test_dataset/extracted_features/extracted_features_TEST_INPUT.csv')
+
+    df = pd.read_csv(path_to_extracted_features, sep='\t')
+    sampler = Sampler(df, 'lab')
+
+    print('desired dfs', sampler.desired_dfs)
+    print('class labels', sampler.labels)
+    print('class population:\n', sampler.class_population)
+    print('class ratios:\n', sampler.class_ratios)
+    # print('class decomposed df:\n', sampler.dfs_dict)
+
+    print(sampler.desired_dfs.shape)
+    desired_populations = {'NF': -1, 'C': 10}
+    sampler.sample(desired_populations=desired_populations)
+    print(sampler.desired_dfs.shape)
+
+
+if __name__ == "__main__":
+    main()

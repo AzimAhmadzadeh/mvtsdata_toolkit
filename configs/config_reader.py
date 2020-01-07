@@ -19,7 +19,8 @@ class ConfigReader:
         self.path_to_config = path_to_config
 
     def read(self) -> dict:
-        """ Evaluates the file before reading it in the following steps:
+        """ Reads the configuration file and returns a dictionary. It evaluates the file before
+        reading it in the following steps:
 
            - (1) checks if the file exists,
            - (2) checks if it is a 'yml' file,
