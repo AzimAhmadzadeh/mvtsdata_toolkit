@@ -58,6 +58,6 @@ def plot_iter_time():
     # plt.savefig('a1.png')
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     plot_iter_time()
     plot_iter_memory()

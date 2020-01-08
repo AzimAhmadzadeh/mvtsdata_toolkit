@@ -13,7 +13,7 @@ from pympler.asizeof import asizeof
 
 def run_tdigest(n_array, length_of_array):
     """
-    this method generates `n_array` array of `length_of_array` random numbers, and runs tDigest
+    this method generates `n_array` arrays of `length_of_array` random numbers, and runs tDigest
     over each of those arrays and record both the execution time (micro-seconds) and memory
     consumption (byte).
 
@@ -30,7 +30,7 @@ def run_tdigest(n_array, length_of_array):
         s_time = datetime.datetime.now()  # -------- START TIME ------------
         digest.batch_update(np.random.random(length_of_array))
         digest.compress()
-        e_time = datetime.datetime.now()  # -------- START TIME ------------
+        e_time = datetime.datetime.now()  # -------- END TIME --------------
         mem_consumption = asizeof(digest)
         delta = e_time - s_time
         all_timediffs.append(delta)
@@ -101,7 +101,7 @@ def get_size(obj, seen=None):
 
 def main():
     n_iterations = 10
-    n_array = 1000
+    n_array = 100
     length_of_array = 100
     time_mem_test(n_iterations, n_array, length_of_array)
 
