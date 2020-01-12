@@ -159,7 +159,6 @@ class FeatureExtractor:
         cr = ConfigReader(path_to_config)
         configs = cr.read()
 
-        self.path_to_config = path_to_config
         self.path_to_root = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
         self.path_to_output = os.path.join(CONST.ROOT, configs['PATH_TO_EXTRACTED_FEATURES'])
         self.statistical_features: list = configs['STATISTICAL_FEATURES']
