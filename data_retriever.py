@@ -54,6 +54,12 @@ class DataRetriever:
             meta = req.info()
         return meta
 
+    def print_info(self):
+        print('URL:\t\t{}'.format(self.dataset_url))
+        print('NAME:\t\t{}'.format(self.dataset_name))
+        print('TYPE:\t\t{}'.format(self.get_compression_type()))
+        print('SIZE:\t\t{}'.format(self.get_total_size()))
+
     def get_total_size(self):
         """:return the size of the data to be extracted."""
         return size(int(self.__meta['Content-Length']))
