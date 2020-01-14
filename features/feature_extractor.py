@@ -463,6 +463,17 @@ class FeatureExtractor:
         if verbose:
             print('\n\tThe dataframe is stored at: {0}'.format(fname))
 
+    def boxplot_extracted_features(self, feature_names: list, output_path: str = None):
+        """
+
+        :param feature_names:
+        :param output_path:
+        :return:
+        """
+        from visualizations.stat_visualizer import StatVisualizer
+
+        StatVisualizer()
+
 
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
@@ -501,7 +512,9 @@ def main():
                                  features_index=[0, 1, 2, 3],
                                  params_index=[0, 1, 2], first_k=50)
 
-    print(fe.df_all_features)
+    params = ['TOTUSJH_median', 'TOTUSJH_mean', 'TOTBSQ_median', 'TOTBSQ_mean']
+    fe.boxplot_extracted_features(params)
+    # print(fe.df_all_features)
     # fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
 
 
