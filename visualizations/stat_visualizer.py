@@ -8,22 +8,33 @@ from normalizing import normalizer
 
 class StatVisualizer:
 
-    def __init__(self, path_to_extracted_features: str, normalize: bool = True):
+    def __init__(self, path_to_extracted_features: str = None,
+                 extracted_features: pd.DataFrame = None,
+                 normalize: bool = True):
         """
         A constructor that loads the data and if required, normalizes the values into the [0,1]
         range.
 
         :param path_to_extracted_features: The absolute or relative path to the extracted features.
+        :param extracted_features:
         :param normalize: False, if the ranges of values for different features are not far apart
                           and therefore, the boxplot does not need normalization. The default
                           value is True.
         """
-
+        if path_to_extracted_features and extracted_features:
+            raise ValueError(
+                """
+                Both of the arguments, `path_to_extracted_features` and `extracted_features`, 
+                cannot be given at the same time!
+                """
+            )
         self.path_to_extracted_features = path_to_extracted_features
-        self.__verify_path_to_extracted_features()
-        self.df = pd.read_csv(self.path_to_extracted_features, sep='\t')
+        self.extracted_features = extracted_features
+        if self.path_to_extracted_features:
+            self.__verify_path_to_extracted_features()
+            self.extracted_features = pd.read_csv(self.path_to_extracted_features, sep='\t')
         if normalize:
-            self.df = normalizer.zero_one_normalize(self.df)
+            self.extracted_features = normalizer.zero_one_normalize(self.extracted_features)
 
     def __verify_path_to_extracted_features(self):
         """
@@ -48,20 +59,20 @@ class StatVisualizer:
                 """.format(self.path_to_extracted_features)
             )
 
-    def boxplot_extracted_features(self, feature_names: list, output_filename: str = None):
+    def boxplot_extracted_features(self, feature_names: list, output_path: str = None):
         """
-        Generates a list of boxplots, one for each extracted feature.
+        Generates a plot of boxplots, one for each extracted feature.
 
         :param feature_names: a list of feature-names indicating the columns of interest for this
                               visualization.
-        :param output_filename: If given, the generated plot will be stored instead of shown.
-                                Otherwise, it will be only shown if the running environment
-                                allows it.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment
+                            allows it.
         :return: None
         """
         # Plot from:
         # https: // seaborn.pydata.org / examples / horizontal_boxplot.html
-        df = pd.melt(self.df[feature_names], var_name='feature', value_name='value')
+        df = pd.melt(self.extracted_features[feature_names], var_name='feature', value_name='value')
         sns.set(style="ticks")
 
         fig, ax = plt.subplots(figsize=(10, len(feature_names)))
@@ -82,25 +93,25 @@ class StatVisualizer:
         ax.set_ylabel('')
         ax.set_xlabel('Value', fontsize=12)
 
-        if output_filename:
-            if not output_filename.endswith('.png'):
-                output_filename += '.png'
-            fig.savefig(output_filename, dpi=200)
+        if output_path:
+            if not output_path.endswith('.png'):
+                output_path += '.png'
+            fig.savefig(output_path, dpi=200)
             plt.close(fig)
         else:
             plt.show()
 
-    def plot_violinplot(self, feature_names: list, output_filename: str = None):
+    def plot_violinplot(self, feature_names: list, output_path: str = None):
         """
         Generates a set of violin-plots, one for each extracted feature.
 
         :param feature_names: a list of feature-names indicating the columns of interest for this
                               visualization.
-        :param output_filename: If given, the generated plot will be stored instead of shown.
+        :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment allows it.
         :return: None
         """
-        df = self.df[feature_names]
+        df = self.extracted_features[feature_names]
         ax = sns.violinplot(data=df, orient='h', order=feature_names, palette="vlag")
         ax.set_title('Violin Plot of Extracted Features', fontsize=20)
         fig = ax.figure
@@ -108,15 +119,15 @@ class StatVisualizer:
         # fig.set_ticklabels(rotation=45, va="center")
         fig.tight_layout(pad=1)
 
-        if output_filename:
-            if not output_filename.endswith('.png'):
-                output_filename += '.png'
-            fig.savefig(output_filename, dpi=200)
+        if output_path:
+            if not output_path.endswith('.png'):
+                output_path += '.png'
+            fig.savefig(output_path, dpi=200)
             plt.close(fig)
         else:
             plt.show()
 
-    def plot_splom(self, feature_names: list, output_filename: str = None):
+    def plot_splom(self, feature_names: list, output_path: str = None):
         """
         Generates a SPLOM, or a scatter plot matrix, for all pairs of features. Note that for a
         large number of features this may take a while (since each cell of the matrix is a
@@ -124,28 +135,28 @@ class StatVisualizer:
 
         :param feature_names: a list of feature-names indicating the columns of interest for this
                               visualization.
-        :param output_filename: If given, the generated plot will be stored instead of shown.
+        :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
                                 allows it.
         :return: None
         """
-        df = self.df[feature_names]
+        df = self.extracted_features[feature_names]
 
         ax = sns.pairplot(df)
-        # ax.set_title('SPLOT of Extracted Features', fontsize=20)
+        # ax.set_title('SPLOM of Extracted Features', fontsize=20)
         fig = ax.fig
         fig.set_size_inches((len(feature_names)*2, len(feature_names)*2))
         fig.tight_layout(pad=1)
 
-        if output_filename:
-            if not output_filename.endswith('.png'):
-                output_filename += '.png'
-            fig.savefig(output_filename, dpi=200)
+        if output_path:
+            if not output_path.endswith('.png'):
+                output_path += '.png'
+            fig.savefig(output_path, dpi=200)
             plt.close(fig)
         else:
             plt.show()
 
-    def plot_correlation_heatmap(self, feature_names: list, output_filename: str = None):
+    def plot_correlation_heatmap(self, feature_names: list, output_path: str = None):
         """
         Generates a heat-map for the correlation matrix of all pairs of given features.
 
@@ -155,12 +166,12 @@ class StatVisualizer:
 
         :param feature_names: a list of feature-names indicating the columns of interest for this
                               visualization.
-        :param output_filename: If given, the generated plot will be stored instead of shown.
+        :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
                                 allows it.
         :return: None
         """
-        df = self.df[feature_names]
+        df = self.extracted_features[feature_names]
 
         ax = sns.heatmap(df.corr(), cmap="vlag", vmin=-1, vmax=1)
         fig = ax.figure
@@ -175,15 +186,15 @@ class StatVisualizer:
 
         plt.yticks(va="center")  # rotation=45, fontsize="10",
 
-        if output_filename:
-            if not output_filename.endswith('.png'):
-                output_filename += '.png'
-            fig.savefig(output_filename, dpi=200)
+        if output_path:
+            if not output_path.endswith('.png'):
+                output_path += '.png'
+            fig.savefig(output_path, dpi=200)
             plt.close(fig)
         else:
             plt.show()
 
-    def plot_covariance_heatmap(self, feature_names: list, output_filename: str = None):
+    def plot_covariance_heatmap(self, feature_names: list, output_path: str = None):
         """
         Generates a heat-map for the covariance matrix of all pairs of given features.
 
@@ -195,12 +206,12 @@ class StatVisualizer:
 
         :param feature_names: a list of feature-names indicating the columns of interest for this
                               visualization.
-        :param output_filename: If given, the generated plot will be stored instead of shown.
+        :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
                                 allows it.
         :return: None
         """
-        df = self.df[feature_names]
+        df = self.extracted_features[feature_names]
 
         # Heatmap of covariance matrix
         ax = sns.heatmap(df.cov(), cmap="vlag")
@@ -217,10 +228,10 @@ class StatVisualizer:
 
         plt.yticks(va="center")  # rotation=45, fontsize="10",
 
-        if output_filename:
-            if not output_filename.endswith('.png'):
-                output_filename += '.png'
-            fig.savefig(output_filename, dpi=200)
+        if output_path:
+            if not output_path.endswith('.png'):
+                output_path += '.png'
+            fig.savefig(output_path, dpi=200)
             plt.close(fig)
         else:
             plt.show()

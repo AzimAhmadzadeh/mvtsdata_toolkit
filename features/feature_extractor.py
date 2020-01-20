@@ -465,15 +465,85 @@ class FeatureExtractor:
 
     def boxplot_extracted_features(self, feature_names: list, output_path: str = None):
         """
+        Generates a plot of box-plots, one for each extracted feature.
 
-        :param feature_names:
-        :param output_path:
-        :return:
+        :param feature_names: a list of feature-names indicating the columns of interest for this
+                              visualization.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment allows it.
+        :return: None
         """
         from visualizations.stat_visualizer import StatVisualizer
+        sv = StatVisualizer(extracted_features=self.df_all_features)
+        sv.boxplot_extracted_features(feature_names=feature_names, output_path=output_path)
 
-        StatVisualizer()
+    def plot_violinplot(self, feature_names: list, output_path: str = None):
+        """
+        Generates a plot of violin-plots, one for each extracted feature.
 
+        :param feature_names: a list of feature-names indicating the columns of interest for this
+                              visualization.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment allows it.
+        :return: None
+        """
+        from visualizations.stat_visualizer import StatVisualizer
+        sv = StatVisualizer(extracted_features=self.df_all_features)
+        sv.plot_violinplot(feature_names=feature_names, output_path=output_path)
+
+    def plot_splom(self, feature_names: list, output_path: str = None):
+        """
+        Generates a SPLOM, or a scatter plot matrix, for all pairs of features. Note that for a
+        large number of features this may take a while (since each cell of the matrix is a
+        scatter plot on its own), and also the final plot may become very large.
+
+        :param feature_names: a list of feature-names indicating the columns of interest for this
+                              visualization.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment allows it.
+        :return: None
+        """
+        from visualizations.stat_visualizer import StatVisualizer
+        sv = StatVisualizer(extracted_features=self.df_all_features)
+        sv.plot_splom(feature_names=feature_names, output_path=output_path)
+
+    def plot_correlation_heatmap(self, feature_names: list, output_path: str = None):
+        """
+        Generates a heat-map for the correlation matrix of all pairs of given features.
+
+        Note: Regardless of the range of correlations, the color-map is fixed to [-1, 1]. This is
+        especially important to avoid mapping insignificant changes of values into significant
+        changes of colors.
+
+        :param feature_names: a list of feature-names indicating the columns of interest for this
+                              visualization.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment allows it.
+        :return: None
+        """
+        from visualizations.stat_visualizer import StatVisualizer
+        sv = StatVisualizer(extracted_features=self.df_all_features)
+        sv.plot_correlation_heatmap(feature_names=feature_names, output_path=output_path)
+
+    def plot_covariance_heatmap(self, feature_names: list, output_path: str = None):
+        """
+        Generates a heat-map for the covariance matrix of all pairs of given features.
+
+        Note that covariance is not a standardized statistic, and because of this, the color-map
+        might be confusing; when the difference between the largest and smallest covariance is
+        insignificant, the colors may imply a significant difference. To avoid this, the values
+        mapped to the colors (as shown next to the color-map) must be carefully taken into
+        account in analysis of the covariance.
+
+        :param feature_names: a list of feature-names indicating the columns of interest for this
+                              visualization.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment allows it.
+        :return: None
+        """
+        from visualizations.stat_visualizer import StatVisualizer
+        sv = StatVisualizer(extracted_features=self.df_all_features)
+        sv.plot_covariance_heatmap(feature_names=feature_names, output_path=output_path)
 
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
@@ -513,7 +583,12 @@ def main():
                                  params_index=[0, 1, 2], first_k=50)
 
     params = ['TOTUSJH_median', 'TOTUSJH_mean', 'TOTBSQ_median', 'TOTBSQ_mean']
-    fe.boxplot_extracted_features(params)
+    # fe.boxplot_extracted_features(params)
+    fe.plot_violinplot(params)
+    # fe.plot_correlation_heatmap(params)
+    # fe.plot_covariance_heatmap(params)
+    # fe.plot_splom(params)
+
     # print(fe.df_all_features)
     # fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
 
