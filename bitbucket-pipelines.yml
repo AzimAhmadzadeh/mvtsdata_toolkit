@@ -25,7 +25,8 @@ pipelines:
             name: unittesting
             trigger: manual
             script:
-              - python -m tests.tests_runner
+              - pip install -r requirements.txt
+              - python -m tests.test_runner
 
         - step:
             name: rsync
