@@ -545,6 +545,7 @@ class FeatureExtractor:
         sv = StatVisualizer(extracted_features=self.df_all_features)
         sv.plot_covariance_heatmap(feature_names=feature_names, output_path=output_path)
 
+
 def main():
     path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
     fe = FeatureExtractor(path_to_config)
