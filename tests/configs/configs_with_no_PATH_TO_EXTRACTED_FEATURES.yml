@@ -1,0 +1,10 @@
+PATH_TO_MVTS: 'tests/test_dataset/mvts/'
+PATH_TO_EXTRACTED_FEATURES:
+META_DATA_TAGS: ['id', 'lab']
+MVTS_PARAMETERS:
+  - 'TOTUSJH'
+  - 'TOTBSQ'
+STATISTICAL_FEATURES:
+  - 'get_min'
+  - 'get_max'
+

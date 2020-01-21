@@ -1,81 +1,160 @@
 import pandas as pd
-from sampling.input_validator import validate_input,validate_sampling_input
+import numpy as np
+from sampling.input_validator import validate_sampling_input, validate_under_over_sampling_input
+
+
+def _extract_labels(mvts: pd.DataFrame, label_col_name) -> list:
+    """
+    A private method that extracts the unique class labels from the dataframe.
+    :return: a list of unique class labels.
+    """
+    class_labels = mvts[label_col_name].unique().tolist()
+    return class_labels
+
+
+def _decompose_mvts(mvts: pd.DataFrame, class_labels: list, label_col_name) -> dict:
+    """
+    A private method that decomposes the mvts dataframe into several dataframes, one for each
+    class label.
+
+    :return: a dictionary of labels (as keys) and dataframes (as values), each corresponding
+             to one label.
+     """
+    decomposed_mvts: dict = {label: pd.DataFrame for label in class_labels}
+    for key in decomposed_mvts.keys():
+        decomposed_mvts[key] = mvts[:][mvts[label_col_name] == key]
+    return decomposed_mvts
+
+
+def _compute_populations(mvts: pd.DataFrame, label_col_name) -> dict:
+    """
+    A private method that computes the population corresponding to each class label.
+
+    :param mvts: The dataframe who class population is of interest.
+    :param label_col_name: The column-name corresponding to the class labels in `mvts`.
+
+    :return: a dictionary of class labels (as keys) and class populations (as values).
+    """
+    class_labels: list = _extract_labels(mvts, label_col_name)
+    decomposed_mvts = _decompose_mvts(mvts, class_labels, label_col_name)
+    pop_dict = {label: len(decomposed_mvts[label]) for label in decomposed_mvts.keys()}
+    return pop_dict
+
+
+def _compute_ratios(mvts: pd.DataFrame, label_col_name) -> dict:
+    """
+    A private method that computes the population corresponding to each class label.
+
+    :param mvts: The dataframe who class population is of interest.
+    :param label_col_name: The column-name corresponding to the class labels in `mvts`.
+
+    :return: a dictionary of class labels (as keys) and class populations (as values).
+    :return: 
+    """
+
+    class_labels: list = _extract_labels(mvts, label_col_name)
+    decomposed_mvts = _decompose_mvts(mvts, class_labels, label_col_name)
+    pop_dict = {label: len(decomposed_mvts[label]) for label in decomposed_mvts.keys()}
+    return pop_dict
 
 
 class Sampler:
     """
-    This module  contains several sampling methods to handle dataset issues like imbalanced class.
+    This module contains several methods that assist sampling for a number of purposes,
+    among which, to remedy the class-imbalance issue is the primary objective.
 
-    See ReadMe.md for usage example.
     """
 
     def __init__(self, mvts_df: pd.DataFrame, label_col_name):
         """
-        The constructor method takes the input dataset as pandas dataframe and the column name to decompose
-        the specific column or feature.
-        We can get the population and ratio of the provided column name.
-        It also decomposes the whole dataset in several smaller dataset based on class.
+        The constructor method takes the input dataset and the column name corresponding to the
+        class labels, and extracts the information about class labels and class populations.
 
-        :param mvts_df:
-        :param label_col_name:
+        :param mvts_df: a mvts dataframe that needs normalization.
+        :param label_col_name: column-name corresponding to the class class_labels.
         """
-        self.df = mvts_df
         self.label_col_name = label_col_name
-        self.labels = mvts_df[label_col_name].unique().tolist()
-        self.dfs_dict = {label: pd.DataFrame for label in self.labels}
-        self.desired_dfs = pd.DataFrame()  # {label: pd.DataFrame for label in self.labels}
-        self.__decompose_mvts()
-        self.class_population = self.__compute_original_population()
-        self.class_ratios = self.__compute_original_ratios()
+        self.original_mvts = mvts_df
+        self.sampled_mvts = pd.DataFrame()
+        self.class_labels: list = _extract_labels(self.original_mvts, self.label_col_name)
+        self.__decomposed_original_mvts: dict = _decompose_mvts(self.original_mvts,
+                                                                self.class_labels,
+                                                                self.label_col_name)
+        self.__decomposed_sampled_mvts: dict = {}
 
-    def __compute_original_population(self):
+        self.original_class_populations: dict = {}
+        self.original_class_ratios: dict = {}
+        self.sampled_class_populations: dict = {}
+        self.sampled_class_ratios: dict = {}
+
+        self.__update_original_metadata()
+
+    def __compute_original_population(self) -> dict:
         """
-        A private method that computes the sample population of the original dataset.
-        :return: a dictionary of labels (as key) and populations (as values)
+        A private method that computes the population of the original dataset.
+
+        :return: a dictionary of class labels (as keys) and class populations (as values)
         """
-        pop_dict = {label: len(self.dfs_dict[label]) for label in self.dfs_dict.keys()}
+        pop_dict = {label: len(self.__decomposed_original_mvts[label]) for label in
+                    self.__decomposed_original_mvts.keys()}
         return pop_dict
 
-    def __compute_original_ratios(self):
-        total = sum(self.class_population.values())
-        class_ratios = [self.class_population[label] / total for label in self.class_population.keys()]
+    def __compute_original_ratios(self) -> dict:
+        """
+        A private method that computes the class ratios of the original dataset.
+
+        :return:
+        """
+        total = sum(self.original_class_populations.values())
+        class_ratios = {label: self.original_class_populations[label] / total for label in
+                        self.class_labels}
         return class_ratios
 
-    def __decompose_mvts(self):
+    def __compute_sampled_population(self) -> dict:
         """
-        A private method that decomposes the mvts dataframe into several dataframes, one for each class label.
-        """
-        for key in self.dfs_dict.keys():
-            self.dfs_dict[key] = self.df[:][self.df[self.label_col_name] == key]
+        A private method that computes the class population of the sampled dataset.
 
-    def get_labels(self):
-        """
-        A getter method for the labels
-        :return: a list of all class labels of the data.
-        """
-        return self.labels
+        Note: Do not use this method directly. Instead, call `update_after_sampling`.
 
-    def get_original_populations(self):
+        :return: a dictionary of class labels (as keys) and class populations (as values).
         """
-        Gets the per-class population of the original dataset.
-        :return: a dictionary of labels (as key) and class populations (as values)
-        """
-        return self.class_population
+        if self.sampled_mvts.empty:
+            return {}
 
-    def get_original_ratios(self):
-        """
-        Gets the per-class ratio of the original dataset.
-        :return: a dictionary of labels (as key) and class ratios (as values)
-        """
-        return self.class_ratios
+        self.__decomposed_sampled_mvts = _decompose_mvts(self.sampled_mvts, self.class_labels,
+                                                         self.label_col_name)
+        pop_dict = {label: len(self.__decomposed_sampled_mvts[label]) for label in
+                    self.__decomposed_sampled_mvts.keys()}
+        return pop_dict
 
-    def get_decomposed_mvts(self):
+    def __compute_sampled_ratios(self) -> dict:
         """
-        Decomposes the dataframe provided to the class into several dataframes, one for each class label.
-        :return: a dictionary of dataframes, with keys being the class labels, and the corresponding
-        dataframes contain instances of those labels only.
+        A private method that computes the class ratios of the sampled dataset.
+
+        Note: Do not use this method directly. Instead, call `update_after_sampling`.
+
+        :return: a dictionary of class labels (as keys) and class ratios (as values).
         """
-        return self.dfs_dict
+        total = sum(self.sampled_class_populations.values())
+        class_ratios = {label: self.sampled_class_populations[label] / total
+                        for label in self.class_labels}
+        return class_ratios
+
+    def get_labels(self) -> list:
+        """
+        A getter method for the class_labels.
+
+        :return: the class field `class_labels`; a list of all class labels in the data.
+        """
+        return self.class_labels
+
+    def __update_original_metadata(self):
+        self.original_class_populations = self.__compute_original_population()
+        self.original_class_ratios = self.__compute_original_ratios()
+
+    def __update_sampled_metadata(self):
+        self.sampled_class_populations = self.__compute_sampled_population()
+        self.sampled_class_ratios = self.__compute_sampled_ratios()
 
     def sample(self, desired_populations: dict = None, desired_ratios: dict = None):
         """
@@ -94,146 +173,216 @@ class Sampler:
 
         Note:
             1. One and only one of the arguments must be provided.
-            2. The dictionary must contain all class labels present in the mvts dataframe.
+            2. The dictionary must contain all class class_labels present in the mvts dataframe.
             3. The number -1 can be used wherever the population or ratio should not change.
 
         :param desired_populations: a dictionary of label-integer pairs, where each integer specifies
         the desired population of the corresponding class. The integers must be positive, but -1
-        can be used to indicate that the population of the corresponding class should remain unchanged.
+        can be used to indicate that the population of the corresponding class should remain
+        unchanged.
         :param desired_ratios: a dictionary of label-float pairs, where each float specifies
         the desired ratios (with respect to the total sample size) of the corresponding class.
-        The floats must be positive, but -1 can be used to indicate that the ratio of the corresponding
-        class should remain unchanged.
+        The floats must be positive, but -1 can be used to indicate that the ratio of the
+        corresponding class should remain unchanged.
         :return:
         """
+        self.sampled_mvts = pd.DataFrame()  # empty this before appending new dataframes
+        expected_populations = {}
 
-        if not desired_populations:
-            validate_input(self.class_population, desired_ratios=desired_ratios)
-            total_population = sum(self.class_population.values())
-            desired_populations = {}
+        if desired_ratios:
+            validate_sampling_input(class_populations=self.original_class_populations,
+                                    desired_ratios=desired_ratios)
+            total_population = sum(self.original_class_populations.values())
 
             for label, value in desired_ratios.items():
                 if value == -1:
-                    desired_populations[label] = self.class_population[label]
+                    expected_populations[label] = self.original_class_populations[label]
                 else:
-                    desired_populations[label] = round(value * total_population)
+                    expected_populations[label] = np.round(value * total_population)
 
         else:
+            validate_sampling_input(class_populations=self.original_class_populations,
+                                    desired_populations=desired_populations)
+            for label, value in desired_populations.items():
+                if value == -1:
+                    expected_populations[label] = self.original_class_populations[label]
+                else:
+                    expected_populations[label] = desired_populations[label]
 
-            validate_input(self.class_population, desired_populations=desired_populations)
+        for label, value in expected_populations.items():
+            sample_size = int(expected_populations[label])
+            output_dfs = self.sample_each_class(self.__decomposed_original_mvts[label], sample_size)
+            self.sampled_mvts = self.sampled_mvts.append(output_dfs)
 
-        for label in self.labels:
-            if desired_populations[label] == -1:
-                self.desired_dfs = self.desired_dfs.append(self.dfs_dict[label])
-            elif value >= 0:
-                count = round(desired_populations[label])
-                output_dfs = self.sample_each_class(self.dfs_dict[label], count)
-                self.desired_dfs = self.desired_dfs.append(output_dfs)
-
-        return self.desired_dfs
+        self.__update_sampled_metadata()
+        return self.sampled_mvts
 
     def undersample(self, minority_labels: list, majority_labels: list, base_minority: str):
         """
-        Undersamples form the majority class to achieve a 1:1 balance between the minority and
-        majority classes. This is done by keeping the population of the base_minority unchanged,
-        make all other minority classes to have an equal population, and then reduce the population
-        of the majority classes to match with the minority classes. This reduction is done in
-        a way that all majority classes reach to an equal population, and their total population
-        sum up to the total population of the minority classes. Hence a 1:1 balance.
+        Undersamples from the majority classes to achieve a 1:1 balance between the minority and
+        majority classes. This is done in such a way that the outcome follows these criteria:
 
-        Example: Consider mvts data with 5 classes:
+         * The minority classes have an equal population, equal to that of `base_minority` class.
+         * The majority classes have an equal population, such that the next criterion is held true.
+         * Total population of the majority classes is (undersampled to become) equal to the total
+         population of the minority classes.
+
+        Example: Consider a mvts dataset with 5 classes, A, B, C, D, and E:
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
+
+            where
+
             |A| + |B| = 500, |C| + |D| + |E| = 3000
 
-        and given is: minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'], base_minority = 'A'
+        and suppose given is::
 
-        then, the resultant dataframe would have the following populations:
+            minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'], base_minority = 'A'
+
+
+        Then, the sampled dataframe would have the following populations:
 
             |A| = 100, |B| = 100, |C| = 200/3, |D| = 200/3, |E| = 200/3
+
+            where
+
             |A| + |B| = 200, |C| + |D| + |E| = 200
 
-        :param minority_labels:
-        :param majority_labels:
-        :param base_minority:
+        :param minority_labels: a list of class labels considered to be the minority classes.
+        :param majority_labels: a list of class labels considered to be the majority classes.
+        :param base_minority: the class label based on which, the sampling method is decided.
         :return:
         """
-        validate_sampling_input(self.class_population,minority_labels= minority_labels, majority_labels= majority_labels
-                                , base= base_minority)
+        validate_under_over_sampling_input(self.original_class_populations,
+                                           minority_labels=minority_labels,
+                                           majority_labels=majority_labels,
+                                           base_minority=base_minority)
         if base_minority:
-            base_count = self.dfs_dict[base_minority].shape[0]
+            base_count = self.__decomposed_original_mvts[base_minority].shape[0]
             total_min_count = base_count * len(minority_labels)
             for label in minority_labels:
                 if label != base_minority:
-                    output_dfs = self.sample_each_class(self.dfs_dict[label], base_count)
-                    self.desired_dfs = self.desired_dfs.append(output_dfs)
+                    output_dfs = self.sample_each_class(self.__decomposed_original_mvts[label],
+                                                        base_count)
+                    self.sampled_mvts = self.sampled_mvts.append(output_dfs)
 
                 else:
-                    self.desired_dfs = self.desired_dfs.append(self.dfs_dict[label])
+                    self.sampled_mvts = self.sampled_mvts.append(
+                        self.__decomposed_original_mvts[label])
 
             maj_base_count = round(total_min_count / len(majority_labels))
             for label in majority_labels:
-                output_dfs = self.sample_each_class(self.dfs_dict[label], maj_base_count)
-                self.desired_dfs = self.desired_dfs.append(output_dfs)
+                output_dfs = self.sample_each_class(self.__decomposed_original_mvts[label],
+                                                    maj_base_count)
+                self.sampled_mvts = self.sampled_mvts.append(output_dfs)
+
+        self.__update_sampled_metadata()
+        return self.sampled_mvts
 
     def oversample(self, minority_labels: list, majority_labels: list, base_majority: str):
         """
-        Oversamples form the minority class to achieve a 1:1 balance between the minority and
-        majority classes. This is done by keeping the population of the base_majority unchanged,
-        make all other majority classes to have an equal population, and then increase the population
-        of the minority classes to match with the majority classes. This increase is done in
-        a way that all minority classes reach to an equal population, and their total population
-        sums up to the total population of the majority classes. Hence a 1:1 balance.
+        UOversamples from the majority classes to achieve a 1:1 balance between the minority and
+        majority classes. This is done in such a way that the outcome follows these criteria:
+
+         * The minority classes have an equal population, equal to that of `base_minority` class.
+         * The majority classes have an equal population, such that the next criterion is held true.
+         * Total population of the majority classes is (oversampled to become) equal to the total
+         population of the minority classes.
+
 
         Example: Consider mvts data with 5 classes:
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
+
+            where
+
             |A| + |B| = 500, |C| + |D| + |E| = 3000
 
-        and given is: minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'], base_majority = 'D'
+        and given is::
 
-        then, the resultant dataframe would have the following populations:
+            minority_labels = ['A', 'B'], majority_labels = ['C', 'D', 'E'], base_majority = 'D'.
+
+        Then, the sampled dataframe would have the following populations:
 
             |A| = 2100/2, |B| = 2100/2, |C| = 700, |D| = 700, |E| = 700
-            |A| + |B| = 2100, |C| + |D| + |E| = 2100
+
+            where
+
+            |A| + |B| = 2100, |C| + |D| + |E| = 2100.
 
         :param minority_labels:
         :param majority_labels:
         :param base_majority:
         :return:
         """
-        validate_sampling_input(self.class_population, minority_labels=minority_labels, majority_labels=majority_labels,
-                                base=base_majority)
+        validate_under_over_sampling_input(self.original_class_populations,
+                                           minority_labels=minority_labels,
+                                           majority_labels=majority_labels,
+                                           base_majority=base_majority)
         if base_majority:
-            base_count = self.dfs_dict[base_majority].shape[0]
+            base_count = self.__decomposed_original_mvts[base_majority].shape[0]
             total_maj_count = base_count * len(majority_labels)
             for label in majority_labels:
                 if label != base_majority:
-                    output_dfs = self.sample_each_class(self.dfs_dict[label], base_count)
-                    self.desired_dfs = self.desired_dfs.append(output_dfs)
+                    output_dfs = self.sample_each_class(self.__decomposed_original_mvts[label],
+                                                        base_count)
+                    self.sampled_mvts = self.sampled_mvts.append(output_dfs)
 
                 else:
-                    self.desired_dfs = self.desired_dfs.append(self.dfs_dict[label])
+                    self.sampled_mvts = self.sampled_mvts.append(
+                        self.__decomposed_original_mvts[label])
 
             min_base_count = round(total_maj_count / len(minority_labels))
             for label in minority_labels:
-                output_dfs = self.sample_each_class(self.dfs_dict[label], min_base_count)
-                self.desired_dfs = self.desired_dfs.append(output_dfs)
+                output_dfs = self.sample_each_class(self.__decomposed_original_mvts[label],
+                                                    min_base_count)
+                self.sampled_mvts = self.sampled_mvts.append(output_dfs)
 
-    def sample_each_class(self, input_dfs: pd.DataFrame, count: int) -> pd.DataFrame:
-        """
-        This method returns output samples based on given dataset and count of desired output sample.
-        If desired sample size is more than input dataset then whole input dataset is used and rest of the samples
-        are created using sampling with replacement from the input dataset.
-        :param input_dfs: Input Dataset
-        :param count: Count of desired output samples
-        :return: Sampled Dataset
-        """
+        self.__update_sampled_metadata()
+        return self.sampled_mvts
 
-        if count > input_dfs.shape[0]:
-            output_dfs = input_dfs.append(
-                input_dfs.sample((count - input_dfs.shape[0]), replace=True))
+    def sample_each_class(self, input_dfs: pd.DataFrame, new_sample_size: int) -> pd.DataFrame:
+        """
+        This method samples `new_sample_size` instances from a given dataframe. If the desired
+        sample size is larger than the original population (i.e., `new_sample_size >
+        input_dfs.shape[0]`), then the entire population will be used, as well as the extra samples
+        needed to achieve the desired sample size. The extra instances will be sampled from
+        `input_dfs` with replacement.
+
+        :param input_dfs: The input dataset to sample from.
+        :param new_sample_size: The size of the desired sample.
+        :return: The sampled dataframe.
+        """
+        new_sample_size = int(new_sample_size)
+        population_size = input_dfs.shape[0]
+        if new_sample_size > population_size:
+            extra_samples = input_dfs.sample(new_sample_size - population_size, replace=True)
+            output_dfs = input_dfs.append(extra_samples, ignore_index=True)
         else:
-            output_dfs = input_dfs.sample(count)
-
+            output_dfs = input_dfs.sample(new_sample_size, replace=False)
         return output_dfs
+
+
+def main():
+    import os
+    import pandas as pd
+    import CONSTANTS as CONST
+
+    path_to_extracted_features = os.path.join(CONST.ROOT,
+                                              'tests/test_dataset/extracted_features'
+                                              '/extracted_features_TEST_NORMALIZER.csv')
+    df = pd.read_csv(path_to_extracted_features, sep='\t')
+    sampler = Sampler(df, 'lab')
+
+    print('sampled mvts', sampler.sampled_mvts)
+    print('class class_labels', sampler.class_labels)
+    print('class population:\n', sampler.original_class_populations)
+    print('class ratios:\n', sampler.original_class_ratios)
+    print('sampled mvts (shape)', sampler.sampled_mvts.shape)
+    desired_populations = {'NF': 5, 'C': 10}
+    sampler.sample(desired_populations=desired_populations)
+    print(sampler.sampled_mvts.shape)
+
+
+if __name__ == "__main__":
+    main()

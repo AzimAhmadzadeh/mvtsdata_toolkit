@@ -12,7 +12,20 @@ def get_methods_for_names(method_names: list):
     """
     callable_methods = []
     for m in method_names:
-        callable_m = getattr(fc, m)
+        try:
+            callable_m = getattr(fc, m)
+        except AttributeError as e:
+            raise AttributeError(
+                '''
+                The statistical feature '{}' is invalid!
+                Hint: To see all available features, run the following snippet:
+                
+                    import features.feature_collection as fc
+                    help(fc)
+                
+                Any method-name starting with 'get_' can be used as a statistical feature.
+                '''.format(m)
+            )
         callable_methods.append(callable_m)
     return callable_methods
 
@@ -49,13 +62,13 @@ def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFra
 
 def flatten_to_row_df(df: pd.DataFrame) -> pd.DataFrame:
     """
-    For a given dataframe of dimension P X F, where the row names (i.e., df's indices) are the
+    For a given dataframe of dimension P X F, where the row names (i.e., original_mvts's indices) are the
     time series (i.e., parameters') names, and the column names are the statistical features, this
     method flattens the given dataframe into a single-row dataframe of dimension 1 X (P X F). The
-    columns names in the resultant dataframe is derived from the given dataframe df, by combining
+    columns names in the resultant dataframe is derived from the given dataframe original_mvts, by combining
     the row and column names of the given dataframe.
 
-    For example, for a given df like the one below::
+    For example, for a given original_mvts like the one below::
 
         -----------------------------------------------
             f1    f2    ...

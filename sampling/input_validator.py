@@ -1,75 +1,144 @@
-def validate_input(class_population: dict = None, desired_ratios: dict = None,
-                   desired_populations: dict = None, ):
-    """
+import numpy as np
 
-    :param class_population: Existing classes with population present in dataset
-    :param desired_ratios: Given input by user(class label with desired ratio)
-    :param desired_populations: Given input by user(class label with desired population)
-    :return:
+
+def validate_sampling_input(class_populations: dict, desired_ratios: dict = None,
+                            desired_populations: dict = None):
     """
+    This methods validates the three arguments against the followig rules:
+
+     - Both `desired_ratios` and `desired_populations` cannot be `None` at the same time.
+     - Both `desired_ratios` and `desired_populations` cannot be given at the same time.
+     - class labels in `desired_populations` must match with those in `class_populations`.
+     - class labels in `desired_ratios` must match with those in `class_populations`.
+     - class populations in `desired_populations` MUST be either positive or -1.
+     - class ratios in `desired_ratios` MUST be either positive or -1. The positive values may be
+       larger than 1.0.
+
+    :param class_populations: The class labels present in the data.
+    :param desired_ratios: The desired ratios of each class to be sampled.
+    :param desired_populations: The desired population of each class to be sampled.
+    :return: True, if no exception was raised.
+    """
+    desired_ratios = desired_ratios if desired_ratios else {}
+    desired_populations = desired_populations if desired_populations else {}
+
     if not desired_populations and not desired_ratios:
+        # at least one MUST be given
         raise ValueError(
             """
-            One argument needs to be passed
-            """
-        )
-    elif not desired_populations:
-
-        # Check whether the argument passed by the user matches with the dataset
-        if set(class_population.keys()) != set(desired_ratios.keys()):
-            raise ValueError(
-                """
-                Please enter correct labels and desired ratio
-                """
-            )
-    elif not desired_ratios:
-        # Check whether the argument passed by the user matches with the dataset
-        if set(class_population.keys()) != set(desired_populations.keys()):
-            raise ValueError(
-                """
-                Please enter correct labels and desired population
-                """
-            )
-        if (desired_populations.values() != -1) and (desired_populations.values() <= 0) and (
-                desired_populations.values() > 1):
-            raise ValueError(
-                """
-                Please enter values between 0 to 1 or -1 in desired ratios
-                """
-            )
-
-    else:
-        raise ValueError(
-            """
-            One argument needs to be passed
+            One and only one of the of the args, `desired_populations` or `desired_ratios` MUST 
+            be given! None is given!
             """
         )
 
+    if desired_populations and desired_ratios:
+        # both CANNOT be given at the same time
+        raise ValueError(
+            """
+            One and only one of the of the args, `desired_populations` or `desired_ratios` MUST 
+            be given! Both are given!
+            """
+        )
 
-def validate_sampling_input(class_population, minority_labels, majority_labels, base):
+    if desired_ratios:
+        # class labels MUST match.
+        if set(class_populations.keys()) != set(desired_ratios.keys()):
+            raise ValueError(
+                """
+                The class labels in `desired_ratios` do not match with those specified in 
+                `class-populations`!
+                """
+            )
+        n_of_invalid_ratios = \
+            np.sum([True for _, count in desired_ratios.items() if count != -1 and count < 0])
+        # no negative count (except -1) is allowed.
+        if n_of_invalid_ratios > 0:
+            raise ValueError(
+                """
+                The dictionary `desired_ratios` CANNOT have negative values except -1!
+                """
+            )
+
+    if desired_populations:
+        # class labels MUST match.
+        if set(class_populations.keys()) != set(desired_populations.keys()):
+            raise ValueError(
+                """
+                The class labels in `desired_populations` do not match with those specified in 
+                `class-populations`!
+                """
+            )
+
+        n_of_nonint_populations = \
+            len([True for _, count in desired_populations.items() if count != int(count)])
+        if n_of_nonint_populations > 0:
+            # no decimal is allowed.
+            raise ValueError(
+                """
+                The dictionary `desired_populations` CANNOT have non-int values!
+                """
+            )
+
+        n_of_invalid_populations = \
+            len([True for _, count in desired_populations.items() if count < -1])
+        if n_of_invalid_populations > 0:
+            # no negative count (except -1) is allowed.
+            raise ValueError(
+                """
+                The dictionary `desired_populations` CANNOT have negative values except -1!
+                """
+            )
+
+    return True
+
+
+def validate_under_over_sampling_input(class_populations, minority_labels, majority_labels,
+                                       base_minority=None, base_majority=None):
     """
-    :param class_population: Existing classes with population present in dataset
-    :param minority_labels: Given input by user(class labels of minority set)
-    :param majority_labels: Given input by user(class labels of majority set)
-    :param base: Given input by user(Base minority r majority class label)
-    :return:
+    This is to validate the arguments of two methods in the class `Sampler` in
+    `sampling.sampler`, namely `undersample` and `oversample`.
+    :param class_populations: See the corresponding docstring in `Sampler`.
+    :param minority_labels: See the corresponding docstring in `Sampler`.
+    :param majority_labels: See the corresponding docstring in `Sampler`.
+    :param base_majority: See the corresponding docstring in `Sampler`.
+    :param base_minority: See the corresponding docstring in `Sampler`.
+    :return: True, if no exception was raised.
     """
-    all_classes = set(minority_labels).union(set(majority_labels))
-    if all_classes != set(class_population):
+    union_of_labels = set(minority_labels).union(set(majority_labels))
+    if union_of_labels != set(class_populations):
+        # union of minority and majority classes must contain all classes.
         raise ValueError(
             """
-            Please enter correct labels and desired population
+            One or more class labels are not present in either of the dictionaries, 
+            `minority_labels` or `majority_labels`!
             """
         )
-    if base not in all_classes:
+    intersection_of_labels = set(minority_labels).intersection(set(majority_labels))
+    if len(intersection_of_labels) > 0:
+        # no intersection of labels allowed.
         raise ValueError(
             """
-            Please enter correct base value.
+            The dictionaries, `minority_labels` and `majority_labels`, MUST be mutually exclusive!
             """
         )
-    if set(minority_labels).intersection(set(majority_labels)):
-        raise ValueError(
-            """
-            Majority and Minority Classes should have distinct class labels.
-            """
-        )
+
+    if base_majority:
+        if base_majority not in set(majority_labels):
+            # base_minority should be a minority
+            raise ValueError(
+                """
+                The (majority) base label MUST be one of the labels in `majority_labels`! '{}' is
+                not!
+                """.format(base_majority)
+            )
+    if base_minority:
+        if base_minority not in set(minority_labels):
+            # base majority must be a majority
+            raise ValueError(
+                """
+                he (minority) base lanel MUST be one of the labels in `minority_labels`! '{}' is 
+                not!
+                """.format(base_minority)
+            )
+
+    return True

@@ -3,12 +3,13 @@ from os import path, makedirs
 import pandas as pd
 import numpy as np
 
-_summary_keywords: dict = {"params_col": 'Feature Name',
-                           "null_col": "Null Count",
-                           "count_col": "Count",
-                           "label_col": "Label"}
+_summary_keywords: dict = {"params_col": 'Feature-Name',
+                           "null_col": "Null-Count",
+                           "count_col": "Val-Count",
+                           "label_col": "Label",
+                           "population": "Population"}
 
-_5num_colnames: list = ['min', '25%', '50%', '75%', 'max']
+_5num_colnames: list = ['mean', 'std', 'min', '25th', '50th', '75th', 'max']
 
 
 class ExtractedFeaturesAnalysis:
@@ -54,13 +55,13 @@ class ExtractedFeaturesAnalysis:
             * 'Null Count': Contains the number of null entries per feature,
             * 'Min': Contains the minimum value of the feature(Without considering the null or
               nan value),
-            * 'Q1': Contains the first quartile(25%) of the feature values(Without considering the
+            * '25th': Contains the first quartile(25%) of the feature values(Without considering the
               null or nan  value),
             * 'Mean': Contains the mean of the feature values(Without considering the null/nan
               value),
-            * 'Median': Contains the median of the feature values(Without considering the null/nan
+            * '50th': Contains the median of the feature values(Without considering the null/nan
               value),
-            * 'Q3': Contains the third quartile(75%) of the feature values(Without considering the
+            * '75th': Contains the third quartile(75%) of the feature values(Without considering the
               null/nan value),
             * 'Max': Contains the minimum value of the feature(Without considering the null/nan
               value),
@@ -77,7 +78,7 @@ class ExtractedFeaturesAnalysis:
 
         # drop any non-numeric column
         if not self.df.empty:
-            df_desc = self.df.describe(include=[np.number])
+            df_desc = df_desc.describe(include=[np.number])
         else:
             raise ValueError(
                 '''
@@ -97,6 +98,10 @@ class ExtractedFeaturesAnalysis:
         df_desc = df_desc.T
         df_desc.insert(0, _summary_keywords['params_col'], df_desc.index)
         df_desc.insert(2, _summary_keywords['null_col'], self.df.isnull().sum())
+        # New colnames: [Feature-Name, Val-Count, Null-Count, mean, std, min, 25th, 50th, 75th, max]
+        df_desc.columns = [_summary_keywords['params_col'],
+                           _summary_keywords['count_col'],
+                           _summary_keywords['null_col']] + _5num_colnames
         df_desc.reset_index(inplace=True)
         df_desc.drop(labels='index', inplace=True, axis=1)
         self.summary = df_desc
@@ -105,20 +110,20 @@ class ExtractedFeaturesAnalysis:
         """
         Gets the per-class population of the original dataset.
 
-        :param label: Column name corresponding to the labels.
-        :return: a dictionary of labels (as keys) and class populations (as values).
+        :param label: The column-name corresponding to the class_labels.
+        :return: a dataframe of two columns; class_labels and class counts.
         """
         population_df = self.df[label].value_counts()
-        population_df = population_df.to_frame('Count')
-        population_df.insert(0, 'Label', population_df.index)
-        return population_df.set_index('Label')
+        population_df = population_df.to_frame(_summary_keywords['population'])
+        population_df.insert(0, label, population_df.index)
+        return population_df.reset_index(drop=True)
 
     def get_missing_values(self) -> pd.DataFrame:
         """
-        Gets the missing value counts for each feature.
+        Gets the missing-value counts for each extracted feature.
 
-        :return: a dataframe of two columns, one for the column name of `extracted_features_df` and the other
-                 for the counts of missing values corresponding to each column, will be returned.
+        :return: a dataframe of two columns; the extracted features (i.e., column names of
+        `extracted_features_df`) and the missing-value counts.
         """
         if self.summary.empty:
             raise ValueError(
@@ -126,16 +131,16 @@ class ExtractedFeaturesAnalysis:
                 Execute `compute_summary` before getting the missing values.
                 """
             )
-        count_df = self.summary[[_summary_keywords["null_col"]]]
-        return count_df
+        count_df = self.summary[[_summary_keywords['params_col'], _summary_keywords['null_col']]]
+        return count_df.reset_index(drop=True)
 
     def get_five_num_summary(self) -> pd.DataFrame:
         """
-        Gets the five number summary of each feature. This method does not compute the five-number
-        statistics. It only returns what was already computed in `compute_summary` method.
+        returns the seven number summary of each extracted feature. This method does not compute
+        the statistics, but only returns what was already computed in `compute_summary` method.
 
-        :return: a dataframe where the rows are [min, 25%, 50%, 75%, max] and the columns are the
-                 features in the given dataframe.
+        :return: a dataframe where the columns are [Feature-Name, mean, std, min, 25th, 50th, 75th,
+        max] and each row corresponds to the statistics on one of the extracted features.
         """
         if self.summary.empty:
             raise ValueError(
@@ -143,9 +148,10 @@ class ExtractedFeaturesAnalysis:
                 Execute `compute_summary` before getting the five number summary.
                 """
             )
-        _5num_colnames.insert(0, _summary_keywords['params_col'])
-        five_num_df = self.summary[_5num_colnames]
-        return five_num_df
+        colname_copy = _5num_colnames.copy()  # copy: we don't want to change `_5num_colnames`
+        colname_copy.insert(0, _summary_keywords['params_col'])
+        five_num_df = self.summary[colname_copy]
+        return five_num_df.reset_index(drop=True)
 
     def print_summary(self):
         """
@@ -184,6 +190,20 @@ class ExtractedFeaturesAnalysis:
         self.summary.to_csv(out_file, sep='\t', header=True, index=False)
         print('Data Analysis of the extracted features is stored at [{}]'.format(out_file))
 
+    def boxplot_extracted_features(self, feature_names: list, output_path: str = None):
+        """
+        Generates a plot of box-plots, one for each extracted feature.
+
+        :param feature_names: a list of feature-names indicating the columns of interest for this
+                              visualization.
+        :param output_path: If given, the generated plot will be stored instead of shown.
+                            Otherwise, it will be only shown if the running environment allows it.
+        :return: None
+        """
+        from visualizations.stat_visualizer import StatVisualizer
+        sv = StatVisualizer(extracted_features=self.df_all_features)
+        sv.boxplot_extracted_features(feature_names=feature_names, output_path=output_path)
+
 
 def main():
     import pandas as pd
@@ -191,24 +211,28 @@ def main():
     from normalizing import normalizer
 
     f_path = os.path.join(CONST.ROOT,
-                          'data/extracted_features/extracted_features_3_pararams_3_featues.csv')
+                          'data/extracted_features/extracted_features_parallel_3_pararams_4_features.csv')
     mvts_df = pd.read_csv(f_path, sep='\t')
     # Normalizer Test on extracted feature dataset
     # excluded_col = extracted_features_df.select_dtypes(exclude=np.number).columns.to_list()
-    excluded_col = ['id']  # .insert(0,'id')
+    excluded_col = ['id']
     # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
     # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
     # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
-    # df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
-    # print(df_norm)
+    df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
+    print(df_norm)
 
-    efa = ExtractedFeaturesAnalysis(mvts_df, ['id'])
-    efa.compute_summary()
-    efa.print_summary()
-    print(efa.get_class_population(label='lab'))
-    print(efa.get_five_num_summary())
-    print(efa.get_missing_values())
-    efa.summary_to_csv(CONST.ROOT, 'summary.csv')
+    # efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
+    # efa.compute_summary()
+    # efa.print_summary()
+
+    # d = efa.get_five_num_summary()
+    # print(d[d['Feature-Name'] == 'TOTUSJH_median'].values)
+    # print(list(d))
+    # print(efa.get_class_population(label='lab'))
+    # print(efa.get_five_num_summary())
+    # print(efa.get_missing_values())
+    # efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/xxxxx.csv')
 
 
 if __name__ == '__main__':

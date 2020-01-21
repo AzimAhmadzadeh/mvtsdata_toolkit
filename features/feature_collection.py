@@ -3,6 +3,7 @@ from scipy.signal import argrelextrema
 import numpy as np
 from itertools import *
 import pandas as pd
+from typing import Union
 
 '''
     This is a collection of all time series features gathered
@@ -17,68 +18,69 @@ import pandas as pd
 # -----------------------------------------------------------
 
 
-def get_min(uni_ts: pd.Series):
+def get_min(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """ Returns the minimum value of a given univariate time series """
-    return np.min(uni_ts)
+    return np.float64(np.min(uni_ts))
 
 
-def get_max(uni_ts: pd.Series):
+def get_max(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """ Returns the maximum value of a given univariate time series """
-    return np.max(uni_ts)
+    return np.float64(np.max(uni_ts))
 
 
-def get_median(uni_ts: pd.Series):
+def get_median(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """ Returns the median value of a given univariate time series """
-    return np.median(uni_ts)
+    return np.float64(np.median(uni_ts))
 
 
-def get_mean(uni_ts: pd.Series):
+def get_mean(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """ Returns the arithmetic mean value of a given univariate time series """
-    return np.mean(uni_ts)
+    return np.float64(np.mean(uni_ts))
 
 
-def get_stddev(uni_ts: pd.Series):
+def get_stddev(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """ Returns the standard deviation of a given univariate time series """
-    return np.std(uni_ts)
+    return np.float64(np.std(uni_ts))
 
 
-def get_var(uni_ts: pd.Series):
+def get_var(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """ Returns the variance of a given univariate time series """
-    return np.var(uni_ts)
+    return np.float64(np.var(uni_ts))
 
 
-def get_skewness(uni_ts: pd.Series):
+def get_skewness(uni_ts: Union[pd.Series, np.ndarray]):
     """ Returns the skewness of a given univariate time series """
-    return sp.stats.skew(uni_ts)
+    return np.float64(sp.stats.skew(uni_ts))
 
 
-def get_kurtosis(uni_ts: pd.Series):
+def get_kurtosis(uni_ts: Union[pd.Series, np.ndarray]):
     """ Returns the kurtosis of a given univariate time series """
-    return sp.stats.kurtosis(uni_ts)
+    return np.float64(sp.stats.kurtosis(uni_ts))
 
 
-def get_no_local_maxima(uni_ts: pd.Series):
+def get_no_local_maxima(uni_ts: Union[pd.Series, np.ndarray]):
     """ Returns the numer of local maxima in a given univariate time series """
     return len(argrelextrema(uni_ts.values, np.greater)[0])
 
 
-def get_no_local_minima(uni_ts: pd.Series):
+def get_no_local_minima(uni_ts: Union[pd.Series, np.ndarray]):
     """ Returns the number of local minima in a given univariate time series """
     return len(argrelextrema(uni_ts.values, np.less)[0])
 
 
-def get_no_local_extrema(uni_ts: pd.Series):
+def get_no_local_extrema(uni_ts: Union[pd.Series, np.ndarray]):
     """ Returns the number of local extrema in a given univariate time series """
     return get_no_local_minima(uni_ts) + get_no_local_maxima(uni_ts)
 
 
-def get_no_zero_crossings(uni_ts: pd.Series):
+def get_no_zero_crossings(uni_ts: Union[pd.Series, np.ndarray]):
     """ Returns the number of zero-crossings in a given univariate time series """
     zero_crossings = np.where(np.diff(np.sign(uni_ts)))[0]
     return len(zero_crossings)
 
 
-def get_mean_local_maxima_value(uni_ts: pd.Series, only_positive: bool = False) -> float:
+def get_mean_local_maxima_value(uni_ts: Union[pd.Series, np.ndarray],
+                                only_positive: bool = False) -> np.float64:
     """
     Returns the mean of local maxima values.
 
@@ -91,12 +93,13 @@ def get_mean_local_maxima_value(uni_ts: pd.Series, only_positive: bool = False) 
     maxima_values = uni_ts[local_maxima]
     if only_positive:
         pos_maxima_values = maxima_values[maxima_values > 0]
-        return np.mean(pos_maxima_values)
+        return np.float64(np.mean(pos_maxima_values))
     else:
-        return np.mean(maxima_values)
+        return np.float64(np.mean(maxima_values))
 
 
-def get_mean_local_minima_value(uni_ts: pd.Series, only_negative: bool = False) -> float:
+def get_mean_local_minima_value(uni_ts: Union[pd.Series, np.ndarray], only_negative: bool = False) \
+        -> np.float64:
     """
     Returns the mean of local minima values.
 
@@ -109,12 +112,13 @@ def get_mean_local_minima_value(uni_ts: pd.Series, only_negative: bool = False) 
     minima_values = uni_ts[local_minima]
     if only_negative:
         neg_minima_values = minima_values[minima_values < 0]
-        return np.mean(neg_minima_values)
+        return np.float64(np.mean(neg_minima_values))
     else:
-        return np.mean(minima_values)
+        return np.float64(np.mean(minima_values))
 
 
-def get_no_mean_local_maxima_upsurges(uni_ts: pd.Series, only_positive: bool = False) -> int:
+def get_no_mean_local_maxima_upsurges(uni_ts: Union[pd.Series, np.ndarray],
+                                      only_positive: bool = False) -> np.int64:
     """
     Returns the number of values in a given time series whose value is greater than the mean of
     local maxima values (# of upserges).
@@ -126,10 +130,11 @@ def get_no_mean_local_maxima_upsurges(uni_ts: pd.Series, only_positive: bool = F
     """
     mean_local_maxima = get_mean_local_maxima_value(uni_ts, only_positive)
     upsurging = uni_ts > mean_local_maxima
-    return np.sum(upsurging)
+    return np.int64(np.sum(upsurging))
 
 
-def get_no_mean_local_minima_downslides(uni_ts: pd.Series, only_negative: bool = False) -> int:
+def get_no_mean_local_minima_downslides(uni_ts: Union[pd.Series, np.ndarray],
+                                        only_negative: bool = False) -> np.int64:
     """
     Returns the number of values in a given time series whose value is less than the mean of
     local minima values (# of downslides).
@@ -141,10 +146,10 @@ def get_no_mean_local_minima_downslides(uni_ts: pd.Series, only_negative: bool =
     """
     mean_local_minima = get_mean_local_minima_value(uni_ts, only_negative)
     downslides = uni_ts < mean_local_minima
-    return np.sum(downslides)
+    return np.int64(np.sum(downslides))
 
 
-def get_difference_of_mins(uni_ts: pd.Series) -> float:
+def get_difference_of_mins(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the absolute difference between the minimums of the first and the second halves of a
              given univariate time series.
@@ -153,7 +158,7 @@ def get_difference_of_mins(uni_ts: pd.Series) -> float:
     return np.abs(get_min(uni_ts[:mid]) - get_min(uni_ts[mid:]))
 
 
-def get_difference_of_maxs(uni_ts: pd.Series) -> float:
+def get_difference_of_maxs(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the absolute difference between the maximums of the first and the second halves of a
              given univariate time series.
@@ -162,7 +167,7 @@ def get_difference_of_maxs(uni_ts: pd.Series) -> float:
     return np.abs(get_max(uni_ts[:mid]) - get_max(uni_ts[mid:]))
 
 
-def get_difference_of_means(uni_ts: pd.Series) -> float:
+def get_difference_of_means(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the absolute difference between the means of the first and the second halves of a
              given univariate time series.
@@ -171,7 +176,7 @@ def get_difference_of_means(uni_ts: pd.Series) -> float:
     return np.abs(get_mean(uni_ts[:mid]) - get_mean(uni_ts[mid:]))
 
 
-def get_difference_of_stds(uni_ts: pd.Series) -> float:
+def get_difference_of_stds(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the absolute difference between the standard dev. of the first and the second halves
              of a given univariate time series.
@@ -180,7 +185,7 @@ def get_difference_of_stds(uni_ts: pd.Series) -> float:
     return np.abs(get_stddev(uni_ts[:mid]) - get_stddev(uni_ts[mid:]))
 
 
-def get_difference_of_vars(uni_ts: pd.Series) -> float:
+def get_difference_of_vars(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the absolute difference between the variances of the first and the second halves of
              a given univariate time series.
@@ -189,7 +194,7 @@ def get_difference_of_vars(uni_ts: pd.Series) -> float:
     return np.abs(get_var(uni_ts[:mid]) - get_var(uni_ts[mid:]))
 
 
-def get_difference_of_medians(uni_ts: pd.Series) -> float:
+def get_difference_of_medians(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the absolute difference between the medians of the first and the second halves of a
              given univariate time series."""
@@ -197,65 +202,65 @@ def get_difference_of_medians(uni_ts: pd.Series) -> float:
     return np.abs(get_median(uni_ts[:mid]) - get_median(uni_ts[mid:]))
 
 
-def get_dderivative_mean(uni_ts: pd.Series, step_size: int = 1) -> float:
+def get_dderivative_mean(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
     :return: the mean of the difference derivative of univariate time series within the function
              we use step_size to find derivative (default value of step_size is 1).
     """
-    return get_mean(__difference_derivative(uni_ts, step_size))
+    return np.float64(get_mean(_difference_derivative(uni_ts, step_size)))
 
 
-def get_gderivative_mean(uni_ts: pd.Series) -> float:
+def get_gderivative_mean(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the mean of the gradient derivative of univariate time series.
     """
-    return get_mean(__gradient_derivative(uni_ts))
+    return get_mean(_gradient_derivative(uni_ts))
 
 
-def get_dderivative_stddev(uni_ts: pd.Series, step_size: int = 1) -> float:
+def get_dderivative_stddev(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
     :return: the std.dev of the difference derivative of univariate time series within the
              function we use step_size to find derivative (default value of step_size is 1).
     """
-    return get_stddev(__difference_derivative(uni_ts, step_size))
+    return get_stddev(_difference_derivative(uni_ts, step_size))
 
 
-def get_gderivative_stddev(uni_ts: pd.Series) -> float:
+def get_gderivative_stddev(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the std.dev of the gradient derivative of univariate time series.
     """
-    return get_stddev(__gradient_derivative(uni_ts))
+    return get_stddev(_gradient_derivative(uni_ts))
 
 
-def get_dderivative_skewness(uni_ts: pd.Series, step_size: int = 1) -> float:
+def get_dderivative_skewness(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
     :return: the skewness of the difference derivative of univariate time series within the
              function we use step_size to find derivative (default value of step_size is 1)."""
-    return get_skewness(__difference_derivative(uni_ts, step_size))
+    return get_skewness(_difference_derivative(uni_ts, step_size))
 
 
-def get_gderivative_skewness(uni_ts: pd.Series) -> float:
+def get_gderivative_skewness(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the skewness of the gradient derivative of univariate time series.
     """
-    return get_skewness(__gradient_derivative(uni_ts))
+    return get_skewness(_gradient_derivative(uni_ts))
 
 
-def get_dderivative_kurtosis(uni_ts: pd.Series, step_size: int = 1) -> float:
+def get_dderivative_kurtosis(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
     :return: the kurtosis of the difference derivative of univariate time series within the
              function we use step_size to find derivative (default value of step_size is 1)."""
-    return get_kurtosis(__difference_derivative(uni_ts, step_size))
+    return get_kurtosis(_difference_derivative(uni_ts, step_size))
 
 
-def get_gderivative_kurtosis(uni_ts: pd.Series) -> float:
+def get_gderivative_kurtosis(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the kurtosis of the gradient derivative of univariate time series.
     """
-    return get_kurtosis(__gradient_derivative(uni_ts))
+    return get_kurtosis(_gradient_derivative(uni_ts))
 
 
-def get_linear_weighted_average(uni_ts: pd.Series) -> float:
+def get_linear_weighted_average(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
      Computes the linear weighted average of a univariate time series. It simply, for each `x_i` in
     `uni_ts` computes the following::
@@ -272,7 +277,7 @@ def get_linear_weighted_average(uni_ts: pd.Series) -> float:
     return (2.0 * w_sum) / (n * (n + 1))
 
 
-def get_quadratic_weighted_average(uni_ts: pd.Series) -> float:
+def get_quadratic_weighted_average(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     Computes quadratic weighted average of a univariate time series. It simply, for each `x_i` in
     `uni_ts`, computes the following::
@@ -289,109 +294,109 @@ def get_quadratic_weighted_average(uni_ts: pd.Series) -> float:
     return (6.0 * qw_sum) / (n * (n + 1) * (2 * n + 1))
 
 
-def get_average_absolute_change(uni_ts: pd.Series) -> float:
+def get_average_absolute_change(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the average absolute first difference of a univariate time series.
     """
-    return np.mean(np.abs(__difference_derivative(uni_ts)))
+    return np.float64(np.mean(np.abs(_difference_derivative(uni_ts))))
 
 
-def get_average_absolute_derivative_change(uni_ts: pd.Series) -> float:
+def get_average_absolute_derivative_change(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the average absolute first difference of a derivative of univariate time series.
     """
-    return np.mean(np.abs(np.diff(uni_ts, 2)))
+    return np.float64(np.mean(np.abs(np.diff(uni_ts, 2))))
 
 
-def get_positive_fraction(uni_ts: pd.Series) -> float:
+def get_positive_fraction(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the fraction of positive numbers in uni_ts.
     """
-    return np.mean(uni_ts > 0)
+    return np.float64(np.mean(uni_ts > 0))
 
 
-def get_negative_fraction(uni_ts: pd.Series) -> float:
+def get_negative_fraction(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the fraction of negative numbers in uni_ts.
     """
-    return np.mean(uni_ts < 0)
+    return np.float64(np.mean(uni_ts < 0))
 
 
-def get_last_K(uni_ts: pd.Series, k: int) -> pd.Series:
+def get_last_K(uni_ts: Union[pd.Series, np.ndarray], k: int) -> pd.Series:
     """
     :return: the last k values in a univariate time series.
     """
     return uni_ts[-k:]
 
 
-def get_last_value(uni_ts):
+def get_last_value(uni_ts) -> np.float64:
     """
     :return: the last value in a univariate time series. This seems redundant since `get_last_K`
              already does this job, but it is necessary because the return type is different (
              `numpy.int64`) than what `get_last_K` returns (`numpy.ndarray`). This is especially
              important if the methods in this module are going to be called from a list.
     """
-    return uni_ts.iloc[-1]
+    return np.float64(uni_ts.iloc[-1])
 
 
-def get_sum_of_last_K(uni_ts: pd.Series, k: int = 10) -> float:
+def get_sum_of_last_K(uni_ts: Union[pd.Series, np.ndarray], k: int = 10) -> np.float64:
     """
     :return: the sum of last k-values in a univariate time series.
     """
-    return np.sum(uni_ts[-k:])
+    return np.float64(np.sum(uni_ts[-k:]))
 
 
-def get_mean_last_K(uni_ts: pd.Series, k: int = 10) -> float:
+def get_mean_last_K(uni_ts: Union[pd.Series, np.ndarray], k: int = 10) -> np.float64:
     """
     :return: the mean of last k-values in a univariate time series.
     """
-    return np.mean(uni_ts[-k:])
+    return np.float64(np.mean(uni_ts[-k:]))
 
 
-def get_longest_positive_run(uni_ts: pd.Series) -> int:
+def get_longest_positive_run(uni_ts: Union[pd.Series, np.ndarray]) -> np.int64:
     """
     :return: the longest positive run in a univariate time series.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(uni_ts))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(uni_ts))]
     signs = np.array([signature for run, signature in ts_encode])
     runs = np.array([run for run, signature in ts_encode])
     if runs[signs == 1].size == 0:  # empty array
-        return 0
-    return np.max(runs[signs == 1])
+        return np.int64(0)
+    return np.int64(np.max(runs[signs == 1]))
 
 
-def get_longest_negative_run(uni_ts: pd.Series) -> int:
+def get_longest_negative_run(uni_ts: Union[pd.Series, np.ndarray]) -> np.int64:
     """
     :return: the longest negative run in a univariate time series.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(uni_ts))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(uni_ts))]
     signs = np.array([signature for run, signature in ts_encode])
     runs = np.array([run for run, signature in ts_encode])
     if runs[signs == -1].size == 0:  # empty array
-        return 0
-    return np.max(runs[signs == -1])
+        return np.int64(0)
+    return np.int64(np.max(runs[signs == -1]))
 
 
-def get_longest_monotonic_increase(uni_ts: pd.Series) -> int:
+def get_longest_monotonic_increase(uni_ts: Union[pd.Series, np.ndarray]) -> np.int64:
     """
     :return: the length of the time series segment with longest monotonic increase.
     """
     return get_longest_positive_run(np.sign(np.diff(uni_ts)))
 
 
-def get_longest_monotonic_decrease(uni_ts: pd.Series) -> int:
+def get_longest_monotonic_decrease(uni_ts: Union[pd.Series, np.ndarray]) -> np.int64:
     """
     :return: the length of the time series segment with longest monotonic increase.
     """
     return get_longest_negative_run(np.sign(np.diff(uni_ts)))
 
 
-def get_slope_of_longest_mono_increase(uni_ts: pd.Series) -> float:
+def get_slope_of_longest_mono_increase(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     Identifies the longest monotonic increase and gets the slope.
     :return: the slope of the longest monotonic increase in `uni_ts`.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -404,17 +409,17 @@ def get_slope_of_longest_mono_increase(uni_ts: pd.Series) -> float:
             slopes.append(slope)
         index_start = index_end
     if len(slopes) == 0:
-        return 0
+        return np.float64(0)
     else:
-        return np.max(slopes)
+        return np.float64(np.max(slopes))
 
 
-def get_slope_of_longest_mono_decrease(uni_ts: pd.Series) -> float:
+def get_slope_of_longest_mono_decrease(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     Identifies the longest monotonic decrease and gets the slope.
     :return: the slope of the longest monotonic decrease in `uni_ts`.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -427,16 +432,16 @@ def get_slope_of_longest_mono_decrease(uni_ts: pd.Series) -> float:
             slopes.append(slope)
         index_start = index_end
     if len(slopes) == 0:
-        return 0
+        return np.float64(0)
     else:
-        return np.max(slopes)
+        return np.float64(np.max(slopes))
 
 
-def get_avg_mono_increase_slope(uni_ts: pd.Series) -> float:
+def get_avg_mono_increase_slope(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the average slope of monotonically increasing segments.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -449,16 +454,16 @@ def get_avg_mono_increase_slope(uni_ts: pd.Series) -> float:
             slopes.append(slope)
         index_start = index_end
     if len(slopes) == 0:
-        return 0
+        return np.float64(0)
     else:
-        return np.mean(slopes)
+        return np.float64(np.mean(slopes))
 
 
-def get_avg_mono_decrease_slope(uni_ts: pd.Series) -> float:
+def get_avg_mono_decrease_slope(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
     :return: the average slope of monotonically decreasing segments.
     """
-    ts_encode = [(len(list(group)), name) for name, group in groupby(__sign(np.diff(uni_ts)))]
+    ts_encode = [(len(list(group)), name) for name, group in groupby(_sign(np.diff(uni_ts)))]
     slopes = []
     index_start = 0
     for run, signature in ts_encode:
@@ -471,9 +476,9 @@ def get_avg_mono_decrease_slope(uni_ts: pd.Series) -> float:
             slopes.append(slope)
         index_start = index_end
     if len(slopes) == 0:
-        return 0
+        return np.float64(0)
     else:
-        return np.mean(slopes)
+        return np.float64(np.mean(slopes))
 
 
 # -----------------------------------------------------------
@@ -481,16 +486,16 @@ def get_avg_mono_decrease_slope(uni_ts: pd.Series) -> float:
 # -----------------------------------------------------------
 
 
-def __difference_derivative(uni_ts: pd.Series, N: int = 1):
+def _difference_derivative(uni_ts: Union[pd.Series, np.ndarray], N: int = 1):
     if N < 1:
         return None
     else:
-        return np.array([uni_ts[x + N] - uni_ts[x] for x in range(len(uni_ts) - N)])
+        return np.subtract(uni_ts[N:], uni_ts[:-N])
 
 
-def __gradient_derivative(uni_ts: pd.Series):
+def _gradient_derivative(uni_ts: Union[pd.Series, np.ndarray]):
     return np.gradient(uni_ts)
 
 
-def __sign(uni_ts: pd.Series):
+def _sign(uni_ts: Union[pd.Series, np.ndarray]):
     return np.sign(uni_ts)

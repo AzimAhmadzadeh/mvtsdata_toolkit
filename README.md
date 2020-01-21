@@ -122,7 +122,7 @@ stat_features = CONST.CANDIDATE_STAT_FEATURES
 phys_parameters = CONST.CANDIDATE_PHYS_PARAMETERS
 
 pc = FeatureExtractor(path_to_root, path_to_dest, output_filename)
-pc.calculate_all(features_list=stat_features, params_name_list=phys_parameters)
+pc.do_extraction(features_list=stat_features, params_name_list=phys_parameters)
 
 ```
 
@@ -151,13 +151,13 @@ mvts = MVTSDataAnalysis(path_to_root)
 
 mvts.compute_summary(CONST.CANDIDATE_PHYS_PARAMETERS)
 mvts.print_summary('mvts_eda.csv')
-five_num_sum = mvts.get_five_num_summary()
+five_num_sum = mvts.get_six_num_summary()
 null_count = mvts.get_missing_value()
 print('Print Five point Summary')
 print(five_num_sum)
 print('Print Missing Value on Test Data:')
 print(null_count)
-mvts.get_five_num_summary() 
+mvts.get_six_num_summary() 
 ```
 
 #### Extracted Features Analysis[[utils.extracted_features_analysis.py](./data_analysis/extracted_features_analysis.py)]
@@ -188,7 +188,7 @@ m.compute_summary()
 m.print_summary('extracted_feature_eda.csv')
 class_population = m.get_class_population
 miss_pop = m.get_missing_values()
-five_num = m.get_five_num_summary()
+five_num = m.get_six_num_summary()
 print('Print Class Population:')
 print(class_population)
 print('Print Missing Value:')
