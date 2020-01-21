@@ -22,8 +22,14 @@ pipelines:
               - sphinxdocs/_build/html/**
 
         - step:
-            name: rsync
+            name: unittesting
             trigger: manual
+            script:
+              - python -m tests.tests_runner
+
+        - step:
+            name: rsync
+            trigger: manual  # triggered only on demand (using bitbucket pipeline page)
             script:
               - pipe: atlassian/rsync-deploy:0.3.2
                 variables:
