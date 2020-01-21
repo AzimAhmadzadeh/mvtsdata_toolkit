@@ -194,7 +194,5 @@ class TestSampler(unittest.TestCase):
         self.assertDictEqual(expected_ratios, sampler.sampled_class_ratios)
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
