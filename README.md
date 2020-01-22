@@ -1,15 +1,39 @@
-## MVTS Data Toolkit
-Multivariate Time Series Data Toolkit is a python package that works on multivariate time series datasets and provides: 
+## Multivariate Time Series Data Toolkit
 
- - over 50 time series statistical features collected from a number of research studies of different domains,
- - an automated feature extraction process, provided in both sequential and parallel fashions,
- - a set of generic sampling methodologies,
- - a set of different normalization transformations on mvts data,
- - an automated data analysis process that provides basic summary on both mvts data and the extracted features.
+* **Software Name:** MVTS Data Toolkit
+* **Journal:** SoftwareX (Elsevier) -- [*submitted*]
+* **Title:** MVTS-Data Toolkit: A Python Package for Preprocessing Multivariate Time Series Data
+* **Authors:** Azim Ahmadzadeh, Kankana Sinha, Berkay Aydin, and Rafal Angryk
+* **Submission Date:** Feb 2020
+
+
+**Abstract:** We developed a domain-independent Python package to facilitate the
+preprocessing routines required in preparation of any multi-class, multivariate time
+series data. It provides a comprehensive set of 48 statistical features for extracting
+the important characteristics of time series. The feature extraction process is
+automated in a sequential and parallel fashion, and is supplemented with an extensive
+summary report about the data. Using other modules, different data normalization
+methods and imputation are at users' disposal. To cater the class-imbalance issue,
+that is often intrinsic to real-world datasets, a set of generic but user-friendly,
+sampling methods are also developed.
+
+
+**This package provides:**
+* **Feature Collection:** A collection of 48 statistical features useful for analysis
+of time series.
+* **Feature Extraction:** An automated feature-extraction process, with both parallel
+and sequential execution capabilities.
+* **Data Analysis:** A quick analysis of the mvts data and the extracted features, in
+tabular and illustrative modes.
+* **Normalization:** A set of data transformation tools for normalization of the
+extracted features.
+* **Sampling:** A set of generic methods to provide an array of undersampling and
+oversampling remedies for balancing the class-imbalance datasets. 
+
 
 ----
-[![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://pypi.org/project/mvts-data-toolkit/)
-[![PyPI license](https://img.shields.io/badge/PyPI-0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvts-data-toolkit/)
+[![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://opensource.org/licenses/MIT)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdata-toolkit/)
 [![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
 ----
  
@@ -18,17 +42,17 @@ Multivariate Time Series Data Toolkit is a python package that works on multivar
 * For a list of all required packages, see [requirements.txt](./requirements.txt).
 
 ----
-#### Try it online:
+#### Try it online
 Click on the badge below to try the demo provided in the notebook `demo.ipynb`:
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvtsdata_toolkit/master)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvtsdata_toolkit%2Fsrc%2Fmaster/master?filepath=demo.ipynb)
 
 
 ----
 #### Install it from PyPI
 You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
 
-```pip install mvts_data_toolkit```
+```pip install mvtsdata-toolkit```
 
 [![PyPI license](https://img.shields.io/badge/PyPI-0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvts-data-toolkit/)
 
@@ -41,43 +65,28 @@ Check out the documentation of the project here:
 
 ----
 
-### Multivariate Timeseries (MVTS) Data
-## Data Rules:
+### Data Rules:
 #### MVTS Files
-It is assumed that the input data follows these assumptions:
 
-1. Each mvts is stored in a `tab` delimited, csv file. Each
-column represents a time series, except the first column which
-has the time stamp of each value. (A mvts data with `t` time
-series, each of length `d`, has a dimension of `d X (t+1)`)
+It is assumed that the input dataset is a collection multivariate time series (mvts),
+following these assumptions:
 
-2. File names should have the following naming convention,  
-   i. LABEL: located between `'lab['` and the first occurrence of `']'` after that.  
-   ii. ID: located between `'id['` and the first occurrence of `']'` after that.  
-   iii. START TIME: located between `'st['` and the first occurrence of `']'` after that.  
-   iv. END TIME: located between `'et['` and the first occurrence of `']'` after that.
-   
-   So, an example would be:  
-   ```lab[B]1.0@1053_id[345]_st[2011-01-24T03:24:00]_et[2011-01-24T11:12:00].csv```
+1. Each mvts is stored in a `tab` delimited, csv file. Each column represents either
+the time series values or some metadata such as timestamp. An mvts data with `t`
+time series and `k` metadata columns, each of length `d`, has a dimension of
+`d * (t + k)`).
+
+2. File names can have encoded data using a *tag* followed by `[]`. The *tag* indicates
+what that piece of info is about, and the actual information should be stored inside
+the corresponding square brackets. For instance, `A_id[123]_lab[1].csv` indicates that
+this mvts is assigned the id `123` and the label `1`. Using these *tag*s, the metadata
+can be extracted from the raw mvts data and be added to the extracted features. See 
+the documentation in [features.feature_extractor.py](./features/feature_extractor.py)
+to learn more about how the *tag*s can be used.
   
-3. If the embedded values (`label`, `id`, ...) contain paired braces `'[]'` within the string, 
-(e.g. for start date, `st[2011-01-24T[03:24:00]]`, then the methods will be able to extract
- correctly but for unpaired brace it will raise an exception.
- 
-4. It is optional to embed the id of each mvts in their filename. 
-The order of the embedding doesn't matter as long as the starting expression and braces'[]' are placed correctly. 
-
-#### Extracted Features Files
-It is assumed that the features extracted from all mvts data follow
-these assumptions:
-
-1. The extracted features will be stored in a `tab` delimited,
-csv file.
-2. Each row summarizes one mvts with a list of features.
-3. The first four columns of this file are reserved for: `ID`,
-`LABEL`,`START_TIME`, and `END_TIME`. The dimension of the
-extracted features dataframe will be `n X f` where `n` is the
-number of mvts, and `f` is the number of chosen features.
+3. If the embedded values contain paired braces within `[]`, (e.g. for start date,
+`id[123[001]]`, then the metadata extractor would still be able to extract the info
+correctly, however for unpaired braces it will raise an exception.
 
 ----
 
