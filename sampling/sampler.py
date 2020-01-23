@@ -65,16 +65,16 @@ class Sampler:
 
     """
 
-    def __init__(self, mvts_df: pd.DataFrame, label_col_name):
+    def __init__(self, extracted_features_df: pd.DataFrame, label_col_name):
         """
         The constructor method takes the input dataset and the column name corresponding to the
         class labels, and extracts the information about class labels and class populations.
 
-        :param mvts_df: a mvts dataframe that needs normalization.
+        :param extracted_features_df: a mvts dataframe that needs normalization.
         :param label_col_name: column-name corresponding to the class class_labels.
         """
         self.label_col_name = label_col_name
-        self.original_mvts = mvts_df
+        self.original_mvts = extracted_features_df
         self.sampled_mvts = pd.DataFrame()
         self.class_labels: list = _extract_labels(self.original_mvts, self.label_col_name)
         self.__decomposed_original_mvts: dict = _decompose_mvts(self.original_mvts,
@@ -361,28 +361,3 @@ class Sampler:
         else:
             output_dfs = input_dfs.sample(new_sample_size, replace=False)
         return output_dfs
-
-
-def main():
-    import os
-    import pandas as pd
-    import CONSTANTS as CONST
-
-    path_to_extracted_features = os.path.join(CONST.ROOT,
-                                              'tests/test_dataset/extracted_features'
-                                              '/extracted_features_TEST_NORMALIZER.csv')
-    df = pd.read_csv(path_to_extracted_features, sep='\t')
-    sampler = Sampler(df, 'lab')
-
-    print('sampled mvts', sampler.sampled_mvts)
-    print('class class_labels', sampler.class_labels)
-    print('class population:\n', sampler.original_class_populations)
-    print('class ratios:\n', sampler.original_class_ratios)
-    print('sampled mvts (shape)', sampler.sampled_mvts.shape)
-    desired_populations = {'NF': 5, 'C': 10}
-    sampler.sample(desired_populations=desired_populations)
-    print(sampler.sampled_mvts.shape)
-
-
-if __name__ == "__main__":
-    main()

@@ -8,7 +8,7 @@ class TestMVTSDataAnalysis(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        f_path = 'tests/configs/feature_extraction_configs.yml'
+        f_path = 'tests/configs/test_configs.yml'
         cls.mvts = MVTSDataAnalysis(f_path)
         cls.mvts.compute_summary(params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
 

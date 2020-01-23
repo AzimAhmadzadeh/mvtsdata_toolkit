@@ -57,7 +57,7 @@ class TestFeatureExtractor(unittest.TestCase):
             - both of the args `params_name` and `params_index` are given.
         """
         path_to_config = os.path.join(CONST.ROOT,
-                                      'tests/configs/feature_extraction_configs.yml')
+                                      'tests/configs/test_configs.yml')
         fe = FeatureExtractor(path_to_config)
         with self.assertRaises(ValueError):
             fe.do_extraction(params_name=['TOTUSJH', 'TOTBSQ'], params_index=[0, 1],
@@ -96,7 +96,7 @@ class TestFeatureExtractor(unittest.TestCase):
             - both the args `features_name` and `features_index` are given.
         """
         path_to_config = os.path.join(CONST.ROOT,
-                                      'tests/configs/feature_extraction_configs.yml')
+                                      'tests/configs/test_configs.yml')
         fe = FeatureExtractor(path_to_config)
         with self.assertRaises(ValueError):
             fe.do_extraction(params_name=['TOTUSJH', 'TOTBSQ'],
@@ -105,7 +105,7 @@ class TestFeatureExtractor(unittest.TestCase):
 
     def test_store_extracted_features_X1(self):
         path_to_config = os.path.join(CONST.ROOT,
-                                      'tests/configs/feature_extraction_configs.yml')
+                                      'tests/configs/test_configs.yml')
         output_filename = 'extracted_features_TEST_OUTPUT.csv'
         output_path = os.path.join(CONST.ROOT,
                                       'tests/test_dataset/extracted_features/', output_filename)

@@ -113,17 +113,27 @@ correctly, however for unpaired braces (e.g. for id,
 
 ----
 
+## Demo
+The Jupyer notebook [demo](./demo.ipynb) is designed to give a tour of the
+main functionalities of MVTS Data Toolkit. Users can either click on the
+*binder* badge and run it online, or clone this project and run it on
+their local machine.
 
+A dataset of 2000 mvts files can be downloaded within the steps of this
+demo. 
+
+----
 ## Example Usage
 
-In the examples below, the string `'/PATH/TO/CONFIG.YML'` points to the
+In following examples, the string `'/PATH/TO/CONFIG.YML'` points to the
 user's configuration file.
  
+----
 #### Data Analysis
 This package allows analysis of both raw mvts data and the extracted
 features.
 
-Using [mvts_data_analysis](./data_analysis/mvts_data_analysis.py)
+Using [mvts_data_analysis](./data_analysis/mvts_data_analysis.py) module
 users can easily get a glimpse of their raw data.
 
 ```python
@@ -150,7 +160,7 @@ We explained in our paper in more details, about computing the statistics
 in parallel.
 
 Using [extracted_features_analysis](./data_analysis/extracted_features_analysis.py)
-users can also get some analysis from the extracted features (see Section
+module users can also get some analysis from the extracted features (see Section
 Feature Extraction). Suppose the dataframe of the extracted features is
 loaded as a pandas dataframe into a variable called
 `extracted_features_df`. Then,
@@ -161,11 +171,19 @@ efa = ExtractedFeaturesAnalysis(extracted_features_df, excluded_col=['id'])
 efa.compute_summary()
 ```
 that excludes the column `id` of the extracted features from the analysis.
+After the summary is computed, the following methods can be used:
+```python
+efa.get_class_population(label='lab')
+efa.get_missing_values()
+efa.get_five_num_summary()
+```
 
+ 
+----
 #### Feature Extraction
 
 This snippet shows how [feature_extractor](./features/feature_extractor.py)
-can be used, for extracting 4 statistics (i.e., *min*, *max*, *median*, and *mean*),
+module can be used, for extracting 4 statistics (i.e., *min*, *max*, *median*, and *mean*),
 from 3 time series parameteres (i.e., *TOTUSJH*, *TOTBSQ*, and *TOTPOT*).
 
 ```python
@@ -191,147 +209,85 @@ These lists will be mapped to the list of parameters and features provided
 in the user's configuration file, under the keys `MVTS_PARAMETERS` and
 `STATISTICAL_FEATURES`, respectively.
 
-
-
-
-
-
-
-
-
-
-
-
-
-## Multivariate Timeseries Feature Extraction 
-This module aims to simplify the feature extraction process for those interested in working with MVTS Data. The main objectives of this module are as follows.
-
-This module provides:
-
-1. a set of useful statistical features to be extracted form the multivariate time series, in order to transform the time series dataset into tabular data.
-2. means to facilitate extraction of the features from a high dimensional multivariate time series dataset. 
-3. several sampling methodologies tailored specifically for class-imbalance issue which is intrinsic to many MVTS dataset.
-4. multiple normalization methods that can be used and potentially improve a forecast model's performance.
-5. several performance metrics that several studies have shown to be effective in reflecting forecast models' performance.
-
-In the following, we briefly introduce the dataset, all the means provided by this module, and some snippets of code to showcase how the module can be used.
-
-
-### FEATURES PACKAGE [[features](./features)]
-This package contains the statistical features that can be extracted from the time series, and the scripts needed to compute the features on the multivariate time series data.
-
-#### Features Collection [[features.feature_collection.py](./features/feature_collection.py)]
-
-
-#### Features Extractor (sequential) [[features.feature_extractor.py](./features/feature_extractor.py)]
-This extracts statistical features from the multivariate time series dataset. Using this script, any of the features mentioned above can be selected to be computed on any subset of the physical parameters in SWAN.
-
-The snippet below shows how to extract specified statistical features from specified physical parameters (declared in [CONSTANTS.py](CONSTANTS.py) file). The extracted features will be a `pandas.DataFrame` (stored as a csv file) with its shape being `N X M`, where `N` is the number of multivaraite time series available in `/path/to/FL/`, and `M` is the dimensionality of each extracted vector. In this exmaple, `M` equals the number of generated features (3*4), plus 4; four pieces of meta data, `NOAA_AR_NO`, `LABEL`, START_TIME`, and `END_TIME`.
+In `FeatureExtractor` class, several plotting functionalities are
+implemented that can be easily used as follows:
 
 ```python
-import os
-import CONSTANTS as CONST
-import features.feature_collection as fc
-from features.feature_extractor import FeatureExtractor
+params = ['TOTUSJH_median', 'TOTUSJH_mean', 'TOTBSQ_median', 'TOTBSQ_mean']
+fe.plot_boxplot(params)
+fe.plot_violinplot(params)
+fe.plot_correlation_heatmap(params)
+fe.plot_covariance_heatmap(params)
+fe.plot_splom(params)
+``` 
 
-# Input and output path
-path_to_root = os.path.join('..', CONST.IN_PATH_TO_MVTS_FL)
-path_to_dest = os.path.join('..', CONST.OUT_PATH_TO_RAW_FEATURES)
-output_filename = 'extracted_features.csv'
-
-# Prepare two lists, one for the statistical features and another for the physical parameters
-stat_features = CONST.CANDIDATE_STAT_FEATURES
-phys_parameters = CONST.CANDIDATE_PHYS_PARAMETERS
-
-pc = FeatureExtractor(path_to_root, path_to_dest, output_filename)
-pc.do_extraction(features_list=stat_features, params_name_list=phys_parameters)
-
-```
-
-### UTIL PACKAGE [[utils](./utils)]
-This package serves five different functionality as helper methods to the overall tool:
-#### MVTS Data Analysis[[utils.mvts_data_analysis.py](./data_analysis/mvts_data_analysis.py)]
-This class takes the folder location(path) of the MVTS dataset in time of instance creation. By calling method compute_summary()
-it extracts each mvts(.csv) file and computes the statistical parameters of each numeric physical feature that belongs to the MVTS.
-TDigest module is used in order to calculate the statistical parameters(like percentile) in the accumulated data. This t-digest datastructure can also be used in distributed file system. 
-If the MVTS dataset is distributed still we can get these parameters using t-digest data structure.
-
-This module performs Exploratory Data Analysis(EDA) on overall MVTS Dataset:  
-    a.Missing Value count  
-    c.Five-Number summary of each Timeseries  
-Creates a summary report and saves in .CSV file in folder specified by user(Example: 'pet_datasets/mvts_analysis/').
-
-Below code snippet shows how to execute different methods of this class,
+  
+----
+#### Sampling
+After the statistical features are extracted from the mvts data, to remedy
+the class-imbalance issue (if exists) a set of generic sampling methods
+are provided in [sampler](./sampling/sampler.py) module.
 
 ```python
-import CONSTANTS as CONST
-import os
-from data_analysis.mvts_data_analysis import MVTSDataAnalysis
+from sampling.sampler import Sampler
 
-path_to_root = os.path.join('..', CONST.IN_PATH_TO_MVTS)
-mvts = MVTSDataAnalysis(path_to_root)
-
-mvts.compute_summary(CONST.CANDIDATE_PHYS_PARAMETERS)
-mvts.print_summary('mvts_eda.csv')
-five_num_sum = mvts.get_six_num_summary()
-null_count = mvts.get_missing_value()
-print('Print Five point Summary')
-print(five_num_sum)
-print('Print Missing Value on Test Data:')
-print(null_count)
-mvts.get_six_num_summary() 
+sampler = Sampler(extracted_features_df, label_col_name='lab')
+sampler.sample(desired_populations={'N': 100, 'Y': 100})
 ```
+which randomly samples 100 instances of the `N` class and 100 instances
+of the `Y` class. If either of the classes does not have enough samples,
+then after the entire samples are taken, the remaining needed instances
+will be sampled with replacement. Depending on the provided populations,
+this method could be an *undersampling* or an *oversampling* technique.
 
-#### Extracted Features Analysis[[utils.extracted_features_analysis.py](./data_analysis/extracted_features_analysis.py)]
-This analyses the dataset(extracted_features.csv) created by feature extractor module.
+Users can use *ratio*s instead of *size* as follows:
+```python
+sampler.sample(desrired_ratios = {'N': 0.50, 'Y': -1})
+```
+which means take 50% of `N`-class instances, and *all* of `Y`-class
+instances.
 
-Perform Exploratory Data Analysis(EDA) on extracted features  
-    a.Histogram of classes  
-    b.Missing Value count  
-    c.Five-Number summary of each Timeseries  
-Creates a summary report and saves in .CSV file in folder specified by user(Example: 'pet_datasets/mvts_analysis/').
+For other approaches, see the [/demo](./demo.ipynb).
 
-Below code snippet shows how to execute different methods of this class,
+ 
+----
+#### Normalizing
+The extracted features often require normalization. Using
+[normalizer](./normalizing/normalizer.py) module, it can be easily
+normalized as follows:
 
 ```python
-import CONSTANTS as CONST
-import pandas as pd
-import os
-from data_analysis.extracted_features_analysis import ExtractedFeaturesAnalysis
+from normalizing import normalizer
+normalizer.zero_one_normalize()
+df_normalized = normalizer.zero_one_normalize(extracted_features_df)
+``` 
+that again, `extracted_features_df` is assumed to be a pandas dataframe
+of the extracted features.
 
-path_to_data = CONST.OUT_PATH_TO_EXTRACTED_FEATURES
-path_to_data = os.path.join(path_to_data, "extracted_features.csv")
-df = pd.read_csv(path_to_data, sep='\t')
+In this module, the following four normalizers are provided:
+* zero_one_normalizer()
+* negativeone_one_normalize()
+* standardize()
+* robust_standardize()
 
-# Testing ExtractedFeaturesAnalysis class on original extracted_features.csv
-m = ExtractedFeaturesAnalysis(df, "pet_datasets/mvts_analysis/")
-# compute_summary() needs to be called first in order to print/save any Data Analysis results
-m.compute_summary()
-m.print_summary('extracted_feature_eda.csv')
-class_population = m.get_class_population
-miss_pop = m.get_missing_values()
-five_num = m.get_six_num_summary()
-print('Print Class Population:')
-print(class_population)
-print('Print Missing Value:')
-print(miss_pop)
-print('Print Five Num Value:')
-print(five_num)
-```
-#### Meta Data Getter[[utils.meta_data_getter.py](./utils/meta_data_getter.py)]
-This section is responsible for extracting the embedded information from the raw MVTS file names. These helper methods are used
-to fill the first four columns of the extracted_features.csv file: `ID`,`LABEL`,`START_TIME`, and `END_TIME`
-
-#### MVTS Cleaner[[utils.mvts_cleaner.py](./utils/mvts_cleaner.py)]
-Responsible for cleaning the dataset by different methods like: interpolation.
-
-#### Normalizer [[utils.normalizer.py](normalizing/normalizer.py)]
-Uses different normalization techniques like: zero one normalization, -1 to 1 normalization, standardization and robust standardization. User can choose from these given options and implement on MVTS dataset.
+ 
+----
+Extra files:
+* [bitbucket-pipelines.yml](./bitbucket-pipelines.yml) is a configuration
+file for pipelining the deployment steps before each release.
+* [CONSTANTS.py](./CONSTANTS.py) keeps track of the root directory, and
+a few other pieces of information that are needed for the demo.
+* [demo.ipynb](./demo.ipynb) is the demo Jupyter notebook that can walk
+the interested users through the functionalities this toolkit provides.
+* [README.md](./README.md) has the content of this very manual.
+* [requirements.txt](./requirements.txt) keeps track of all dependencies.
+* [setup.py](./setup.py) is used to generate the binary files needed for
+generating the pip-installble version of this package.
 
 ----
 #### Authors:
 
 |                 |               |       |
 | --------------- |:-------------:| -----:|
-| Kankana Sinha   | _ksinha3[AT]student[DOT]gsu[DOT]edu_  | [LinkedIn](https://www.linkedin.com/in/kankana-sinha-4b4b13131/) |
 | Azim Ahmadzadeh | _aahmadzadeh1[AT]cs[DOT]gsu[DOT]edu_  | [Website](https://grid.cs.gsu.edu/~aahmadzadeh1)   |
+| Kankana Sinha   | _ksinha3[AT]student[DOT]gsu[DOT]edu_  | [LinkedIn](https://www.linkedin.com/in/kankana-sinha-4b4b13131/) |

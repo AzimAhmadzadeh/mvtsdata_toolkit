@@ -189,37 +189,3 @@ class ExtractedFeaturesAnalysis:
         out_file = os.path.join(output_path, file_name)
         self.summary.to_csv(out_file, sep='\t', header=True, index=False)
         print('Data Analysis of the extracted features is stored at [{}]'.format(out_file))
-
-
-def main():
-    import pandas as pd
-    import CONSTANTS as CONST
-    from normalizing import normalizer
-
-    f_path = os.path.join(CONST.ROOT,
-                          'data/extracted_features/extracted_features_parallel_3_pararams_4_features.csv')
-    mvts_df = pd.read_csv(f_path, sep='\t')
-    # Normalizer Test on extracted feature dataset
-    # excluded_col = extracted_features_df.select_dtypes(exclude=np.number).columns.to_list()
-    excluded_col = ['id']
-    # df_norm = normalizer.negativeone_one_normalize(extracted_features_df,excluded_col)
-    # df_norm = normalizer.robust_standardize(extracted_features_df,excluded_col)
-    # df_norm = normalizer.standardize(extracted_features_df,excluded_col)
-    df_norm = normalizer.zero_one_normalize(mvts_df, excluded_col)
-    print(df_norm)
-
-    # efa = ExtractedFeaturesAnalysis(mvts_df, excluded_col)
-    # efa.compute_summary()
-    # efa.print_summary()
-
-    # d = efa.get_five_num_summary()
-    # print(d[d['Feature-Name'] == 'TOTUSJH_median'].values)
-    # print(list(d))
-    # print(efa.get_class_population(label='lab'))
-    # print(efa.get_five_num_summary())
-    # print(efa.get_missing_values())
-    # efa.summary_to_csv(CONST.ROOT, 'data/extracted_features/xxxxx.csv')
-
-
-if __name__ == '__main__':
-    main()

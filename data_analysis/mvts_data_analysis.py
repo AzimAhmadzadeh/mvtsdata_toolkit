@@ -498,36 +498,3 @@ class MVTSDataAnalysis:
         out_file = os.path.join(output_path, file_name)
         self.summary.to_csv(out_file, sep='\t', header=True, index=False)
         print('Data Analysis of the MVTS Dataset is stored in [{}]'.format(out_file))
-
-
-def main():
-    path_to_config = CONST.PATH_TO_CONFIG
-    mvts = MVTSDataAnalysis(path_to_config)
-    mvts.print_stat_of_directory()
-
-    # --------------------------- Sequential Cases -----------------------------------
-    # ------------- Usage 1:
-    mvts.compute_summary(first_k=50, params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
-    # ------------- Usage 2:
-    # mvts.compute_summary(first_k=50, params_index=[0, 1, 2])
-    # ------------- Usage 2:
-    # mvts.compute_summary(first_k=50, params_index=[0, 1, 2], proc_id=0)
-    # mvts.print_summary()
-
-    # --------------------------- Parallel Cases -------------------------------------
-    # ------------- Usage 2:
-    # mvts.compute_summary_in_parallel(n_jobs=4, first_k=50, verbose=False,
-    #                                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
-    # mvts.print_summary()
-
-    mvts.summary_to_csv(output_path='.',
-                        file_name='../data/mvts_data_analysis/data_analysis_sequential_params_['
-                                  '3].csv')
-
-    # print(mvts.summary.columns)
-    print(mvts.get_six_num_summary())
-    # print(mvts.get_missing_values())
-
-
-if __name__ == '__main__':
-    main()

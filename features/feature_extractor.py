@@ -111,7 +111,7 @@ class FeatureExtractor:
     """
     An instance of this class can extract a set of given statistical features from a large number of
     mvts data, in both sequential and parallel fashions. It loads the configuration file
-    `feature_extraction_configs.yml`, and reads the following pieces of information from it.
+    provided by the user, and reads the following pieces of information from it.
 
     Below are the column names of the summary dataframe:
         * `PATH_TO_MVTS`: path to where the csv (mvts) files are stored.
@@ -544,55 +544,3 @@ class FeatureExtractor:
         from visualizations.stat_visualizer import StatVisualizer
         sv = StatVisualizer(extracted_features=self.df_all_features)
         sv.plot_covariance_heatmap(feature_names=feature_names, output_path=output_path)
-
-
-def main():
-    path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_CONFIG)
-    fe = FeatureExtractor(path_to_config)
-
-    # --------------------------- Sequential Cases -----------------------------------
-    # ------------- Usage 1:
-    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
-    # ------------- Usage 2:
-    # fe.do_extraction(features_index=[0, 1, 2, 3],
-    #                  params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
-    # ------------- Usage 3:
-    # fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-    #                  params_index=[0, 1, 2], first_k=50)
-    # ------------- Usage 4:
-    # fe.do_extraction(features_index=[0, 1, 2, 3],
-    #                  params_index=[0, 1, 2], first_k=50)
-    # -------------------------------------------------------------------------------
-
-    # --------------------------- Parallel Cases ------------------------------------
-    # ------------- Usage 1:
-    # fe.do_extraction_in_parallel(n_jobs=4,
-    #                              features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-    #                              params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
-    # ------------- Usage 2:
-    # fe.do_extraction_in_parallel(n_jobs=4,
-    #                              features_index=[0, 1, 2, 3],
-    #                              params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'], first_k=50)
-    # ------------- Usage 3:
-    # fe.do_extraction_in_parallel(n_jobs=4,
-    #                              features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
-    #                              params_index=[0, 1, 2], first_k=50)
-    # ------------- Usage 4:
-    fe.do_extraction_in_parallel(n_jobs=4,
-                                 features_index=[0, 1, 2, 3],
-                                 params_index=[0, 1, 2], first_k=50)
-
-    params = ['TOTUSJH_median', 'TOTUSJH_mean', 'TOTBSQ_median', 'TOTBSQ_mean']
-    # fe.plot_boxplot(params)
-    fe.plot_violinplot(params)
-    # fe.plot_correlation_heatmap(params)
-    # fe.plot_covariance_heatmap(params)
-    # fe.plot_splom(params)
-
-    # print(fe.df_all_features)
-    # fe.store_extracted_features('extracted_features_parallel_3_pararams_4_features.csv')
-
-
-if __name__ == '__main__':
-    main()
