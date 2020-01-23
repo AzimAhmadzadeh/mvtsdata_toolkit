@@ -34,10 +34,17 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         self.assertEqual(actual_count, expected_count)
 
     def test_computing_mean(self):
+        accepted_err_rate = 0.1  # i.e., 10% of the expected values
         actual_means = self.mvts.summary.loc[:, 'mean'].tolist()
+
         # the expected values are verified by what LibreCalc gives using 'MEANA' function.
         expected_means = [3000.64, 40492563413.12, 7.935093000765689e+23]
-        np.testing.assert_almost_equal(actual_means, expected_means, decimal=2)
+
+        accepted_diff = np.abs(np.multiply(expected_means, accepted_err_rate))
+        actual_diff = np.absolute(np.subtract(actual_means, expected_means))
+
+        self.assertListEqual(list(actual_diff < accepted_diff), [True, True, True])
+        # np.testing.assert_almost_equal(actual_means, expected_means, decimal=2)
 
     def test_computing_min(self):
         actual_mins = self.mvts.summary.loc[:, 'min'].tolist()
@@ -52,7 +59,7 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         np.testing.assert_almost_equal(actual_maxs, expected_maxs, decimal=4)
 
     def test_computing_q1(self):
-        accepted_err_rate = 0.3  # i.e., 30% of the extual values
+        accepted_err_rate = 0.3  # i.e., 30% of the expected values
         actual_q1s = np.array(self.mvts.summary.loc[:, '25th'])
 
         # the expected Q1's are verified by what LibreCalc gives using 'PERCENTILE' function.

@@ -6,7 +6,8 @@
 *  **Authors:** Azim Ahmadzadeh, Kankana Sinha, Berkay Aydin, and Rafal Angryk
 *  **Submission Date:** Feb 2020
 
-![Alt text](./__icon/MVTS_Data_Toolkit_icon2.png)
+![MVTS_Date_Toolkit Icon](https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/c8f7e0edcfd899c93d9356d52b7ed8c6b500de04/__icon/MVTS_Data_Toolkit_icon2.png)
+
 
 **Abstract:** We developed a domain-independent Python package to facilitate the
 preprocessing routines required in preparation of any multi-class, multivariate time
@@ -20,6 +21,7 @@ sampling methods are also developed.
 
 
 **This package provides:**
+
 *  *Feature Collection:* A collection of 48 statistical features useful for analysis
 of time series.
 *  *Feature Extraction:* An automated feature-extraction process, with both parallel

@@ -6,6 +6,7 @@ from sampling.input_validator import validate_sampling_input, validate_under_ove
 def _extract_labels(mvts: pd.DataFrame, label_col_name) -> list:
     """
     A private method that extracts the unique class labels from the dataframe.
+
     :return: a list of unique class labels.
     """
     class_labels = mvts[label_col_name].unique().tolist()
