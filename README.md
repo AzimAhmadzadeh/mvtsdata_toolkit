@@ -55,8 +55,7 @@ You can install this package, directly from Python Package Index (PyPI), using `
 
 ```pip install mvtsdata-toolkit```
 
-[![PyPI license](https://img.shields.io/badge/PyPI-0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvts-data-toolkit/)
-
+[![PyPI license](https://img.shields.io/badge/PyPI-0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdata-toolkit/)
 
 ----
 #### See Documentation
@@ -288,7 +287,7 @@ the interested users through the functionalities this toolkit provides.
 generating the pip-installble version of this package.
 
 ----
-#### Authors:
+#### Software Authors:
 
 |                 |               |       |
 | --------------- |:-------------:| -----:|
