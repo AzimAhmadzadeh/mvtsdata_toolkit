@@ -12,8 +12,11 @@
    viewBox="0 0 150 150"
    version="1.1"
    id="svg1669"
-   sodipodi:docname="MVTS_features_icon.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+   sodipodi:docname="MVTS_Data_Toolkit_icon.svg"
+   inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
+   inkscape:export-filename="/home/azim/CODES/PyCode/mvtsdata_toolkit/__icon/MVTS_Data_Toolkit_icon.png"
+   inkscape:export-xdpi="100.66"
+   inkscape:export-ydpi="100.66">
   <metadata
      id="metadata1673">
     <rdf:RDF>
@@ -36,20 +39,20 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1025"
+     inkscape:window-height="1052"
      id="namedview1671"
      showgrid="false"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
      fit-margin-bottom="0"
-     inkscape:zoom="1.14"
-     inkscape:cx="129.34007"
-     inkscape:cy="49.135118"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:zoom="2.2800001"
+     inkscape:cx="71.758671"
+     inkscape:cy="155.50677"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1669" />
+     inkscape:current-layer="layer4" />
   <defs
      id="defs382">
     <g
@@ -1217,35 +1220,156 @@
          cy="157.3421"
          r="75" />
     </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath1699">
+      <g
+         id="g1713">
+        <text
+           id="text1703"
+           y="64.251587"
+           x="45.081017"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.75"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.75"
+             y="64.251587"
+             x="45.081017"
+             id="tspan1701"
+             sodipodi:role="line">MVTS</tspan></text>
+        <text
+           id="text1707"
+           y="86.827103"
+           x="47.294685"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.75"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.75"
+             y="86.827103"
+             x="47.294685"
+             id="tspan1705"
+             sodipodi:role="line">DATA</tspan></text>
+        <text
+           id="text1711"
+           y="108.92264"
+           x="28.564615"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#faeeee;fill-opacity:1;stroke:none;stroke-width:0.75"
+           xml:space="preserve"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#faeeee;fill-opacity:1;stroke-width:0.75"
+             y="108.92264"
+             x="28.564615"
+             id="tspan1709"
+             sodipodi:role="line">TOOLKIT</tspan></text>
+      </g>
+    </clipPath>
   </defs>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:1;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75"
-     x="12.500001"
-     y="82.631584"
-     id="text2565"><tspan
-       sodipodi:role="line"
-       id="tspan2563"
-       x="12.500001"
-       y="82.631584"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.75"><tspan
-         style="fill:#a02c2c"
-         id="tspan2585">M</tspan><tspan
-         style="fill:#c83737"
-         id="tspan2589">V</tspan><tspan
-         style="fill:#d35f5f"
-         id="tspan2591">T</tspan><tspan
-         style="fill:#e9afaf"
-         id="tspan2593">S</tspan></tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22px;line-height:1;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75"
-     x="13.157894"
-     y="103.78947"
-     id="text2565-2"><tspan
-       sodipodi:role="line"
-       id="tspan2563-9"
-       x="13.157894"
-       y="103.78947"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.75">FEATURES</tspan></text>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="bars"
+     style="display:inline" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="text"
+     style="display:inline">
+    <path
+       style="display:inline;fill:#4a4a4a;fill-opacity:1;stroke:none;stroke-width:1.10226214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 7.8528593,31.116197 124.84734,26.765153 149.01973,122.48787 1.0845884,125.38858 Z"
+       id="path1653-2-5-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#e97777;fill-opacity:1;stroke:none;stroke-width:1.10226214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 18.115843,34.270605 119.63999,20.250597 143.32894,125.51076 5.4875391,119.68927 Z"
+       id="path1653-2-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <g
+       transform="matrix(1.4696827,0,0,1.4696827,-38.93105,-37.821195)"
+       id="g1661-5-0"
+       style="fill:#ac9393">
+      <text
+         id="text1585-2-2-9"
+         y="64.251587"
+         x="45.081017"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ac9393;fill-opacity:1;stroke:none;stroke-width:0.75"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ac9393;fill-opacity:1;stroke-width:0.75"
+           y="64.251587"
+           x="45.081017"
+           id="tspan1583-5-6-6"
+           sodipodi:role="line">MVTS</tspan></text>
+      <text
+         id="text1585-1-2-9-3"
+         y="86.827103"
+         x="47.294685"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ac9393;fill-opacity:1;stroke:none;stroke-width:0.75"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ac9393;fill-opacity:1;stroke-width:0.75"
+           y="86.827103"
+           x="47.294685"
+           id="tspan1583-2-4-1-8"
+           sodipodi:role="line">DATA</tspan></text>
+      <text
+         id="text1585-1-9-4-3-5"
+         y="108.92264"
+         x="28.564615"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ac9393;fill-opacity:1;stroke:none;stroke-width:0.75"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ac9393;fill-opacity:1;stroke-width:0.75"
+           y="108.92264"
+           x="28.564615"
+           id="tspan1583-2-3-3-3-6"
+           sodipodi:role="line">TOOLKIT</tspan></text>
+    </g>
+    <path
+       style="display:inline;fill:#4a4a4a;fill-opacity:1;stroke:none;stroke-width:1.10226214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 13.392805,300.66972 130.38728,296.31868 154.55967,392.04139 6.6245349,394.9421 Z"
+       id="path1653-2-5-1-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="display:inline;fill:#e97777;fill-opacity:1;stroke:none;stroke-width:1.10226214px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 23.655785,303.82413 101.524145,-14.02 23.68895,105.26015 -137.841395,-5.82149 z"
+       id="path1653-2-5-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <g
+       style="display:inline"
+       transform="matrix(1.4696827,0,0,1.4696827,-33.391106,231.73234)"
+       id="g1661-5-0-9">
+      <text
+         id="text1585-2-2-9-8"
+         y="64.251587"
+         x="45.081017"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.75"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.75"
+           y="64.251587"
+           x="45.081017"
+           id="tspan1583-5-6-6-4"
+           sodipodi:role="line">MVTS</tspan></text>
+      <text
+         id="text1585-1-2-9-3-8"
+         y="86.827103"
+         x="47.294685"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.75"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke-width:0.75"
+           y="86.827103"
+           x="47.294685"
+           id="tspan1583-2-4-1-8-1"
+           sodipodi:role="line">DATA</tspan></text>
+      <text
+         id="text1585-1-9-4-3-5-0"
+         y="108.92264"
+         x="28.564615"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;line-height:1.25;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#faeeee;fill-opacity:1;stroke:none;stroke-width:0.75"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:30px;font-family:'Ubuntu Condensed';-inkscape-font-specification:'Ubuntu Condensed, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;fill:#faeeee;fill-opacity:1;stroke-width:0.75"
+           y="108.92264"
+           x="28.564615"
+           id="tspan1583-2-3-3-3-6-3"
+           sodipodi:role="line">TOOLKIT</tspan></text>
+    </g>
+  </g>
 </svg>

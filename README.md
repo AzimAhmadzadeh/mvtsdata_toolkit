@@ -1,11 +1,12 @@
 ## Multivariate Time Series Data Toolkit
 
-* **Software Name:** MVTS Data Toolkit
-* **Journal:** SoftwareX (Elsevier) -- [*submitted*]
-* **Title:** MVTS-Data Toolkit: A Python Package for Preprocessing Multivariate Time Series Data
-* **Authors:** Azim Ahmadzadeh, Kankana Sinha, Berkay Aydin, and Rafal Angryk
-* **Submission Date:** Feb 2020
+*  **Package Name:** MVTS Data Toolkit
+*  **Journal:** SoftwareX (Elsevier) -- [*submitted*]
+*  **Title:** MVTS-Data Toolkit: A Python Package for Preprocessing Multivariate Time Series Data
+*  **Authors:** Azim Ahmadzadeh, Kankana Sinha, Berkay Aydin, and Rafal Angryk
+*  **Submission Date:** Feb 2020
 
+![Alt text](./__icon/MVTS_Data_Toolkit_icon2.png)
 
 **Abstract:** We developed a domain-independent Python package to facilitate the
 preprocessing routines required in preparation of any multi-class, multivariate time
@@ -19,15 +20,15 @@ sampling methods are also developed.
 
 
 **This package provides:**
-* *Feature Collection:* A collection of 48 statistical features useful for analysis
+*  *Feature Collection:* A collection of 48 statistical features useful for analysis
 of time series.
-* *Feature Extraction:* An automated feature-extraction process, with both parallel
+*  *Feature Extraction:* An automated feature-extraction process, with both parallel
 and sequential execution capabilities.
-* *Data Analysis:* A quick analysis of the mvts data and the extracted features, in
+*  *Data Analysis:* A quick analysis of the mvts data and the extracted features, in
 tabular and illustrative modes.
-* *Normalization:* A set of data transformation tools for normalization of the
+*  *Normalization:* A set of data transformation tools for normalization of the
 extracted features.
-* *Sampling:* A set of generic methods to provide an array of undersampling and
+*  *Sampling:* A set of generic methods to provide an array of undersampling and
 oversampling remedies for balancing the class-imbalance datasets. 
 
 
@@ -38,8 +39,8 @@ oversampling remedies for balancing the class-imbalance datasets.
 ----
  
 #### Requirements
-* Python > 3.6
-* For a list of all required packages, see [requirements.txt](./requirements.txt).
+*  Python > 3.6
+*  For a list of all required packages, see [requirements.txt](./requirements.txt).
 
 ----
 #### Try it online
@@ -73,14 +74,15 @@ Check out the documentation of the project here:
 
 #### MVTS Files
 
-It is assumed that the input dataset is a collection of multivariate time series (mvts), following these assumptions:
+It is assumed that the input dataset is a collection of multivariate time series (mvts), following
+these assumptions:
 
-1. Each mvts is stored in a `tab`-delimited, csv file. Each column represents either the time
+1.  Each mvts is stored in a `tab`-delimited, csv file. Each column represents either the time
  series or some metadata such as timestamp. An mvts data with `t`
 time series and `k` metadata columns, each of length `d`, has a dimension of
 `d * (t + k)`).
 
-2. File names can also be used to have some metadata encoded using a *tag* followed by
+2.  File names can also be used to have some metadata encoded using a *tag* followed by
  `[]`, for each piece of info. The *tag* indicates
 what that piece of info is about, and the actual information should be stored inside
 the proceeding square brackets. For instance, `A_id[123]_lab[1].csv` indicates that
@@ -90,24 +92,24 @@ this mvts is assigned the id `123` and the label `1`. If *tag*s are used, the
 the documentation in [features.feature_extractor.py](./features/feature_extractor.py)
 .
   
-3. If the embedded values contain paired braces within `[]`, (e.g. for id,
+3.  If the embedded values contain paired braces within `[]`, (e.g. for id,
 `id[123[001]]`), then the metadata extractor would still be able to extract the info
 correctly, however for unpaired braces (e.g. for id,
 `id[123[001]`) it will raise an exception.
 
 ----
 ## Main Components:
-* All statistical features can be found in
+*  All statistical features can be found in
 [features.feature_collection](./features/feature_collection.py).
-* Code for parallel and sequential feature extraction can be found in
+*  Code for parallel and sequential feature extraction can be found in
 [features.feature_extractor](./features/feature_extractor.py).
-* Code for parallel and sequential analysis of raw mvts can be found in
+*  Code for parallel and sequential analysis of raw mvts can be found in
 [data_analysis.mvts_data_analysis](./data_analysis/mvts_data_analysis.py). 
-* Code for analysis of the extracted features can be found in
+*  Code for analysis of the extracted features can be found in
 [data_analysis.extracted_features_analysis](./data_analysis/extracted_features_analysis.py).
-* Code for data normalization can be found in
+*  Code for data normalization can be found in
 [normalizing.normalizer](./normalizing/normalizer.py).
-* Code for sampling methods can be found in
+*  Code for sampling methods can be found in
 [sampling.sampler](./sampling/sampler.py).
 
 
@@ -265,23 +267,24 @@ that again, `extracted_features_df` is assumed to be a pandas dataframe
 of the extracted features.
 
 In this module, the following four normalizers are provided:
-* zero_one_normalizer()
-* negativeone_one_normalize()
-* standardize()
-* robust_standardize()
+
+*  zero_one_normalizer()
+*  negativeone_one_normalize()
+*  standardize()
+*  robust_standardize()
 
  
 ----
 Extra files:
-* [bitbucket-pipelines.yml](./bitbucket-pipelines.yml) is a configuration
+*  [bitbucket-pipelines.yml](./bitbucket-pipelines.yml) is a configuration
 file for pipelining the deployment steps before each release.
-* [CONSTANTS.py](./CONSTANTS.py) keeps track of the root directory, and
+*  [CONSTANTS.py](./CONSTANTS.py) keeps track of the root directory, and
 a few other pieces of information that are needed for the demo.
-* [demo.ipynb](./demo.ipynb) is the demo Jupyter notebook that can walk
+*  [demo.ipynb](./demo.ipynb) is the demo Jupyter notebook that can walk
 the interested users through the functionalities this toolkit provides.
-* [README.md](./README.md) has the content of this very manual.
-* [requirements.txt](./requirements.txt) keeps track of all dependencies.
-* [setup.py](./setup.py) is used to generate the binary files needed for
+*  [README.md](./README.md) has the content of this very manual.
+*  [requirements.txt](./requirements.txt) keeps track of all dependencies.
+*  [setup.py](./setup.py) is used to generate the binary files needed for
 generating the pip-installble version of this package.
 
 ----
