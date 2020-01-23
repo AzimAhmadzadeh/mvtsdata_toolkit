@@ -10,7 +10,7 @@ setup(
     author_email="aahmadzadeh1@cs.gsu.edu, ksinha1106@gmail.com",
     maintainer="Azim Ahmadzadeh",
     maintainer_email="aahmadzadeh1@cs.gsu.edu",
-    description="A Toolkit for MultiVariate Time Series Data",
+    description="A Toolkit for Multivariate Time Series Data",
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://bitbucket.org/gsudmlab/mvtsdata_toolkit/src/master/",
