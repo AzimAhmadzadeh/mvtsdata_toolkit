@@ -190,20 +190,6 @@ class ExtractedFeaturesAnalysis:
         self.summary.to_csv(out_file, sep='\t', header=True, index=False)
         print('Data Analysis of the extracted features is stored at [{}]'.format(out_file))
 
-    def boxplot_extracted_features(self, feature_names: list, output_path: str = None):
-        """
-        Generates a plot of box-plots, one for each extracted feature.
-
-        :param feature_names: a list of feature-names indicating the columns of interest for this
-                              visualization.
-        :param output_path: If given, the generated plot will be stored instead of shown.
-                            Otherwise, it will be only shown if the running environment allows it.
-        :return: None
-        """
-        from visualizations.stat_visualizer import StatVisualizer
-        sv = StatVisualizer(extracted_features=self.df_all_features)
-        sv.boxplot_extracted_features(feature_names=feature_names, output_path=output_path)
-
 
 def main():
     import pandas as pd

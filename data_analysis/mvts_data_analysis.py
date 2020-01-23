@@ -98,11 +98,21 @@ class MVTSDataAnalysis:
                                     params_index: list = None, first_k: int = None,
                                     verbose: bool = False):
         """
-        :param n_jobs:
-        :param params_name:
-        :param params_index:
-        :param first_k:
-        :param verbose:
+        This method calls `compute_summary` in parallel. For more details, see `compute_summary`'s
+        documentation.
+
+        :param n_jobs: the number of processes to be employed.
+        :param params_name: (Optional) User may specify the list of parameters for which
+                            statistical analysis is needed. If no params_name is provided by
+                            the user then all existing numeric parameters are included in the
+                            list.
+        :param params_index: (Optional) User may specify the list of indices corresponding to the
+                             parameters provided in the configuration file.
+        :param first_k: (Optional) If provided, only the fist `k` mvts will be processed. This is
+                        mainly for getting some preliminary results in case the number of mvts
+                        files is too large.
+        :param verbose: Set it to True if you want to see more details as the function is running.
+                        Default is False.
         :return:
         """
         import multiprocessing as mp
@@ -213,15 +223,16 @@ class MVTSDataAnalysis:
                         mainly for getting some preliminary results in case the number of mvts
                         files is too large.
         :param params_name: (Optional) User may specify the list of parameters for which
-                                statistical analysis is needed. If no params_name is provided by
-                                the user then all existing numeric parameters are included in the
-                                list.
+                            statistical analysis is needed. If no params_name is provided by
+                            the user then all existing numeric parameters are included in the
+                            list.
         :param params_index: (Optional) User may specify the list of indices corresponding to the
                              parameters provided in the configuration file.
-        :param partition:
-        :param proc_id:
-        :param verbose:
-        :param output_list:
+        :param partition: Only for internal use. Ignore this.
+        :param proc_id: Only for internal use. Ignore this.
+        :param verbose: Set it to True if you want to see more details as the function is running.
+                        Default is False.
+        :param output_list: Only for internal use. Ignore this.
         :return: None.
         """
         is_parallel = False
@@ -269,8 +280,7 @@ class MVTSDataAnalysis:
         total_params = len(numeric_params_name)
 
         param_seq = [""] * total_params
-        # TODO: Line below produces objects with similar id!! Is this OK? (object.__repr__(
-        #  digests[0]). If this is OK, it can be replaced with [TDigest()] * total_params.
+
         digests = [TDigest() for i in range(total_params)]
         null_counts = np.array(np.zeros(total_params), dtype=int)
         col_counts = np.array(np.zeros(total_params), dtype=int)

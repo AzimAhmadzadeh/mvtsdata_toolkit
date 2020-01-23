@@ -463,7 +463,7 @@ class FeatureExtractor:
         if verbose:
             print('\n\tThe dataframe is stored at: {0}'.format(fname))
 
-    def boxplot_extracted_features(self, feature_names: list, output_path: str = None):
+    def plot_boxplot(self, feature_names: list, output_path: str = None):
         """
         Generates a plot of box-plots, one for each extracted feature.
 
@@ -584,7 +584,7 @@ def main():
                                  params_index=[0, 1, 2], first_k=50)
 
     params = ['TOTUSJH_median', 'TOTUSJH_mean', 'TOTBSQ_median', 'TOTBSQ_mean']
-    # fe.boxplot_extracted_features(params)
+    # fe.plot_boxplot(params)
     fe.plot_violinplot(params)
     # fe.plot_correlation_heatmap(params)
     # fe.plot_covariance_heatmap(params)
