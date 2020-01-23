@@ -5,7 +5,7 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name="mvtsdata_toolkit",
-    version="0.1.0",
+    version="0.1.2",
     author="Azim Ahmadzadeh, Kankana Sinha",
     author_email="aahmadzadeh1@cs.gsu.edu, ksinha1106@gmail.com",
     maintainer="Azim Ahmadzadeh",
