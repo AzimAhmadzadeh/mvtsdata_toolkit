@@ -1,11 +1,17 @@
+import os
 from setuptools import setup, find_packages
 
 with open("README.md", "r") as readme_file:
     readme = readme_file.read()
 
+requirement_path = './requirements.txt'
+if os.path.isfile(requirement_path):
+    with open(requirement_path) as f:
+        install_requires = f.read().splitlines()
+
 setup(
     name="mvtsdata_toolkit",
-    version="0.1.3",
+    version="0.1.4",
     author="Azim Ahmadzadeh, Kankana Sinha",
     author_email="aahmadzadeh1@cs.gsu.edu, ksinha1106@gmail.com",
     maintainer="Azim Ahmadzadeh",
@@ -14,7 +20,8 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://bitbucket.org/gsudmlab/mvtsdata_toolkit/src/master/",
-    packages=find_packages(),
+    packages=find_packages(exclude='tests.*'),
+    install_requires=install_requires,
     py_modules=['CONSTANTS'],
     include_package_data=True,
     license='MIT',
