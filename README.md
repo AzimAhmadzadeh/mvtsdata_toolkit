@@ -1,10 +1,12 @@
-## Multivariate Time Series Data Toolkit
+## MVTS Data Toolkit
+### A Toolkit for Pre-processing Multivariate Time Series Data
 
-*  **Package Name:** MVTS Data Toolkit
-*  **Journal:** SoftwareX (Elsevier) -- [*submitted*]
-*  **Title:** MVTS-Data Toolkit: A Python Package for Preprocessing Multivariate Time Series Data
-*  **Authors:** Azim Ahmadzadeh, Kankana Sinha, Berkay Aydin, and Rafal Angryk
-*  **Submission Date:** Feb 2020
+* **Title:** MVTS Data Toolkit: A Toolkit for Pre-processing Multivariate Time Series Data
+* **Journal:** SoftwareX Journal (Elsevier) -- [*under-review*]
+* **Authors:** Azim Ahmadzadeh [>](https://www.azim-a.com/), Kankana Sinha [>](https://www.linkedin.com/in/kankana-sinha-4b4b13131/), Berkay Aydin [>](https://grid.cs.gsu.edu/~baydin2/), Rafal A. Angryk [>](https://grid.cs.gsu.edu/~rangryk/)
+* **Demo Author:** Azim Ahmadzadeh
+* **Last Modified:** Jan 24, 2020
+
 
 ![MVTS_Date_Toolkit Icon](https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/c8f7e0edcfd899c93d9356d52b7ed8c6b500de04/__icon/MVTS_Data_Toolkit_icon2.png)
 
@@ -23,13 +25,14 @@ sampling methods are also developed.
 **This package provides:**
 
 *  *Feature Collection:* A collection of 48 statistical features useful for analysis
-of time series.
+of time series,
 *  *Feature Extraction:* An automated feature-extraction process, with both parallel
-and sequential execution capabilities.
+and sequential execution capabilities,
+*  *Visualization:* Quick and easy visualization for analysis of the extracted features, 
 *  *Data Analysis:* A quick analysis of the mvts data and the extracted features, in
-tabular and illustrative modes.
+tabular and illustrative modes,
 *  *Normalization:* A set of data transformation tools for normalization of the
-extracted features.
+extracted features,
 *  *Sampling:* A set of generic methods to provide an array of undersampling and
 oversampling remedies for balancing the class-imbalance datasets. 
 
@@ -289,9 +292,18 @@ the interested users through the functionalities this toolkit provides.
 generating the pip-installble version of this package.
 
 ----
-#### Software Authors:
+#### Citation
 
-|                 |               |       |
-| --------------- |:-------------:| -----:|
-| Azim Ahmadzadeh | _aahmadzadeh1[AT]cs[DOT]gsu[DOT]edu_  | [Website](https://grid.cs.gsu.edu/~aahmadzadeh1)   |
-| Kankana Sinha   | _ksinha3[AT]student[DOT]gsu[DOT]edu_  | [LinkedIn](https://www.linkedin.com/in/kankana-sinha-4b4b13131/) |
+Currently, this package is under review in [SoftwareX journal](https://www.journals.elsevier.com/softwarex). If you are interested in using this, I can share the manuscrip with you. Till it is published, it can be cited as follows:
+
+```
+@article{ahmadzadeh2020mvts,
+  title={MVTS-Data Toolkit: A Python Package for Preprocessing Multivariate Time Series Data}},
+  author={Azim Ahmadzadeh, Kankana Sinha, Berkay Aydin, Rafal A. Angryk},
+  journal={SoftwareX},
+  volume={},
+  pages={},
+  year={under-review},
+  publisher={Elsevier}
+}
+```
