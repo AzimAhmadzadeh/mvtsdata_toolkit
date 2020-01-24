@@ -5,7 +5,7 @@ with open("README.md", "r") as readme_file:
 
 setup(
     name="mvtsdata_toolkit",
-    version="0.1.2",
+    version="0.1.3",
     author="Azim Ahmadzadeh, Kankana Sinha",
     author_email="aahmadzadeh1@cs.gsu.edu, ksinha1106@gmail.com",
     maintainer="Azim Ahmadzadeh",
@@ -20,6 +20,6 @@ setup(
     license='MIT',
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3',
     ],
 )
