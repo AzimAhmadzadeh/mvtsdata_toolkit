@@ -7,7 +7,7 @@ def interpolate_missing_vals(df: pd.DataFrame) -> pd.DataFrame:
     is, for any group of consecutive missing values, it treats the values as equally
     spaced numbers between the present values before and after the gap.
     This does not impact non-numerical values.
-    :return: the interpolated version of the given dataframe.
+    :return: The interpolated version of the given dataframe.
     """
     if df.isna().sum().sum() != 0:
         return df.interpolate(method='linear', axis=0, limit_direction='both')

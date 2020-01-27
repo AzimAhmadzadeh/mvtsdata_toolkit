@@ -13,8 +13,8 @@ def _evaluate_features(features_name: list, features_index: list, config_feature
     This ensures that (1) if feature names are provided in the config file, one and only one of the
     arguments, `features_name` or `features_index`, might be given, and (2) if feature names are
     NOT provided in the config file, one and only one of the arguments MUST be given.
-    :param features_name: see the same argument in `do_extraction`.
-    :param features_index: see the same argument in `do_extraction`.
+    :param features_name: See the same argument in `do_extraction`.
+    :param features_index: See the same argument in `do_extraction`.
     :param config_features_available: `True` if the key `STATISTICAL_FEATURES` in the config file,
            is associated with a list of features, and `False` otherwise.
     :return: True, if no exception was raised.
@@ -55,8 +55,8 @@ def _evaluate_params(params_name: list, params_index: list, config_params_availa
     This ensures that (1) if parameter names are provided in the config file, one and only one of
     the arguments, `params_name` or `params_index`, might be given, and (2) if parameter names are
     NOT provided in the config file, the arg `params_name` and only that MUST be given.
-    :param params_name: see the same argument in `do_extraction`.
-    :param params_index: see the same argument in `do_extraction`.
+    :param params_name: See the same argument in `do_extraction`.
+    :param params_index: See the same argument in `do_extraction`.
     :param config_params_available: `True` if the key `MVTS_PARAMETERS` in the config file, is
            associated with a list of parameters, and `False` otherwise.
     :return: True, if no exception was raised.
@@ -95,7 +95,7 @@ def _evaluate_params(params_name: list, params_index: list, config_params_availa
 
 def _unwrap_self_do_extraction(*arg, **kwarg):
     """
-    This unwraps a class method so that it can perform independently and thus, can be called in
+    This unwraps a class method so that it can perform independently and thus can be called in
     parallel. More specifically, we need to be able to call `do_extraction` both sequentially and
     in parallel. In case of a parallel call, when it is called in a child process, the child process
     gets its own separate copy of the class instance. So, the class method needs to be unwrapped
@@ -110,27 +110,26 @@ def _unwrap_self_do_extraction(*arg, **kwarg):
 class FeatureExtractor:
     """
     An instance of this class can extract a set of given statistical features from a large number of
-    mvts data, in both sequential and parallel fashions. It loads the configuration file
-    provided by the user, and reads the following pieces of information from it.
+    MVTS data, in both sequential and parallel fashions. It loads the configuration file
+    provided by the user and reads the following pieces of information from it.
 
     Below are the column names of the summary dataframe:
-        * `PATH_TO_MVTS`: path to where the csv (mvts) files are stored.
+        * `PATH_TO_MVTS`: path to where the CSV (MVTS) files are stored.
         * `MVTS_PARAMETERS`: a list of time series name; only those listed here will be processed.
-        * `STATISTICAL_FEATURES`: a list of statistical features to be computed on each time
-           series.
-        * `META_DATA_TAGS`: a list of tags used in the mvts file names; to be used for extraction of
-           some metadata from file names.
-        * `PATH_TO_EXTRACTED_FEATURES`: path to a directory where the extracted features (one csv
-           file) will be stored.
+        * `STATISTICAL_FEATURES`: a list of statistical features to be computed on each time series.
+        * `META_DATA_TAGS`: a list of tags used in the MVTS file names; to be used for extraction of
+        some metadata from file names.
+        * `PATH_TO_EXTRACTED_FEATURES`: path to a directory where the extracted features (one CSV
+        file) will be stored.
 
-    Based on these values, it walks through the directory `PATH_TO_MVTS` and for each of the mvts
+    Based on these values, it walks through the directory `PATH_TO_MVTS` and for each of the MVTS
     files, it computes the statistical features listed in `STATISTICAL_FEATURES` on all time series
     listed in `MVTS_PARAMETERS`. It uses the tags in `META_DATA_TAGS` to extract some metadata,
     such as class `label`, `time stamp`, `id`, etc.
 
     The resultant dataframe (i.e., the extracted features) will have `T X F + x` columns, where `F`
     is the total number of features (i.e., `len(STATISTICAL_FEATURES)`), `T` is the total number of
-    time series parameters (i.e., `len(MVTS_PARAMETERS)`), and `x` is the number of meta data
+    time series parameters (i.e., `len(MVTS_PARAMETERS)`), and `x` is the number of metadata
     extracted from the file names (i.e., `len(META_DATA_TAGS)`).
 
     In the extracted features dataframe, the column-name of the nominal attributes is of the
@@ -142,7 +141,7 @@ class FeatureExtractor:
     corresponding column-name would be `DENSITY_mean`.
 
     Note: In `do_extraction_in_parallel`, each child process takes a list of file names (not the
-    actual files) that is a partition of the entire dataset, and works independently on the mvts
+    actual files) that is a partition of the entire dataset, and works independently on the MVTS
     in that partition. Therefore, the memory consumption of using `n` child processes is almost
     equal to n times the amount used in the sequential mode. That is, the parallel mode does not
     increase memory consumption exponentially with respect to the number of children. The number
@@ -154,7 +153,7 @@ class FeatureExtractor:
         This constructor loads all necessary information from the config file located at
         `path_to_config`.
 
-        :param path_to_config: path to where the corresponding configuration (YAML) file is located.
+        :param path_to_config: Path to where the corresponding configuration (YAML) file is located.
         """
         cr = ConfigReader(path_to_config)
         configs = cr.read()
@@ -177,16 +176,9 @@ class FeatureExtractor:
         For more info about this method and each of its arguments, see documentation of
         `do_extraction`.
 
-        :param n_jobs: the number of processes to be employed. This number will be used to partition
+        :param n_jobs: The number of processes to be employed. This number will be used to partition
                        the dataset in a way that each process gets approximately the same number
                        of files to extract features from.
-        :param params_name:
-        :param params_index:
-        :param features_name:
-        :param features_index:
-        :param first_k:
-        :param need_interp:
-        :param verbose:
         :return: None
         """
         import multiprocessing as mp
@@ -246,17 +238,17 @@ class FeatureExtractor:
                       partition: list = None, proc_id: int = None, verbose: bool = False,
                       output_list: list = None):
         """
-        Computes (based on the meta data loaded in the constructor) all of the statistical
-        features on the mvts data (per time series; column-wise) and stores the results in the
+        Computes (based on the metadata loaded in the constructor) all of the statistical
+        features on the MVTS data (per time series; column-wise) and stores the results in the
         public class field `df_all_features`.
 
         Note that only if the configuration file passed to the class constructor contains a list
         of the desired parameters and features the optional arguments can be skipped. So,
         please keep in mind the followings:
 
-            * For parameters: a selected list of parameters (i.e., column names in mvts data) must
+            * For parameters: a selected list of parameters (i.e., column names in MVTS data) must
               be provided either through the configuration file or the method argument
-              `params_name`. Also the argument `params_index` can be used to work with a smaller
+              `params_name`. Also, the argument `params_index` can be used to work with a smaller
               list of parameters if a list of parameters is already provided in the config file.
             * For features: A selected list of parameters (i.e., statistical features available
               in `features.feature_collection.py`) MUST be provided, as mentioned above.
@@ -265,12 +257,12 @@ class FeatureExtractor:
                             instead of the list `MVTS_PARAMETERS` given in the config file. If
                             the list in the config file is NOT provided, then either this or
                             `params_index` MIST be given.
-        :param params_index: (Optional) A list of column indices of interest, that can be used
+        :param params_index: (Optional) A list of column indices of interest that can be used
                              instead of the list `MVTS_PARAMETERS` given in the config file.
                              If the list in the config file is NOT provided, then either this or
                              `params_name` MUST be given.
         :param features_name: (Optional) A list of statistical features to be calculated on all
-                              time series of each mvts file. The statistical features are the
+                              time series of each MVTS file. The statistical features are the
                               function names present in `features.feature_collection.py'. If they
                               are not provided in the config file (under `STATISTICAL_FEATURES`),
                               either this or `features_index` MUST be given.
@@ -278,15 +270,15 @@ class FeatureExtractor:
                                provided in the configuration file. If they are not provided in
                                the config file (under `STATISTICAL_FEATURES`), either this or
                                `features_names` MUST be given.
-        :param first_k: (Optional) If provided, only the fist `first_k` mvts files will be
+        :param first_k: (Optional) If provided, only the fist `first_k` MVTS files will be
                         processed. This is mainly for getting some preliminary results in case the
-                        number of mvts files is too large.
+                        number of MVTS files is too large.
         :param need_interp: True if a linear interpolation is needed to alter the missing numerical
                             values. This only takes care of the missing values and will not
                             affect the existing ones. Set it to False otherwise. Default is True.
         :param partition: (only for internal use)
         :param proc_id: (only for internal use)
-        :param verbose: if set to True, the program prints on the console which files are being
+        :param verbose: If set to True, the program prints on the console which files are being
                         processed and what processes (if parallel) are doing the work. The default
                         value is False.
         :param output_list: (only for internal use)
@@ -437,14 +429,14 @@ class FeatureExtractor:
 
     def store_extracted_features(self, output_filename:str, verbose:bool=True):
         """
-        stores the dataframe of extracted features, calculated in the method `do_extraction`,
-        as a csv file. The output path is read from the configuration file, while the file name
+        Stores the dataframe of extracted features, calculated in the method `do_extraction`,
+        as a CSV file. The output path is read from the configuration file, while the file name
         given as the argument here will be used as the file name.
 
         If the output directory given in the configuration file does not exist, it will be created
         recursively.
 
-        :param output_filename: the name of the output csv file as the calculated data frame. If
+        :param output_filename: The name of the output CSV file as the calculated data frame. If
                the '.csv' extension is not provided, it will ba appended to the given name.
         :param verbose: Set to `False` to prevent the output path be printed on console. Default
                         is set to True.
@@ -467,7 +459,7 @@ class FeatureExtractor:
         """
         Generates a plot of box-plots, one for each extracted feature.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
@@ -481,7 +473,7 @@ class FeatureExtractor:
         """
         Generates a plot of violin-plots, one for each extracted feature.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
@@ -497,7 +489,7 @@ class FeatureExtractor:
         large number of features this may take a while (since each cell of the matrix is a
         scatter plot on its own), and also the final plot may become very large.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
@@ -515,7 +507,7 @@ class FeatureExtractor:
         especially important to avoid mapping insignificant changes of values into significant
         changes of colors.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
@@ -533,9 +525,9 @@ class FeatureExtractor:
         might be confusing; when the difference between the largest and smallest covariance is
         insignificant, the colors may imply a significant difference. To avoid this, the values
         mapped to the colors (as shown next to the color-map) must be carefully taken into
-        account in analysis of the covariance.
+        account in the analysis of the covariance.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.

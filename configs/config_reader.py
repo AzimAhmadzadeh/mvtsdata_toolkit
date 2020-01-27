@@ -8,11 +8,11 @@ _config_keys = ['PATH_TO_MVTS', 'PATH_TO_EXTRACTED_FEATURES',
 class ConfigReader:
     """
     This is a simple class to read the configuration file and meanwhile verifies its content. This
-    class, must be used whenever the configuration file is needed, instead of the direct reading of
+    class must be used whenever the configuration file is needed, instead of the direct reading of
     the configuration file.
 
-    Note: Should any new entry be added to the main structure of the configuration file,
-    this class or the constants provided in this module, must be carefully reviewed and likely
+    Note: If any new entry be added to the main structure of the configuration file,
+    this class or the constants provided in this module must be carefully reviewed and likely
     modified.
     """
     def __init__(self, path_to_config: str):
@@ -51,7 +51,7 @@ class ConfigReader:
             return False
 
     def __invalid_path_msg(self):
-        """ if os.path.isfile() fails, this method will raise a proper exception."""
+        """ If os.path.isfile() fails, this method will raise a proper exception."""
         raise FileNotFoundError(
             '''
             The given file does NOT exist:
@@ -60,7 +60,7 @@ class ConfigReader:
             '''.format(self.path_to_config))
 
     def __invalid_file_msg(self):
-        """ if the given path exists but it does not end with '.yml', this method will raise a
+        """ If the given path exists, but it does not end with '.yml' this method raises a
         proper exception."""
         raise FileNotFoundError(
             '''
@@ -71,8 +71,8 @@ class ConfigReader:
         )
 
     def __invalid_content_msg(self):
-        """ if the keys in the given config file has some extra ones or is missing one or more,
-        this method will raise a proper exception."""
+        """ If the keys in the given config file has some extra ones or are missing one or more,
+        then this method raises a proper exception."""
         raise AssertionError(
             '''
             The keys in the following configuration file does NOT match
@@ -105,8 +105,8 @@ class ConfigReader:
         `features.features_collection` module (i.e., 'get_min' and 'get_max').
         
         Note 1: The values under MVTS_PARAMETERS must be identical to those used in
-        the mvts dataset as the column-names. Users may want to list only those
-        parameters which are needed. Those that are not mentioned, will be ignored in
+        the MVTS dataset as the column-names. Users may want to list only those
+        parameters which are needed. Those that are not mentioned will be ignored in
         processes.
         
         Note 2: PATH_TO_EXTRACTED_FEATURES points to where the extracted features
@@ -114,8 +114,8 @@ class ConfigReader:
         module. Later on, when other modules need to access the extracted features,
         the program knows, using this value, where it is located.        
         
-        Note 3: The values under STATISTICAL_FEATURES are in fact the names of the
-        methods provided in `features.feature_collection` module. The names should
+        Note 3: The values under STATISTICAL_FEATURES are the names of the
+        methods provided in the `features.feature_collection` module. The names should
         be identical to those methods, without the parenthesis. Users may want to
         pick those that are interesting and meaningful for their time series.
         """)

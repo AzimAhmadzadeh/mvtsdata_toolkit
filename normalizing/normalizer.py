@@ -13,22 +13,22 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.D
     the min and max of each column and transforms the values into the range
     of [0,1]. The transformation is given by::
 
-        X_scaled = (X - X.min(axis=0)) / range
-    where::
+        X_scaled = (X - X.min(axis=0)) / ranges
+    where:
         range = X.max(axis=0) - X.min(axis=0)
 
     Note: In case multiple dataframes are used (i.e., several partitions of
-    dataset in training and testing), make sure that all of them will
+    the dataset in training and testing), make sure that all of them will
     be passed to this method at once, and as one single dataframe. Otherwise,
     the normalization will be carried out on local (as opposed to global)
     extrema, which is incorrect.
 
-    :param df: the dataframe to be normalized.
-    :param excluded_colnames: the name of non-numeric columns (e.g. TimeStamp,
-    ID etc) that must be excluded before normalization takes place.
+    :param df: The dataframe to be normalized.
+    :param excluded_colnames: The name of non-numeric columns (e.g. TimeStamp,
+    ID etc.) that must be excluded before normalization takes place.
     They will be added back to the normalized data.
-    :return: the same dataframe as input, with the label column unchanged,
-    except that now the numerical values are transformed into a [0, 1]-range.
+    :return: The same dataframe as input, with the label column unchanged,
+    except that now the numerical values are transformed into a [0, 1] range.
     """
     from sklearn.preprocessing import MinMaxScaler
 
@@ -67,21 +67,21 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) 
     of [-1,1]. The transformation is given by::
 
         X_scaled = scale * X - 1 - X.min(axis=0) * scale
-    where::
+    where:
         scale = 2 / (X.max(axis=0) - X.min(axis=0))
 
     Note: In case multiple dataframes are used (i.e., several partitions of
-    dataset in training and testing), make sure that all of them will
+    the dataset in training and testing), make sure that all of them will
     be passed to this method at once, and as one single dataframe. Otherwise,
     the normalization will be carried out on local (as opposed to global)
     extrema, which is incorrect.
 
-    :param df: the dataframe to be normalized.
-    :param excluded_colnames: the name of non-numeric columns (e.g. TimeStamp,
+    :param df: The dataframe to be normalized.
+    :param excluded_colnames: The name of non-numeric columns (e.g. TimeStamp,
     ID etc) that must be excluded before normalization takes place.
     They will be added back to the normalized data.
-    :return: the same dataframe as input, with the label column unchanged,
-    except that now the numerical values are transformed into a [-1, 1]-range.
+    :return: The same dataframe as input, with the label column unchanged,
+    except that now the numerical values are transformed into a [-1, 1] range.
     """
     from sklearn.preprocessing import MinMaxScaler
 
@@ -125,16 +125,16 @@ def standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFram
     represents its standard deviation.
 
     Note: In case multiple dataframes are used (i.e., several partitions of
-    dataset in training and testing), make sure that all of them will
+    the dataset in training and testing), make sure that all of them will
     be passed to this method at once, and as one single dataframe. Otherwise,
     the normalization will be carried out on local (as opposed to global)
     extrema, which is incorrect.
 
-    :param df: the dataframe to be normalized.
-    :param excluded_colnames: the name of non-numeric columns (e.g. TimeStamp,
+    :param df: The dataframe to be normalized.
+    :param excluded_colnames: The name of non-numeric columns (e.g. TimeStamp,
     ID etc) that must be excluded before normalization takes place. They will
     be added back to the normalized data.
-    :return: the same dataframe as input, with the label column unchanged,
+    :return: The same dataframe as input, with the label column unchanged,
     except that now the numeric values are transformed into a range with mean
     at 0 and unit standard deviation.
     """
@@ -175,17 +175,17 @@ def robust_standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.D
     range (IQR). This transformation is robust to outliers.
 
     Note: In case multiple dataframes are used (i.e., several partitions of
-    dataset in training and testing), make sure that all of them will
+    the dataset in training and testing), make sure that all of them will
     be passed to this method at once, and as one single dataframe. Otherwise,
     the normalization will be carried out on local (as opposed to global)
     extrema, hence unrepresentative IQR. This is a bad practice.
 
-    :param df: the dataframe to be normalized.
-    :param excluded_colnames: the name of non-numeric (e.g. TimeStamp,
-    ID etc)  that must be excluded before normalization takes place.
+    :param df: The dataframe to be normalized.
+    :param excluded_colnames: The name of non-numeric (e.g., TimeStamp,
+    ID etc.)  that must be excluded before normalization takes place.
     They will be added back to the normalized data.
 
-    :return: the same dataframe as input, with the label column unchanged,
+    :return: The same dataframe as input, with the label column unchanged,
     except that now the numerical values are transformed into new range
     determined by IQR.
     """

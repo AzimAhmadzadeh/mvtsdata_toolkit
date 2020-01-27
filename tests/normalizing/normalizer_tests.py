@@ -47,7 +47,7 @@ class TestNormalizer(unittest.TestCase):
         np.testing.assert_array_almost_equal(arr_expected, arr_normalized, decimal=10)
 
     def test_negativeone_one_normalize_X1(self):
-        """ Test if this method keeps non-numeric columns."""
+        """ Tests if this method keeps non-numeric columns."""
         df_normalized = normalizer.negativeone_one_normalize(self.df)
         colnames_before = list(self.df)
         colnames_after = list(df_normalized)
@@ -71,7 +71,7 @@ class TestNormalizer(unittest.TestCase):
         np.testing.assert_array_almost_equal(arr_expected, arr_normalized, decimal=10)
 
     def test_standardize_X1(self):
-        """ Test if this method keeps non-numeric columns."""
+        """ Tests if this method keeps non-numeric columns."""
         df_normalized = normalizer.standardize(self.df)
         colnames_before = list(self.df)
         colnames_after = list(df_normalized)
@@ -94,7 +94,7 @@ class TestNormalizer(unittest.TestCase):
         np.testing.assert_array_almost_equal(arr_expected, arr_normalized, decimal=10)
 
     def test_robust_standardize_X1(self):
-        """ Test if this method keeps non-numeric columns."""
+        """ Tests if this method keeps non-numeric columns."""
         df_normalized = normalizer.robust_standardize(self.df)
         colnames_before = list(self.df)
         colnames_after = list(df_normalized)

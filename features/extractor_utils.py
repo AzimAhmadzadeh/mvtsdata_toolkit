@@ -4,11 +4,11 @@ import features.feature_collection as fc
 
 def get_methods_for_names(method_names: list):
     """
-    for a given method-name, it finds it in `feature_collection` and returns it as a callable
+    For a given method-name, it finds it in `feature_collection` and returns it as a callable
     method.
 
-    :param method_names: name of the method of interest that exists in `feature_collection`.
-    :return: a callable instance of the method whose name is given.
+    :param method_names: Name of the method of interest that exists in `feature_collection`.
+    :return: A callable instance of the method whose name is given.
     """
     callable_methods = []
     for m in method_names:
@@ -45,10 +45,10 @@ def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFra
     Note: The statistical features will be extracted from all the give columns. So, in case it is
     needed only over some of the time series, then only those selected columns should be passed in.
 
-    :param df_mvts: a mvts dataframe from which the features are to be extracted.
-    :param features_list : a list of all callable functions (from `features.feature_collection`)
-           to be executed on the given mvts.
-    :return: a dataframe with the parameters as rows, and statistical features as columns.
+    :param df_mvts: A MVTS dataframe from which the features are to be extracted.
+    :param features_list: A list of all callable functions (from `features.feature_collection`)
+           to be executed on the given MVTS.
+    :return: A dataframe with the parameters as rows, and statistical features as columns.
     """
     col_names = list(df_mvts)
     df_features = pd.DataFrame(index=col_names, dtype=float)
@@ -84,8 +84,8 @@ def flatten_to_row_df(df: pd.DataFrame) -> pd.DataFrame:
         1   val     val         val     val
         -----------------------------------------------
 
-    :param df: the data frame to be flattened.
-    :return: a dataframe with one row and P X F columns, with values similar to the given dataframe.
+    :param df: The data frame to be flattened.
+    :return: A dataframe with one row and P X F columns, with values similar to the given dataframe.
     """
     all_colnames = list(df)
     all_rownames = list(df.index)
@@ -100,9 +100,9 @@ def split(l: list, n_of_partitions: int) -> list:
     """
     Splits the given list l into n_of_paritions partitions of approximately equal size.
 
-    :param l: the list to be split.
-    :param n_of_partitions: number of partitions.
-    :return: a list of the partitions, where each partition is a list itself.
+    :param l: The list to be split.
+    :param n_of_partitions: Number of partitions.
+    :return: A list of the partitions, where each partition is a list itself.
     """
     k, m = divmod(len(l), n_of_partitions)
     return [l[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n_of_partitions)]

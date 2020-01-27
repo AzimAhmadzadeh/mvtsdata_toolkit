@@ -7,7 +7,7 @@ def _extract_labels(mvts: pd.DataFrame, label_col_name) -> list:
     """
     A private method that extracts the unique class labels from the dataframe.
 
-    :return: a list of unique class labels.
+    :return: A list of unique class labels.
     """
     class_labels = mvts[label_col_name].unique().tolist()
     return class_labels
@@ -15,10 +15,10 @@ def _extract_labels(mvts: pd.DataFrame, label_col_name) -> list:
 
 def _decompose_mvts(mvts: pd.DataFrame, class_labels: list, label_col_name) -> dict:
     """
-    A private method that decomposes the mvts dataframe into several dataframes, one for each
+    A private method that decomposes the MVTS dataframe into several dataframes, one for each
     class label.
 
-    :return: a dictionary of labels (as keys) and dataframes (as values), each corresponding
+    :return: A dictionary of labels (as keys) and dataframes (as values), each corresponding
              to one label.
      """
     decomposed_mvts: dict = {label: pd.DataFrame for label in class_labels}
@@ -34,7 +34,7 @@ def _compute_populations(mvts: pd.DataFrame, label_col_name) -> dict:
     :param mvts: The dataframe who class population is of interest.
     :param label_col_name: The column-name corresponding to the class labels in `mvts`.
 
-    :return: a dictionary of class labels (as keys) and class populations (as values).
+    :return: A dictionary of class labels (as keys) and class populations (as values).
     """
     class_labels: list = _extract_labels(mvts, label_col_name)
     decomposed_mvts = _decompose_mvts(mvts, class_labels, label_col_name)
@@ -49,8 +49,7 @@ def _compute_ratios(mvts: pd.DataFrame, label_col_name) -> dict:
     :param mvts: The dataframe who class population is of interest.
     :param label_col_name: The column-name corresponding to the class labels in `mvts`.
 
-    :return: a dictionary of class labels (as keys) and class populations (as values).
-    :return: 
+    :return: A dictionary of class labels (as keys) and class populations (as values).
     """
 
     class_labels: list = _extract_labels(mvts, label_col_name)
@@ -62,8 +61,7 @@ def _compute_ratios(mvts: pd.DataFrame, label_col_name) -> dict:
 class Sampler:
     """
     This module contains several methods that assist sampling for a number of purposes,
-    among which, to remedy the class-imbalance issue is the primary objective.
-
+    among which, to remedy the class-imbalance issue, is the primary objective.
     """
 
     def __init__(self, extracted_features_df: pd.DataFrame, label_col_name):
@@ -71,8 +69,8 @@ class Sampler:
         The constructor method takes the input dataset and the column name corresponding to the
         class labels, and extracts the information about class labels and class populations.
 
-        :param extracted_features_df: a mvts dataframe that needs normalization.
-        :param label_col_name: column-name corresponding to the class class_labels.
+        :param extracted_features_df: A MVTS dataframe that needs normalization.
+        :param label_col_name: Column-name corresponding to the class class_labels.
         """
         self.label_col_name = label_col_name
         self.original_mvts = extracted_features_df
@@ -94,7 +92,7 @@ class Sampler:
         """
         A private method that computes the population of the original dataset.
 
-        :return: a dictionary of class labels (as keys) and class populations (as values)
+        :return: A dictionary of class labels (as keys) and class populations (as values).
         """
         pop_dict = {label: len(self.__decomposed_original_mvts[label]) for label in
                     self.__decomposed_original_mvts.keys()}
@@ -103,8 +101,6 @@ class Sampler:
     def __compute_original_ratios(self) -> dict:
         """
         A private method that computes the class ratios of the original dataset.
-
-        :return:
         """
         total = sum(self.original_class_populations.values())
         class_ratios = {label: self.original_class_populations[label] / total for label in
@@ -117,7 +113,7 @@ class Sampler:
 
         Note: Do not use this method directly. Instead, call `update_after_sampling`.
 
-        :return: a dictionary of class labels (as keys) and class populations (as values).
+        :return: A dictionary of class labels (as keys) and class populations (as values).
         """
         if self.sampled_mvts.empty:
             return {}
@@ -134,7 +130,7 @@ class Sampler:
 
         Note: Do not use this method directly. Instead, call `update_after_sampling`.
 
-        :return: a dictionary of class labels (as keys) and class ratios (as values).
+        :return: A dictionary of class labels (as keys) and class ratios (as values).
         """
         total = sum(self.sampled_class_populations.values())
         class_ratios = {label: self.sampled_class_populations[label] / total
@@ -145,7 +141,7 @@ class Sampler:
         """
         A getter method for the class_labels.
 
-        :return: the class field `class_labels`; a list of all class labels in the data.
+        :return: The class field `class_labels`; a list of all class labels in the data.
         """
         return self.class_labels
 
@@ -161,14 +157,14 @@ class Sampler:
         """
         Using this method one could do either undersampling or oversampling, in the most generic
         fashion. That is, the user determines the expected population size or ratios that they
-        would like to get from the mvts data.
-        Example: Consider a mvts data with 5 classes:
+        would like to get from the MVTS data.
+        Example: Consider a MVTS data with 5 classes:
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
 
         and given is: desired_ratios = [-1, -1, 0.33, 0.33, 0.33]
 
-        then, the instances of classes A and B will not change, while
+        Then, the instances of classes A and B will not change, while
         the population size of each of the  C, D, and E classes would be
         one-third of the sample size (3500 * 0.33).
 
@@ -177,11 +173,11 @@ class Sampler:
             2. The dictionary must contain all class class_labels present in the mvts dataframe.
             3. The number -1 can be used wherever the population or ratio should not change.
 
-        :param desired_populations: a dictionary of label-integer pairs, where each integer specifies
+        :param desired_populations: A dictionary of label-integer pairs, where each integer specifies
         the desired population of the corresponding class. The integers must be positive, but -1
         can be used to indicate that the population of the corresponding class should remain
         unchanged.
-        :param desired_ratios: a dictionary of label-float pairs, where each float specifies
+        :param desired_ratios: A dictionary of label-float pairs, where each float specifies
         the desired ratios (with respect to the total sample size) of the corresponding class.
         The floats must be positive, but -1 can be used to indicate that the ratio of the
         corresponding class should remain unchanged.
@@ -249,10 +245,9 @@ class Sampler:
 
             |A| + |B| = 200, |C| + |D| + |E| = 200
 
-        :param minority_labels: a list of class labels considered to be the minority classes.
-        :param majority_labels: a list of class labels considered to be the majority classes.
-        :param base_minority: the class label based on which, the sampling method is decided.
-        :return:
+        :param minority_labels: A list of class labels considered to be the minority classes.
+        :param majority_labels: A list of class labels considered to be the majority classes.
+        :param base_minority: The class label based on which, the sampling method is decided.
         """
         validate_under_over_sampling_input(self.original_class_populations,
                                            minority_labels=minority_labels,
@@ -282,7 +277,7 @@ class Sampler:
 
     def oversample(self, minority_labels: list, majority_labels: list, base_majority: str):
         """
-        UOversamples from the majority classes to achieve a 1:1 balance between the minority and
+        Oversamples from the majority classes to achieve a 1:1 balance between the minority and
         majority classes. This is done in such a way that the outcome follows these criteria:
 
          * The minority classes have an equal population, equal to that of `base_minority` class.
@@ -311,10 +306,6 @@ class Sampler:
 
             |A| + |B| = 2100, |C| + |D| + |E| = 2100.
 
-        :param minority_labels:
-        :param majority_labels:
-        :param base_majority:
-        :return:
         """
         validate_under_over_sampling_input(self.original_class_populations,
                                            minority_labels=minority_labels,

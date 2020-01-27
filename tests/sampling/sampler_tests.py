@@ -178,7 +178,7 @@ class TestSampler(unittest.TestCase):
         self.assertDictEqual(expected_ratios, sampler.sampled_class_ratios)
 
     def test_oversample_x1(self):
-        """ Tests if oversample samples correctly with based_majority set to 'M'."""
+        """ Tests if oversampler samples correctly with based_majority set to 'M'."""
         sampler = Sampler(self.mvts_df, 'lab')
         minority_labels = ['NF', 'C']
         majority_labels = ['X', 'M']

@@ -4,14 +4,14 @@ import numpy as np
 def validate_sampling_input(class_populations: dict, desired_ratios: dict = None,
                             desired_populations: dict = None):
     """
-    This methods validates the three arguments against the followig rules:
+    This method validates the three arguments against the following rules:
 
      - Both `desired_ratios` and `desired_populations` cannot be `None` at the same time.
      - Both `desired_ratios` and `desired_populations` cannot be given at the same time.
-     - class labels in `desired_populations` must match with those in `class_populations`.
-     - class labels in `desired_ratios` must match with those in `class_populations`.
-     - class populations in `desired_populations` MUST be either positive or -1.
-     - class ratios in `desired_ratios` MUST be either positive or -1. The positive values may be
+     - Class labels in `desired_populations` must match with those in `class_populations`.
+     - Class labels in `desired_ratios` must match with those in `class_populations`.
+     - Class populations in `desired_populations` MUST be either positive or -1.
+     - Class ratios in `desired_ratios` MUST be either positive or -1. The positive values may be
        larger than 1.0.
 
     :param class_populations: The class labels present in the data.

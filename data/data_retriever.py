@@ -14,8 +14,7 @@ import yaml
 class DataRetriever:
     """
     This is a simple class to provide data for users to play around with the package's
-    functionalities through its demo jupyter notebook.
-    notebook.
+    functionalities through its demo Jupyter notebook.
     """
     def __init__(self, dataset_number=1):
 
@@ -28,9 +27,10 @@ class DataRetriever:
     @staticmethod
     def __read_config():
         """
-        reads the config file located at CONST.PATH_TO_DATASETS_CONFIG, that contains a list of
-        urls to a few datasets.
-        :return: the content of the configuration file as a dictionary.
+        Reads the config file located at CONST.PATH_TO_DATASETS_CONFIG, which contains a list of
+        URLs to a few datasets.
+
+        :return: The content of the configuration file as a dictionary.
         """
         path_to_config = os.path.join(CONST.ROOT, CONST.PATH_TO_DATASETS_CONFIG)
         with open(path_to_config) as file:
@@ -39,16 +39,14 @@ class DataRetriever:
 
     def __get_dataset_name(self):
         """
-        retrieves the dataset's name from the dataset's url.
-        :return:
+        Retrieves the dataset's name from the dataset's URL.
         """
         url_path = urlparse(self.dataset_url).path
         return os.path.basename(url_path)
 
     def __get_info(self):
         """
-        retrieves some basic info about the dataset before downloading it.
-        :return:
+        Retrieves some basic info about the dataset before downloading it.
         """
         with urlopen(self.dataset_url) as req:
             meta = req.info()
@@ -61,15 +59,21 @@ class DataRetriever:
         print('SIZE:\t\t{}'.format(self.get_total_size()))
 
     def get_total_size(self):
-        """:return the size of the data to be extracted."""
+        """
+        :return: The size of the data to be extracted.
+        """
         return size(int(self.__meta['Content-Length']))
 
     def get_compression_type(self):
-        """:return the compression type of the dataset."""
+        """
+        :return: The compression type of the dataset.
+        """
         return self.__meta['Content-Type']
 
     def get_total_number_of_files(self):
-        """:return the total number of files in the dataset."""
+        """
+        :return: The total number of files in the dataset.
+        """
         if self.all_members is None:
             print('[!] this can be called only after the files are downloaded.')
             return 0
@@ -77,11 +81,11 @@ class DataRetriever:
 
     def retrieve(self, target_path):
         """
-        downloads and extracts the compressed dataset (given by 'dataset_id') into the directory
+        Downloads and extracts the compressed dataset (given by 'dataset_id') into the directory
         'target_path'. The original compressed file won't be kept. Only it's content will be copied
         into 'target_path'.
-        :param target_path: where the dataset should be copied to.
-        :return:
+
+        :param target_path: Where the dataset should be copied to.
         """
         with urlopen(self.dataset_url) as zipresp:
             with ZipFile(BytesIO(zipresp.read())) as zfile:

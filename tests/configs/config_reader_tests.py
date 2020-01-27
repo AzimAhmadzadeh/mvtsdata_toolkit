@@ -47,7 +47,7 @@ class MyTestCase(unittest.TestCase):
             cr.read()
 
     def test_config_with_missing_values(self):
-        """ xx """
+        """  """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_PATH_TO_EXTRACTED_FEATURES.yml')
         cr = ConfigReader(path_to_config)

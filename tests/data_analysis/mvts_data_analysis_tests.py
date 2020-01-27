@@ -130,7 +130,7 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         self.assertListEqual(actual_colnames, expected_colnames)
 
     def test_2x_get_six_num_summary(self):
-        """ Test if proper exception will be raised if `compute_summary` has not been executed."""
+        """ Tests if proper exception will be raised if `compute_summary` has not been executed."""
         _backup = self.mvts.summary.copy()
         self.mvts.summary = pd.DataFrame()  # summary is an empty dataframe now
         with self.assertRaises(ValueError) as context:
@@ -145,7 +145,7 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         self.mvts.summary = _backup.copy()  # this is needed for the rest of the tests.
 
     def test_print_summary(self):
-        """ Test if proper exception will be raised if `compute_summary` has not been executed."""
+        """ Tests if proper exception will be raised if `compute_summary` has not been executed."""
         _backup = self.mvts.summary.copy()
         self.mvts.summary = pd.DataFrame()  # summary is an empty dataframe now
         with self.assertRaises(ValueError) as context:
@@ -160,7 +160,7 @@ class TestMVTSDataAnalysis(unittest.TestCase):
         self.mvts.summary = _backup.copy()  # this is needed for the rest of the tests.
 
     def test_summary_to_scv(self):
-        """ Test if proper exception will be raised if `compute_summary` has not been executed."""
+        """ Tests if proper exception will be raised if `compute_summary` has not been executed."""
         _backup = self.mvts.summary.copy()
         self.mvts.summary = pd.DataFrame()  # summary is an empty dataframe now
         with self.assertRaises(ValueError) as context:

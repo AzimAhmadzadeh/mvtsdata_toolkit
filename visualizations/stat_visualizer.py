@@ -12,11 +12,10 @@ class StatVisualizer:
                  extracted_features: pd.DataFrame = None,
                  normalize: bool = True):
         """
-        A constructor that loads the data and if required, normalizes the values into the [0,1]
+        A constructor that loads the data and if required normalizes the values into the [0,1]
         range.
 
         :param path_to_extracted_features: The absolute or relative path to the extracted features.
-        :param extracted_features:
         :param normalize: False, if the ranges of values for different features are not far apart
                           and therefore, the boxplot does not need normalization. The default
                           value is True.
@@ -39,7 +38,7 @@ class StatVisualizer:
     def __verify_path_to_extracted_features(self):
         """
         A private method that verifies whether the given path exist or not, and also whether it
-        points to a csv file or not.
+        points to a CSV file or not.
 
         :return: None
         """
@@ -63,7 +62,7 @@ class StatVisualizer:
         """
         Generates a plot of boxplots, one for each extracted feature.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment
@@ -105,7 +104,7 @@ class StatVisualizer:
         """
         Generates a set of violin-plots, one for each extracted feature.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment allows it.
@@ -133,7 +132,7 @@ class StatVisualizer:
         large number of features this may take a while (since each cell of the matrix is a
         scatter plot on its own), and also the final plot may become very large.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
@@ -164,7 +163,7 @@ class StatVisualizer:
         especially important to avoid mapping insignificant changes of values into significant
         changes of colors.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
@@ -202,9 +201,9 @@ class StatVisualizer:
         might be confusing; when the difference between the largest and smallest covariance is
         insignificant, the colors may imply a significant difference. To avoid this, the values
         mapped to the colors (as shown next to the color-map) must be carefully taken into
-        account in analysis of the covariance.
+        account in the analysis of the covariance.
 
-        :param feature_names: a list of feature-names indicating the columns of interest for this
+        :param feature_names: A list of feature-names indicating the columns of interest for this
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment

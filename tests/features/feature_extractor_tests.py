@@ -30,7 +30,7 @@ class TestFeatureExtractor(unittest.TestCase):
         """
         Checks if the method raises proper exception when:
             - `MVTS_PARAMETERS` is empty in the config file, and
-            - none of the args `params_name` and `params_index` are given.
+            - None of the args `params_name` and `params_index` are given.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_MVTS_PARAMETERS.yml')
@@ -42,7 +42,7 @@ class TestFeatureExtractor(unittest.TestCase):
         """
         Checks if the method raises proper exception when:
             - `MVTS_PARAMETERS` is empty in the config file, and
-            - only the args `params_index` is given.
+            - Only the args `params_index` is given.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_MVTS_PARAMETERS.yml')
@@ -54,7 +54,7 @@ class TestFeatureExtractor(unittest.TestCase):
         """
         Checks if the method raises proper exception when:
             - `MVTS_PARAMETERS` is empty in the config file, and
-            - both of the args `params_name` and `params_index` are given.
+            - Both of the args `params_name` and `params_index` are given.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_MVTS_PARAMETERS.yml')
@@ -67,7 +67,7 @@ class TestFeatureExtractor(unittest.TestCase):
         """
         Checks if the method raises proper exception when:
             - `STATISTICAL_FEATURES` is empty in the config file, and
-            - none of the args `features_name` and `features_index` are given.
+            - None of the args `features_name` and `features_index` are given.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_STATISTICAL_FEATURES.yml')
@@ -80,7 +80,7 @@ class TestFeatureExtractor(unittest.TestCase):
         """
         Checks if the method raises proper exception when:
             - `STATISTICAL_FEATURES` is empty in the config file, and
-            - only the args `features_index` is given.
+            - Only the args `features_index` is given.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_STATISTICAL_FEATURES.yml')
@@ -93,7 +93,7 @@ class TestFeatureExtractor(unittest.TestCase):
         """
         Checks if the method raises proper exception when:
             - `STATISTICAL_FEATURES` is empty in the config file, and
-            - both the args `features_name` and `features_index` are given.
+            - Both the args `features_name` and `features_index` are given.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/configs_with_no_STATISTICAL_FEATURES.yml')
@@ -105,7 +105,7 @@ class TestFeatureExtractor(unittest.TestCase):
 
     def test_store_extracted_features_X1(self):
         """
-        Check if the extracted features can be properly stored as a csv file.
+        Check if the extracted features can be properly stored as a CSV file.
         """
         path_to_config = os.path.join(CONST.ROOT,
                                       'tests/configs/feature_extraction_configs.yml')
