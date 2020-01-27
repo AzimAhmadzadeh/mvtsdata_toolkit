@@ -26,7 +26,6 @@ def _evaluate_args(params_name: list, params_index: list):
     :param params_name:
     :param params_index:
 
-    :return:
     """
     has_param_name_in_arg = (params_name is not None) and (len(params_name) > 0)
     has_param_index_in_arg = (params_index is not None) and (len(params_index) > 0)
@@ -51,7 +50,7 @@ def _unwrap_self_compute_summary(*arg, **kwarg):
     to a non-class method so that the class variables don't overlap.
     :param arg:
     :param kwarg:
-    :return:
+
     """
     return MVTSDataAnalysis.compute_summary(*arg, **kwarg)
 
@@ -232,6 +231,7 @@ class MVTSDataAnalysis:
         :param verbose: Set it to True if you want to see more details as the function is running.
                         Default is False.
         :param output_list: Only for internal use. Ignore this.
+
         :return: None
         """
         is_parallel = False
@@ -481,6 +481,7 @@ class MVTSDataAnalysis:
         :param output_path: Path to where the summary should be stored.
         :param file_name: Name of the CSV file. If the extension is not given, '.csv' will be
                appended to the given name.
+
         :return: None
         """
         if self.summary.empty:

@@ -27,6 +27,7 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.D
     :param excluded_colnames: The name of non-numeric columns (e.g. TimeStamp,
     ID etc.) that must be excluded before normalization takes place.
     They will be added back to the normalized data.
+
     :return: The same dataframe as input, with the label column unchanged,
     except that now the numerical values are transformed into a [0, 1] range.
     """
@@ -80,6 +81,7 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) 
     :param excluded_colnames: The name of non-numeric columns (e.g. TimeStamp,
     ID etc) that must be excluded before normalization takes place.
     They will be added back to the normalized data.
+
     :return: The same dataframe as input, with the label column unchanged,
     except that now the numerical values are transformed into a [-1, 1] range.
     """
@@ -134,6 +136,7 @@ def standardize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.DataFram
     :param excluded_colnames: The name of non-numeric columns (e.g. TimeStamp,
     ID etc) that must be excluded before normalization takes place. They will
     be added back to the normalized data.
+
     :return: The same dataframe as input, with the label column unchanged,
     except that now the numeric values are transformed into a range with mean
     at 0 and unit standard deviation.

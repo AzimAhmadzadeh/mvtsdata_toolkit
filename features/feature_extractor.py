@@ -17,6 +17,7 @@ def _evaluate_features(features_name: list, features_index: list, config_feature
     :param features_index: See the same argument in `do_extraction`.
     :param config_features_available: `True` if the key `STATISTICAL_FEATURES` in the config file,
            is associated with a list of features, and `False` otherwise.
+
     :return: True, if no exception was raised.
     """
     if features_index is None: features_index = []
@@ -59,6 +60,7 @@ def _evaluate_params(params_name: list, params_index: list, config_params_availa
     :param params_index: See the same argument in `do_extraction`.
     :param config_params_available: `True` if the key `MVTS_PARAMETERS` in the config file, is
            associated with a list of parameters, and `False` otherwise.
+
     :return: True, if no exception was raised.
     """
     if params_index is None: params_index = []
@@ -102,7 +104,6 @@ def _unwrap_self_do_extraction(*arg, **kwarg):
     to a non-class method so that the class variables don't overlap.
     :param arg:
     :param kwarg:
-    :return:
     """
     return FeatureExtractor.do_extraction(*arg, **kwarg)
 
@@ -179,6 +180,7 @@ class FeatureExtractor:
         :param n_jobs: The number of processes to be employed. This number will be used to partition
                        the dataset in a way that each process gets approximately the same number
                        of files to extract features from.
+
         :return: None
         """
         import multiprocessing as mp
@@ -282,6 +284,7 @@ class FeatureExtractor:
                         processed and what processes (if parallel) are doing the work. The default
                         value is False.
         :param output_list: (only for internal use)
+
         :return: None
         """
         is_parallel = False
@@ -463,6 +466,7 @@ class FeatureExtractor:
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
+
         :return: None
         """
         from visualizations.stat_visualizer import StatVisualizer
@@ -477,6 +481,7 @@ class FeatureExtractor:
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
+
         :return: None
         """
         from visualizations.stat_visualizer import StatVisualizer
@@ -493,6 +498,7 @@ class FeatureExtractor:
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
+
         :return: None
         """
         from visualizations.stat_visualizer import StatVisualizer
@@ -511,6 +517,7 @@ class FeatureExtractor:
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
+
         :return: None
         """
         from visualizations.stat_visualizer import StatVisualizer
@@ -531,6 +538,7 @@ class FeatureExtractor:
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment allows it.
+
         :return: None
         """
         from visualizations.stat_visualizer import StatVisualizer

@@ -181,7 +181,6 @@ class Sampler:
         the desired ratios (with respect to the total sample size) of the corresponding class.
         The floats must be positive, but -1 can be used to indicate that the ratio of the
         corresponding class should remain unchanged.
-        :return:
         """
         self.sampled_mvts = pd.DataFrame()  # empty this before appending new dataframes
         expected_populations = {}
@@ -343,6 +342,7 @@ class Sampler:
 
         :param input_dfs: The input dataset to sample from.
         :param new_sample_size: The size of the desired sample.
+
         :return: The sampled dataframe.
         """
         new_sample_size = int(new_sample_size)

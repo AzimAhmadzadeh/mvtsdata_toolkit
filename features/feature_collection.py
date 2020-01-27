@@ -111,6 +111,7 @@ def get_mean_local_maxima_value(uni_ts: Union[pd.Series, np.ndarray],
     :param uni_ts: Univariate time series.
     :param only_positive: Only positive flag for local maxima. When True only positive local
            maxima are considered. Default is False.
+
     :return: Mean of local maxima values.
     """
     local_maxima = argrelextrema(uni_ts.values, np.greater)[0]
@@ -130,6 +131,7 @@ def get_mean_local_minima_value(uni_ts: Union[pd.Series, np.ndarray], only_negat
     :param uni_ts: Univariate time series.
     :param only_negative: Only negative flag for local minima. When True only negative local
            minima are considered. Default is False.
+
     :return: Mean of local minima values.
     """
     local_minima = argrelextrema(uni_ts.values, np.less)[0]
@@ -150,6 +152,7 @@ def get_no_mean_local_maxima_upsurges(uni_ts: Union[pd.Series, np.ndarray],
     :param uni_ts: Univariate time series.
     :param only_positive: Only positive flag for mean local maxima. When True only positive local
            maxima are considered. Default is False.
+
     :return: Number of points whose value is greater than mean local maxima.
     """
     mean_local_maxima = get_mean_local_maxima_value(uni_ts, only_positive)
@@ -166,6 +169,7 @@ def get_no_mean_local_minima_downslides(uni_ts: Union[pd.Series, np.ndarray],
     :param uni_ts: Univariate time series.
     :param only_negative: Only negative flag for mean local minima. When True only negative local
            minima are considered. Default is False.
+
     :return: Number of points whose value is less than mean local minima.
     """
     mean_local_minima = get_mean_local_minima_value(uni_ts, only_negative)

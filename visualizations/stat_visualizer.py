@@ -67,6 +67,7 @@ class StatVisualizer:
         :param output_path: If given, the generated plot will be stored instead of shown.
                             Otherwise, it will be only shown if the running environment
                             allows it.
+
         :return: None
         """
         # Plot from:
@@ -108,6 +109,7 @@ class StatVisualizer:
                               visualization.
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment allows it.
+
         :return: None
         """
         df = self.extracted_features[feature_names]
@@ -137,6 +139,7 @@ class StatVisualizer:
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
                                 allows it.
+
         :return: None
         """
         df = self.extracted_features[feature_names]
@@ -168,6 +171,7 @@ class StatVisualizer:
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
                                 allows it.
+
         :return: None
         """
         df = self.extracted_features[feature_names]
@@ -208,6 +212,7 @@ class StatVisualizer:
         :param output_path: If given, the generated plot will be stored instead of shown.
                                 Otherwise, it will be only shown if the running environment
                                 allows it.
+
         :return: None
         """
         df = self.extracted_features[feature_names]

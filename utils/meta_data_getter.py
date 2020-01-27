@@ -21,6 +21,7 @@ def extract_tagged_info(file_name: str, tag: str) -> str:
     :param file_name: MVTS filename with a class-label string encoded in it that follows the
            description above.
     :param tag: A string that points to the piece of info of interest.
+
     :return: The embedded class label of the given filename.
     """
     sub_string: str = get_substring(file_name, tag)
@@ -38,6 +39,7 @@ def get_end_pair_index(s: str, i: int):
 
     :param s: The input string.
     :param i: Index position of the opening brace '['
+
     :return: Index position of the closing pair ']' of the opening brace '['
     """
 
@@ -79,6 +81,7 @@ def get_substring(file_name: str, left_expression: str) -> str:
     :param file_name: A string that contains the time-series filename with the specified format
     :param left_expression: A string in the filename that points to the beginning of the embedded
                             substring.
+
     :return: The embedded substring of the given file name.
     """
     file_name = os.path.basename(os.path.normpath(file_name))

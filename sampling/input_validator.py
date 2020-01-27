@@ -17,6 +17,7 @@ def validate_sampling_input(class_populations: dict, desired_ratios: dict = None
     :param class_populations: The class labels present in the data.
     :param desired_ratios: The desired ratios of each class to be sampled.
     :param desired_populations: The desired population of each class to be sampled.
+
     :return: True, if no exception was raised.
     """
     desired_ratios = desired_ratios if desired_ratios else {}
@@ -102,6 +103,7 @@ def validate_under_over_sampling_input(class_populations, minority_labels, major
     :param majority_labels: See the corresponding docstring in `Sampler`.
     :param base_majority: See the corresponding docstring in `Sampler`.
     :param base_minority: See the corresponding docstring in `Sampler`.
+
     :return: True, if no exception was raised.
     """
     union_of_labels = set(minority_labels).union(set(majority_labels))

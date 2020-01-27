@@ -8,6 +8,7 @@ def get_methods_for_names(method_names: list):
     method.
 
     :param method_names: Name of the method of interest that exists in `feature_collection`.
+
     :return: A callable instance of the method whose name is given.
     """
     callable_methods = []
@@ -48,6 +49,7 @@ def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFra
     :param df_mvts: A MVTS dataframe from which the features are to be extracted.
     :param features_list: A list of all callable functions (from `features.feature_collection`)
            to be executed on the given MVTS.
+
     :return: A dataframe with the parameters as rows, and statistical features as columns.
     """
     col_names = list(df_mvts)
@@ -85,6 +87,7 @@ def flatten_to_row_df(df: pd.DataFrame) -> pd.DataFrame:
         -----------------------------------------------
 
     :param df: The data frame to be flattened.
+
     :return: A dataframe with one row and P X F columns, with values similar to the given dataframe.
     """
     all_colnames = list(df)
@@ -102,6 +105,7 @@ def split(l: list, n_of_partitions: int) -> list:
 
     :param l: The list to be split.
     :param n_of_partitions: Number of partitions.
+
     :return: A list of the partitions, where each partition is a list itself.
     """
     k, m = divmod(len(l), n_of_partitions)
