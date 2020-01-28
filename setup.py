@@ -11,7 +11,7 @@ if os.path.isfile(requirement_path):
 
 setup(
     name="mvtsdata_toolkit",
-    version="0.1.4",
+    version="0.1.5",
     author="Azim Ahmadzadeh, Kankana Sinha",
     author_email="aahmadzadeh1@cs.gsu.edu, ksinha1106@gmail.com",
     maintainer="Azim Ahmadzadeh",
