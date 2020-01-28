@@ -232,7 +232,7 @@ def get_difference_of_medians(uni_ts: Union[pd.Series, np.ndarray]) -> np.float6
 
 def get_dderivative_mean(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 1) -> np.float64:
     """
-    :return: The mean of the difference derivative of univariate time series within the function
+    :return: The mean of the difference-derivative of univariate time series within the function
              we use step_size to find derivative (default value of step_size is 1).
     """
     return np.float64(get_mean(_difference_derivative(uni_ts, step_size)))
@@ -240,7 +240,7 @@ def get_dderivative_mean(uni_ts: Union[pd.Series, np.ndarray], step_size: int = 
 
 def get_gderivative_mean(uni_ts: Union[pd.Series, np.ndarray]) -> np.float64:
     """
-    :return: The mean of the gradient derivative of univariate time series.
+    :return: The mean of the gradient-derivative of univariate time series.
     """
     return get_mean(_gradient_derivative(uni_ts))
 

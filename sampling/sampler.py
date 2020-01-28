@@ -69,7 +69,7 @@ class Sampler:
         The constructor method takes the input dataset and the column name corresponding to the
         class labels, and extracts the information about class labels and class populations.
 
-        :param extracted_features_df: A MVTS dataframe that needs normalization.
+        :param extracted_features_df: An MVTS dataframe that needs normalization.
         :param label_col_name: Column-name corresponding to the class class_labels.
         """
         self.label_col_name = label_col_name
@@ -158,7 +158,7 @@ class Sampler:
         Using this method one could do either undersampling or oversampling, in the most generic
         fashion. That is, the user determines the expected population size or ratios that they
         would like to get from the MVTS data.
-        Example: Consider a MVTS data with 5 classes:
+        Example: Consider an MVTS data with 5 classes:
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
 
@@ -223,7 +223,7 @@ class Sampler:
          * Total population of the majority classes is (undersampled to become) equal to the total
          population of the minority classes.
 
-        Example: Consider a mvts dataset with 5 classes, A, B, C, D, and E:
+        Example: Consider an mvts dataset with 5 classes, A, B, C, D, and E:
 
             |A| = 100, |B| = 400, |C| = 300, |D| = 700, |E| = 2000
 

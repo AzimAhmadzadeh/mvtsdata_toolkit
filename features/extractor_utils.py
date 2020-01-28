@@ -46,7 +46,7 @@ def calculate_one_mvts(df_mvts: pd.DataFrame, features_list: list) -> pd.DataFra
     Note: The statistical features will be extracted from all the give columns. So, in case it is
     needed only over some of the time series, then only those selected columns should be passed in.
 
-    :param df_mvts: A MVTS dataframe from which the features are to be extracted.
+    :param df_mvts: An MVTS dataframe from which the features are to be extracted.
     :param features_list: A list of all callable functions (from `features.feature_collection`)
            to be executed on the given MVTS.
 

@@ -14,7 +14,7 @@ def zero_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) -> pd.D
     of [0,1]. The transformation is given by::
 
         X_scaled = (X - X.min(axis=0)) / ranges
-    where:
+    where::
         range = X.max(axis=0) - X.min(axis=0)
 
     Note: In case multiple dataframes are used (i.e., several partitions of
@@ -68,7 +68,7 @@ def negativeone_one_normalize(df: pd.DataFrame, excluded_colnames: list = None) 
     of [-1,1]. The transformation is given by::
 
         X_scaled = scale * X - 1 - X.min(axis=0) * scale
-    where:
+    where::
         scale = 2 / (X.max(axis=0) - X.min(axis=0))
 
     Note: In case multiple dataframes are used (i.e., several partitions of

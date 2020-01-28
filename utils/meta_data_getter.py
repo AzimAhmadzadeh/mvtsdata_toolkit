@@ -4,7 +4,7 @@ from collections import deque
 
 def extract_tagged_info(file_name: str, tag: str) -> str:
     """
-    Extracts the incorporated info of a MVTS from the given file name. This is a generic method that
+    Extracts the incorporated info of an MVTS from the given file name. This is a generic method that
     considers the substring after `tag`, wrapped in square brackets, as the piece of information
     that is of interest. The value of the string `tag` depends on how the mvts files are named. Any
     piece of information can be encoded in the filename using a substring following the pattern

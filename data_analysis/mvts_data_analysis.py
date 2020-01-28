@@ -57,7 +57,7 @@ def _unwrap_self_compute_summary(*arg, **kwarg):
 
 class MVTSDataAnalysis:
     """
-    This class walks through a directory of CSV files (each being a MVTS) and calculates
+    This class walks through a directory of CSV files (each being an MVTS) and calculates
     estimated statistics of each of the parameters.
 
     It will perform the below tasks:
