@@ -9,7 +9,7 @@ Typical workflow:
     A. Make some changes in the 'dev' branch.
         A.1. Most of changes can be directly done over the 'dev' branch.
         A.2. In some cases, one can create a new branch from 'dev', say 'new_sampling', and when
-        its results is satisfactory, the 'new_sampling' branch can be merged into the 'dev' branch.
+        its results are satisfactory, the 'new_sampling' branch can be merged into the 'dev' branch.
     B. When we want to release a new version:
         B.1. we first need to run all tests in dev and make sure that all tests pass.
         B.2. then we can merge 'dev' into 'master'.
@@ -17,6 +17,6 @@ Typical workflow:
         to the server.
 ---------------------------------------------------------------------------------------------------
 Notes:
-    * We can consider the 'dev' branch as our main development branch.
-    * We can consider the 'master' branch as our release branch.
+    * We consider the 'dev' branch as our main development branch.
+    * We consider the 'master' branch as our release branch.
 ---------------------------------------------------------------------------------------------------

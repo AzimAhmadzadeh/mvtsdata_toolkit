@@ -15,6 +15,9 @@ from .utils import mvts_cleaner_tests
 # TestSuite, and at the end, all TestSuites will be combined into one large
 # TestSuite, called 'all_test_suites'.
 #
+# To run this, do:
+# > python -m tests.test_runner
+#
 if __name__ == "__main__":
 
     loader = unittest.TestLoader()
