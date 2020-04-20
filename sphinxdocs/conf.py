@@ -19,7 +19,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- General configuration ------------------------------------------------
@@ -50,8 +50,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'mvtsdata_toolkit'
-copyright = '2019, Azim Ahmadzadeh - Kankana Sinha'
+project = 'mvtsdatatoolkit'
+copyright = '2020, Azim Ahmadzadeh - Kankana Sinha'
 author = 'Azim Ahmadzadeh - Kankana Sinha'
 
 # The version info for the project you're documenting, acts as replacement for
