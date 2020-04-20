@@ -5,7 +5,7 @@
 * **Journal:** SoftwareX Journal (Elsevier) -- [*under-review*]
 * **Authors:** Azim Ahmadzadeh [>](https://www.azim-a.com/), Kankana Sinha [>](https://www.linkedin.com/in/kankana-sinha-4b4b13131/), Berkay Aydin [>](https://grid.cs.gsu.edu/~baydin2/), Rafal A. Angryk [>](https://grid.cs.gsu.edu/~rangryk/)
 * **Demo Author:** Azim Ahmadzadeh
-* **Last Modified:** Jan 24, 2020
+* **Last Modified:** Apr 20, 2020
 
 
 ![MVTS_Date_Toolkit Icon](https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/c8f7e0edcfd899c93d9356d52b7ed8c6b500de04/__icon/MVTS_Data_Toolkit_icon2.png)
@@ -93,7 +93,7 @@ the proceeding square brackets. For instance, `A_id[123]_lab[1].csv` indicates t
 this mvts is assigned the id `123` and the label `1`. If *tag*s are used, the
  metadata will be extracted and added to the extracted features automatically. To learn more
   about how the *tag*s can be used see 
-the documentation in [features.feature_extractor.py](./features/feature_extractor.py)
+the documentation in [features.feature_extractor.py](mvtsdatatoolkit/features/feature_extractor.py)
 .
   
 3.  If the embedded values contain paired braces within `[]`, (e.g. for id,
@@ -104,17 +104,17 @@ correctly, however for unpaired braces (e.g. for id,
 ----
 ## Main Components:
 *  All statistical features can be found in
-[features.feature_collection](./features/feature_collection.py).
+[features.feature_collection](mvtsdatatoolkit/features/feature_collection.py).
 *  Code for parallel and sequential feature extraction can be found in
-[features.feature_extractor](./features/feature_extractor.py).
+[features.feature_extractor](mvtsdatatoolkit/features/feature_extractor.py).
 *  Code for parallel and sequential analysis of raw mvts can be found in
-[data_analysis.mvts_data_analysis](./data_analysis/mvts_data_analysis.py). 
+[data_analysis.mvts_data_analysis](mvtsdatatoolkit/data_analysis/mvts_data_analysis.py). 
 *  Code for analysis of the extracted features can be found in
-[data_analysis.extracted_features_analysis](./data_analysis/extracted_features_analysis.py).
+[data_analysis.extracted_features_analysis](mvtsdatatoolkit/data_analysis/extracted_features_analysis.py).
 *  Code for data normalization can be found in
-[normalizing.normalizer](./normalizing/normalizer.py).
+[normalizing.normalizer](mvtsdatatoolkit/normalizing/normalizer.py).
 *  Code for sampling methods can be found in
-[sampling.sampler](./sampling/sampler.py).
+[sampling.sampler](mvtsdatatoolkit/sampling/sampler.py).
 
 
 ----
@@ -139,11 +139,11 @@ user's configuration file.
 This package allows analysis of both raw mvts data and the extracted
 features.
 
-Using [mvts_data_analysis](./data_analysis/mvts_data_analysis.py) module
+Using [mvts_data_analysis](mvtsdatatoolkit/data_analysis/mvts_data_analysis.py) module
 users can easily get a glimpse of their raw data.
 
 ```python
-from data_analysis.mvts_data_analysis import MVTSDataAnalysis
+from mvtsdatatoolkit.data_analysis import MVTSDataAnalysis
 mda = MVTSDataAnalysis('/PATH/TO/CONFIG.YML')
 mda.compute_summary(first_k=50,
                     params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
@@ -165,14 +165,14 @@ which utilizes 4 processes to extract the summary statistics in parallel.
 We explained in our paper in more details, about computing the statistics
 in parallel.
 
-Using [extracted_features_analysis](./data_analysis/extracted_features_analysis.py)
+Using [extracted_features_analysis](mvtsdatatoolkit/data_analysis/extracted_features_analysis.py)
 module users can also get some analysis from the extracted features (see Section
 Feature Extraction). Suppose the dataframe of the extracted features is
 loaded as a pandas dataframe into a variable called
 `extracted_features_df`. Then,
 
 ```python
-from data_analysis.extracted_features_analysis import ExtractedFeaturesAnalysis
+from mvtsdatatoolkit.data_analysis import ExtractedFeaturesAnalysis
 efa = ExtractedFeaturesAnalysis(extracted_features_df, excluded_col=['id'])
 efa.compute_summary()
 ```
@@ -188,12 +188,12 @@ efa.get_five_num_summary()
 ----
 #### Feature Extraction
 
-This snippet shows how [feature_extractor](./features/feature_extractor.py)
+This snippet shows how [feature_extractor](mvtsdatatoolkit/features/feature_extractor.py)
 module can be used, for extracting 4 statistics (i.e., *min*, *max*, *median*, and *mean*),
 from 3 time series parameteres (i.e., *TOTUSJH*, *TOTBSQ*, and *TOTPOT*).
 
 ```python
-from features.feature_extractor import FeatureExtractor
+from mvtsdatatoolkit.features import FeatureExtractor
 
 fe = FeatureExtractor(path_to_config='/PATH/TO/CONFIG.YML')
 fe.do_extraction(features_name=['get_min', 'get_max', 'get_median', 'get_mean'],
@@ -232,10 +232,10 @@ fe.plot_splom(params)
 #### Sampling
 After the statistical features are extracted from the mvts data, to remedy
 the class-imbalance issue (if exists) a set of generic sampling methods
-are provided in [sampler](./sampling/sampler.py) module.
+are provided in [sampler](mvtsdatatoolkit/sampling/sampler.py) module.
 
 ```python
-from sampling.sampler import Sampler
+from mvtsdatatoolkit.sampling.sampler import Sampler
 
 sampler = Sampler(extracted_features_df, label_col_name='lab')
 sampler.sample(desired_populations={'N': 100, 'Y': 100})
@@ -259,11 +259,12 @@ For other approaches, see the [/demo](./demo.ipynb).
 ----
 #### Normalizing
 The extracted features often require normalization. Using
-[normalizer](./normalizing/normalizer.py) module, it can be easily
+[normalizer](mvtsdatatoolkit/normalizing/normalizer.py) module, it can be easily
 normalized as follows:
 
 ```python
-from normalizing import normalizer
+
+from mvtsdatatoolkit.normalizing import normalizer
 normalizer.zero_one_normalize()
 df_normalized = normalizer.zero_one_normalize(extracted_features_df)
 ``` 
