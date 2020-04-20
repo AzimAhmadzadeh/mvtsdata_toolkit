@@ -1,5 +1,5 @@
 import unittest
-from mvtsdatatoolkit.data_analysis import MVTSDataAnalysis
+from mvtsdatatoolkit.data_analysis.mvts_data_analysis import MVTSDataAnalysis
 import numpy as np
 import pandas as pd
 
