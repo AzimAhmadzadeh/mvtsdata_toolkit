@@ -1,9 +1,13 @@
 import os
 from setuptools import setup, find_packages
+import CONSTANTS as CONST
 
 # ------------ VARIABLES ------------
-readme_path = 'README.md'
-requirement_path = 'requirements.txt'
+readme_fname = 'README.md'
+requirement_fname = 'requirements.txt'
+
+readme_path = os.path.join(CONST.ROOT, readme_fname)
+requirement_path = os.path.join(CONST.ROOT, requirement_fname)
 
 # ------------ SCRIPTS --------------
 with open(readme_path, "r") as readme_file:

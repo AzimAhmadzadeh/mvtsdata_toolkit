@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-from mvtsdatatoolkit.sampling.input_validator import validate_sampling_input, \
-    validate_under_over_sampling_input
+from mvtsdatatoolkit.sampling.input_validator import validate_sampling_input, validate_under_over_sampling_input
 
 
 def _extract_labels(mvts: pd.DataFrame, label_col_name) -> list:
