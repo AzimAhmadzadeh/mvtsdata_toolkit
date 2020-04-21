@@ -44,7 +44,7 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', 'py', 'yml']
 
 # The master toctree document.
 master_doc = 'index'
@@ -73,7 +73,10 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['build/*', 'Thumbs.db', '.DS_Store', '__icon/*', 'dis/*t',
+                    'mvtsdatatoolkit.egg-info/*', 'tests/*', 'CONSTANTS.py',
+                    'bitbucket-pipelines.yml', 'README.md', 'requirements.txt', 'setup.py',
+                    'demo.py', 'LICENCE.txt']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
