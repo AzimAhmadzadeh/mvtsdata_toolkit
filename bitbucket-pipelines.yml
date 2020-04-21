@@ -9,12 +9,13 @@ pipelines:
               - pip
             script: # use sphinx to automatically generate html documentations.
               # generate html documentations
-              - pip install -r requirements.txt
+              # - pip install -r requirements.txt
               - apt-get update && apt-get -y install python-sphinx
               - pip install sphinx_rtd_theme
               - cd sphinxdocs
               - make clean
-              - sphinx-apidoc -o . ..
+              # - sphinx-apidoc -o . ..
+              - sphinx-apidoc -o . .. ../tests ../CONSTANTS.py ../setup.py
               - make html
             artifacts:
               # This is the path (relative to the root of project) where the generated htmls

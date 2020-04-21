@@ -2,8 +2,8 @@ import os
 from setuptools import setup, find_packages
 
 # ------------ VARIABLES ------------
-readme_path = './README.md'
-requirement_path = './requirements.txt'
+readme_path = 'README.md'
+requirement_path = 'requirements.txt'
 
 # ------------ SCRIPTS --------------
 with open(readme_path, "r") as readme_file:
