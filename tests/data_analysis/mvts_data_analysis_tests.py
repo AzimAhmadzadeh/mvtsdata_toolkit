@@ -2,6 +2,8 @@ import unittest
 from mvtsdatatoolkit.data_analysis.mvts_data_analysis import MVTSDataAnalysis
 import numpy as np
 import pandas as pd
+import os
+import CONSTANTS as CONST
 
 
 class TestMVTSDataAnalysis(unittest.TestCase):
@@ -9,6 +11,7 @@ class TestMVTSDataAnalysis(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         f_path = 'tests/configs/feature_extraction_configs.yml'
+        f_path = os.path.join(CONST.ROOT, f_path)
         cls.mvts = MVTSDataAnalysis(f_path)
         cls.mvts.compute_summary(params_name=['TOTUSJH', 'TOTBSQ', 'TOTPOT'])
 

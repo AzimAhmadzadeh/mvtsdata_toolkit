@@ -5,7 +5,7 @@
 * **Journal:** SoftwareX Journal (Elsevier) -- [*under-review*]
 * **Authors:** Azim Ahmadzadeh [>](https://www.azim-a.com/), Kankana Sinha [>](https://www.linkedin.com/in/kankana-sinha-4b4b13131/), Berkay Aydin [>](https://grid.cs.gsu.edu/~baydin2/), Rafal A. Angryk [>](https://grid.cs.gsu.edu/~rangryk/)
 * **Demo Author:** Azim Ahmadzadeh
-* **Last Modified:** Apr 20, 2020
+* **Last Modified:** Apr 21, 2020
 
 
 ![MVTS_Date_Toolkit Icon](https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/c8f7e0edcfd899c93d9356d52b7ed8c6b500de04/__icon/MVTS_Data_Toolkit_icon2.png)
@@ -17,7 +17,7 @@ series data. It provides a comprehensive set of 48 statistical features for extr
 the important characteristics of time series. The feature extraction process is
 automated in a sequential and parallel fashion, and is supplemented with an extensive
 summary report about the data. Using other modules, different data normalization
-methods and imputation are at users' disposal. To cater the class-imbalance issue,
+methods and imputations are at users' disposal. To cater the class-imbalance issue,
 that is often intrinsic to real-world datasets, a set of generic but user-friendly,
 sampling methods are also developed.
 
@@ -58,7 +58,7 @@ Click on the badge below to try the demo provided in the notebook `demo.ipynb`, 
 #### Install it from PyPI
 You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
 
-```pip install mvtsdata-toolkit```
+```pip install mvtsdatatoolkit```
 
 [![PyPI license](https://img.shields.io/badge/PyPI-0.1-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdata-toolkit/)
 
@@ -82,9 +82,9 @@ It is assumed that the input dataset is a collection of multivariate time series
 these assumptions:
 
 1.  Each mvts is stored in a `tab`-delimited, csv file. Each column represents either the time
- series or some metadata such as timestamp. An mvts data with `t`
+ series or some metadata such as timestamp. An mvts dataset with `t`
 time series and `k` metadata columns, each of length `d`, has a dimension of
-`d * (t + k)`).
+`d * (t + k)`.
 
 2.  File names can also be used to have some metadata encoded using a *tag* followed by
  `[]`, for each piece of info. The *tag* indicates
@@ -105,7 +105,7 @@ correctly, however for unpaired braces (e.g. for id,
 ## Main Components:
 *  All statistical features can be found in
 [features.feature_collection](mvtsdatatoolkit/features/feature_collection.py).
-*  Code for parallel and sequential feature extraction can be found in
+*  Code for parallel and sequential feature extraction process can be found in
 [features.feature_extractor](mvtsdatatoolkit/features/feature_extractor.py).
 *  Code for parallel and sequential analysis of raw mvts can be found in
 [data_analysis.mvts_data_analysis](mvtsdatatoolkit/data_analysis/mvts_data_analysis.py). 
@@ -119,16 +119,47 @@ correctly, however for unpaired braces (e.g. for id,
 
 ----
 
-## Demo
-The Jupyer notebook [demo](./demo.ipynb) is designed to give a tour of the
+## Demo (1)
+The Jupyer notebook [demo1](demo1.ipynb) is designed to give a tour of the
 main functionalities of MVTS Data Toolkit. Users can either click on the
-*binder* badge and run it online, or clone this project and run it on
+*binder* badge (see above) and run it online, or clone this project and run it on
 their local machine.
 
 A dataset of 2000 mvts files can be downloaded within the steps of this
 demo. 
 
 ----
+## Demo (2)
+[demo2](./demo2.ipynb) is another Jupyter notebook that is provided
+in case the user wants to install this package from PyPI and try the demo
+on their local machine. To do so, follow these steps:
+
+* Create a new directory:
+```bash
+mkdir mvts_demo
+```
+* Inside `mvts_demo` create a new virtualenv called `venv` and
+activate it:
+```bash
+cd mvts_demo
+virtualenv -p /usr/bin/python3.6 venv
+source venv/bin/activate
+```
+* Install `mvtsdatatoolkit` (that consequently installs `notebook` too)
+```bash
+pip install mvtsdatatoolkit
+``` 
+* Download the notebook and start the Jupyter notebook:
+```bash
+wget https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/b5add71f62f65c69fa4c4d9f21bc43c840671566
+/demo.ipynb
+jupyter notebook
+```
+
+
+----
+
+
 ## Example Usage
 
 In following examples, the string `'/PATH/TO/CONFIG.YML'` points to the
@@ -253,7 +284,7 @@ sampler.sample(desrired_ratios = {'N': 0.50, 'Y': -1})
 which means take 50% of `N`-class instances, and *all* of `Y`-class
 instances.
 
-For other approaches, see the [/demo](./demo.ipynb).
+For other approaches, see the [/demo](demo1.ipynb).
 
  
 ----
@@ -285,7 +316,7 @@ Extra files:
 file for pipelining the deployment steps before each release.
 *  [CONSTANTS.py](./CONSTANTS.py) keeps track of the root directory, and
 a few other pieces of information that are needed for the demo.
-*  [demo.ipynb](./demo.ipynb) is the demo Jupyter notebook that can walk
+*  [demo.ipynb](demo1.ipynb) is the demo Jupyter notebook that can walk
 the interested users through the functionalities this toolkit provides.
 *  [README.md](./README.md) has the content of this very manual.
 *  [requirements.txt](./requirements.txt) keeps track of all dependencies.

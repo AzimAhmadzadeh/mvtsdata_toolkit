@@ -58,7 +58,7 @@ class MVTSDataAnalysis:
     This class walks through a directory of CSV files (each being an MVTS) and calculates
     estimated statistics of each of the parameters.
 
-    It will perform the below tasks:
+    It will perform the following tasks:
         1. Read each MVTS (.csv files) from the folder where the MVTS dataset is kept, i.e.,
            /pet_datasets/subset_partition3. Parameter path_to_root will be provided by the user
            at the time of creating the instance of this class.
@@ -81,13 +81,16 @@ class MVTSDataAnalysis:
 
         :param path_to_config: Path to the yml configuration file
         """
-        path_to_config = os.path.join(CONST.ROOT, path_to_config)
-
         cr = ConfigReader(path_to_config)
         configs = cr.read()
 
-        self.path_to_dataset = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
-        _, _, self.all_mvts_paths = next(walk(self.path_to_dataset))
+        self.path_to_dataset = configs['PATH_TO_MVTS']
+        # _, _, self.all_mvts_paths = next(walk(self.path_to_dataset))  # TODO: just added
+
+        dirpath, _, all_csv = next(walk(self.path_to_dataset))
+        self.all_mvts_paths = [path.join(dirpath, f) for f in all_csv]  # absolute paths
+
+
         self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.summary = pd.DataFrame()
 
@@ -120,7 +123,7 @@ class MVTSDataAnalysis:
         if first_k is not None:
             all_csv = all_csv[:first_k]
 
-        all_files = [path.join(dirpath, f) for f in all_csv]
+        all_files = [path.join(dirpath, f) for f in all_csv]  # absolute paths
 
         # ------------------------------------------------------------
         # partition the files to be distributed among processes.
@@ -246,8 +249,8 @@ class MVTSDataAnalysis:
         # -----------------------------------------
         all_csv_files = []
         if is_parallel:
-            # Use the given `partition` instead of all csv files.
-            all_csv_files = partition
+            # Use the given `partition` instead of all the csv files.
+            all_csv_files = partition  # absolute paths
 
         else:
             all_csv_files = self.all_mvts_paths
@@ -268,7 +271,8 @@ class MVTSDataAnalysis:
         # Drop any non-numeric columns from the columns of interest.
         # -----------------------------------------
         # read one csv as an example
-        df = pd.read_csv(os.path.join(self.path_to_dataset, self.all_mvts_paths[0]), sep='\t')
+        # df = pd.read_csv(os.path.join(self.path_to_dataset, self.all_mvts_paths[0]), sep='\t')
+        df = pd.read_csv(all_csv_files[0], sep='\t')  # TODO: Just added.
         # get the columns of interest
         df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
         # get a list of numeric column-names
@@ -298,7 +302,8 @@ class MVTSDataAnalysis:
                 continue
 
             i += 1
-            abs_path = os.path.join(self.path_to_dataset, f)
+            # abs_path = os.path.join(self.path_to_dataset, f)
+            abs_path = f  # TODO: Just added.
             df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
 
             df_req = df_mvts[numeric_params_name]  # keep only the numeric columns!
@@ -390,7 +395,8 @@ class MVTSDataAnalysis:
         all_sizes_in_bytes = []
         for f in self.all_mvts_paths:
             if f.lower().endswith('.csv'):
-                f_path = os.path.join(self.path_to_dataset, f)
+                # f_path = os.path.join(self.path_to_dataset, f)
+                f_path = f  # TODO: just added
                 all_sizes_in_bytes.append(os.stat(f_path).st_size)
         return np.mean(all_sizes_in_bytes)
 
@@ -402,7 +408,8 @@ class MVTSDataAnalysis:
         all_sizes_in_bytes = []
         for f in self.all_mvts_paths:
             if f.lower().find('.csv') != -1:
-                f_path = os.path.join(self.path_to_dataset, f)
+                # f_path = os.path.join(self.path_to_dataset, f)
+                f_path = f  # TODO: just added
                 all_sizes_in_bytes.append(os.stat(f_path).st_size)
         return np.sum(all_sizes_in_bytes)
 
