@@ -15,7 +15,6 @@ class TestMVTSCleaner(unittest.TestCase):
         pass
 
     def test_something(self):
-        # TODO: replace this method with whatever you want.
         self.assertEqual(True, True)
 
 

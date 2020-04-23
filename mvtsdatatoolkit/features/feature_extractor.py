@@ -159,13 +159,12 @@ class FeatureExtractor:
         cr = ConfigReader(path_to_config)
         configs = cr.read()
 
-        # self.path_to_root = os.path.join(CONST.ROOT, configs['PATH_TO_MVTS'])
-        self.path_to_root = configs['PATH_TO_MVTS']  # TODO: Just added
-        dirpath, _, all_csv = next(walk(self.path_to_root))  # TODO: Just added
+        self.path_to_root = configs['PATH_TO_MVTS']
+        dirpath, _, all_csv = next(walk(self.path_to_root))
         self.all_mvts_paths = [path.join(dirpath, f) for f in all_csv]  # absolute paths
 
         # self.path_to_output = os.path.join(CONST.ROOT, configs['PATH_TO_EXTRACTED_FEATURES'])
-        self.path_to_output = configs['PATH_TO_EXTRACTED_FEATURES']  # TODO: just added
+        self.path_to_output = configs['PATH_TO_EXTRACTED_FEATURES']
         self.statistical_features: list = configs['STATISTICAL_FEATURES']
         self.mvts_parameters: list = configs['MVTS_PARAMETERS']
         self.metadata_tags: list = configs['META_DATA_TAGS']
@@ -320,7 +319,7 @@ class FeatureExtractor:
             all_csv_files = partition
 
         else:
-            all_csv_files = self.all_mvts_paths  # TODO: Just added
+            all_csv_files = self.all_mvts_paths
             # _, _, all_csv_files = next(walk(self.path_to_root))
             if first_k is not None:
                 # Note: If `fist_k` was used in parallel version, it should have already been taken
@@ -372,7 +371,7 @@ class FeatureExtractor:
                     sys.stdout.flush()
 
             # abs_path = path.join(self.path_to_root, f)
-            abs_path = f  # TODO: Just added
+            abs_path = f
             df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
 
             # -----------------------------------------

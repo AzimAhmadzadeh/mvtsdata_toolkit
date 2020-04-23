@@ -85,7 +85,6 @@ class MVTSDataAnalysis:
         configs = cr.read()
 
         self.path_to_dataset = configs['PATH_TO_MVTS']
-        # _, _, self.all_mvts_paths = next(walk(self.path_to_dataset))  # TODO: just added
 
         dirpath, _, all_csv = next(walk(self.path_to_dataset))
         self.all_mvts_paths = [path.join(dirpath, f) for f in all_csv]  # absolute paths
@@ -271,8 +270,7 @@ class MVTSDataAnalysis:
         # Drop any non-numeric columns from the columns of interest.
         # -----------------------------------------
         # read one csv as an example
-        # df = pd.read_csv(os.path.join(self.path_to_dataset, self.all_mvts_paths[0]), sep='\t')
-        df = pd.read_csv(all_csv_files[0], sep='\t')  # TODO: Just added.
+        df = pd.read_csv(all_csv_files[0], sep='\t')
         # get the columns of interest
         df = pd.DataFrame(df[self.mvts_parameters], dtype=float)
         # get a list of numeric column-names
@@ -302,8 +300,7 @@ class MVTSDataAnalysis:
                 continue
 
             i += 1
-            # abs_path = os.path.join(self.path_to_dataset, f)
-            abs_path = f  # TODO: Just added.
+            abs_path = f
             df_mvts: pd.DataFrame = pd.read_csv(abs_path, sep='\t')
 
             df_req = df_mvts[numeric_params_name]  # keep only the numeric columns!
@@ -395,8 +392,7 @@ class MVTSDataAnalysis:
         all_sizes_in_bytes = []
         for f in self.all_mvts_paths:
             if f.lower().endswith('.csv'):
-                # f_path = os.path.join(self.path_to_dataset, f)
-                f_path = f  # TODO: just added
+                f_path = f
                 all_sizes_in_bytes.append(os.stat(f_path).st_size)
         return np.mean(all_sizes_in_bytes)
 
@@ -408,8 +404,7 @@ class MVTSDataAnalysis:
         all_sizes_in_bytes = []
         for f in self.all_mvts_paths:
             if f.lower().find('.csv') != -1:
-                # f_path = os.path.join(self.path_to_dataset, f)
-                f_path = f  # TODO: just added
+                f_path = f
                 all_sizes_in_bytes.append(os.stat(f_path).st_size)
         return np.sum(all_sizes_in_bytes)
 
