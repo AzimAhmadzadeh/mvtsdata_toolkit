@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------------------------------
+Project: mvtsdata_toolkit
+---------------------------------------------------------------------------------------------------
+Branches:
+    1. master: only used for each release.
+    2. dev: this is the main branch for all changes. Experimental and testing branches must
+    first merge into this branch.
+---------------------------------------------------------------------------------------------------
+Release workflow:
+    A. Make the needed changes in the 'dev' branch.
+        A.1. Most of changes can be directly done over the 'dev' branch.
+        A.2. In some cases, one can create a new branch from 'dev', say 'new_sampling', and when
+        the changes are satisfactory, the 'new_sampling' branch can be merged into the 'dev'
+         branch.
+    B. Prior to each release:
+        B.1. first run all tests (using `test_runner.py`) in dev and make sure that all tests pass.
+        B.2. then merge 'dev' into 'master'.
+        B.3. update the version info in `setup.py` (one occurrence), `README.md` (multiple
+        occurrences), and `demo.ipynb`.
+        B.4. make necessary updates about the latest changes in the `README.md` and `demo.ipynb`
+
+        B.5. verify the sphrinx-generated documentations locally using the following commands:
+            B.5.1. `pip install sphinx_rtd_theme`
+            B.5.2. `cd sphinxdocs`
+            B.5.3. `make clean`
+            B.5.4. `sphinx-apidoc -o . .. ../tests ../CONSTANTS.py ../setup.py`
+            B.5.5. `make html` (and check out at the html files generated and stored at
+            `mvtsdatatoolkit/sphinx/_build/html`
+        B.6. install the project: `python setup.py sdist bdist_wheel` (to generate the binary files)
+        B.7. verify the pip-installable package locally:
+            B.7.1. create a directory, say `test_mvts`, and cd into it.
+            B.7.2. create a virtual environment inside `test_mvts` (call it `venv`).
+            B.7.3. copy (or symlink) the project (with the latest changes) to `test_mvts`.
+            B.7.4. install it from the source: `pip install <project_root_dir>``  (e.g. `pip install
+             mvtsata_toolkit/`)
+            B.7.5. remove the project (copied in step B.7.3) to ensure that you are only relying on
+            the installed package and not the actual source code.
+            B.7.6. verify the install by `pip list | grep 'mvtsdatatoolkit'`.
+            B.7.7. import the package (e.g. `form mvtsdatatoolkit.sampling.sampler import Sampler`)
+        B.8. upload the new version to PyPI:
+            B.8.1. go to the root dir: `cd mvtsdata_toolkit1/`
+            B.8.2. run `python -m twine upload dist/*` (provide user and pass for PyPI)
+            B.8.3. verify the update at `https://pypi.org/project/mvtsdatatoolkit/`
+        B.9. Remove the binary files generated (in `build/`, `dist/`, and `mvtsatatoolkit.egg-info`)
+        B.10. push the 'master' branch. Consequently, bitbucket pipelines will run tests, generate
+        the docs and push them to the dmlab server. (Note that testing, doc generating, and
+         uploading the htmls to the server are manual steps.)
+
+
+---------------------------------------------------------------------------------------------------
+Notes:
+    * We consider the 'dev' branch as our main development branch.
+    * We consider the 'master' branch as our release branch.
+    * Project documentation are rsynced with `http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/`
+---------------------------------------------------------------------------------------------------
