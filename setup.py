@@ -23,9 +23,9 @@ pckges = find_packages(exclude=['tests.*', 'tests', 'docs.*', 'docs'])
 # ------------- SETUP ---------------
 setup(
     name='mvtsdatatoolkit',
-    version='0.2.1',
+    version='0.2.3',
     author='Azim Ahmadzadeh, Kankana Sinha',
-    author_email='aahmadzadeh1@cs.gsu.edu, ksinha1106@gmail.com',
+    author_email='aahmadzadeh1@cs.gsu.edu',  #  ksinha1106@gmail.com
     url='https://bitbucket.org/gsudmlab/mvtsdata_toolkit/src/master',
     maintainer='Azim Ahmadzadeh',
     maintainer_email='aahmadzadeh1@cs.gsu.edu',
@@ -54,7 +54,7 @@ setup(
         'Intended Audience :: Science/Research',
         'Intended Audience :: Developers',
         'Topic :: Scientific/Engineering :: Information Analysis',
-        'Development Status :: 3 - Alpha',  # 3-Alpha, 4-Beta, 5-Production/Stable
+        'Development Status :: 4 - Beta',  # 3-Alpha, 4-Beta, 5-Production/Stable
         'License :: OSI Approved :: MIT License',
     ],
 )
