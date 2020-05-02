@@ -38,7 +38,7 @@ oversampling remedies for balancing the class-imbalance datasets.
 
 ----
 [![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://opensource.org/licenses/MIT)
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.3-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdata-toolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.3-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 [![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
 ----
  
@@ -59,7 +59,7 @@ You can install this package, directly from Python Package Index (PyPI), using `
 
 ```pip install mvtsdatatoolkit```
 
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.3-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdata-toolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.3-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 
 ----
 #### See Documentation
@@ -379,6 +379,7 @@ Currently, this package is under review in [SoftwareX journal](https://www.journ
 [1] A. Ahmadzadeh, K. Sinha, 2020. "MVTS-Data Toolkit:
 A Python Package for Preprocessing Multivariate Time
 Series Data", (under review 2020))
+
 [2] Angryk, R.A., Martens, P.C., Aydin, B., Kempton, D.,
 Mahajan, S.S., Basodi, S., Ahmadzadeh, A., Cai, X.,
 Boubrahimi, S.F., Hamdi, S.M., Schuh, M.A. and
