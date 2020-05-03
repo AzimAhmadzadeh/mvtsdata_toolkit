@@ -54,8 +54,17 @@ Click on the badge below to try the demo provided in the notebook `demo.ipynb`, 
 ----
 #### Install it from PyPI
 You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
+* Linux/Mac OS:
 
-```pip install mvtsdatatoolkit```
+    ```pip install mvtsdatatoolkit```
+* Windows:
+
+**Note**: On windows, the *Microsooft Visual C++* must be
+updated. Otherwise the error `Microsoft Visual C++ 14.0 is required`
+might terminate the installation. To solve this issue, see
+this [Medium post](https://medium.com/@jacky_ttt/day060-fix-error-microsoft-visual-c-14-0-is-required-629413e798cd)
+that elaborates on this short [Stackoverflow answer](https://stackoverflow.com/a/40888720). 
+
 
 [![PyPI license](https://img.shields.io/badge/PyPI-0.2.6-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 
