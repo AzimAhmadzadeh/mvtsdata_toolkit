@@ -54,9 +54,11 @@ Click on the badge below to try the demo provided in the notebook `demo.ipynb`, 
 ----
 #### Install it from PyPI
 You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
+
 * Linux/Mac OS:
 
-    ```pip install mvtsdatatoolkit```
+```pip install mvtsdatatoolkit```
+    
 * Windows:
 
 **Note**: On windows, the *Microsooft Visual C++* must be
