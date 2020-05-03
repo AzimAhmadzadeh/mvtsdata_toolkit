@@ -1,4 +1,4 @@
-## MVTS Data Toolkit v0.2.3
+## MVTS Data Toolkit v0.2.4
 ### A Toolkit for Pre-processing Multivariate Time Series Data
 
 * **Title:** MVTS Data Toolkit: A Toolkit for Pre-processing Multivariate Time Series Data
@@ -38,7 +38,7 @@ oversampling remedies for balancing the class-imbalance datasets.
 
 ----
 [![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://opensource.org/licenses/MIT)
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.3-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.4-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 [![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
 ----
  
@@ -59,7 +59,7 @@ You can install this package, directly from Python Package Index (PyPI), using `
 
 ```pip install mvtsdatatoolkit```
 
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.3-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.4-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 
 ----
 #### See Documentation
@@ -145,13 +145,13 @@ called *Space Weather ANalytics for Solar Flares*
 (*SWAN-SF*) [2] .
 
 ----
-## Need Help With Notebook?
-Follow the steps to run the notebook on your local machine
-using *virtualenv* and without having to clone the project.
-If you are more comfortable with *conda*/*anaconda* make
-appropriate adjustments.
+## Need Help Running Demo Locally?
+Follow the steps below to run the demo notebook on your
+local machine using *virtualenv* and without having to
+clone the project. If you are more comfortable with
+*conda*/*anaconda* make appropriate adjustments.
 
-(Below commands are specific to Unix-base systems)
+(Commands below are specific to Unix-base systems)
 
 * Create a new directory and `cd` into it:
 ```bash
@@ -171,8 +171,7 @@ pip install mvtsdatatoolkit
 ``` 
 * Download the notebook and start the Jupyter notebook:
 ```bash
-wget https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/b5add71f62f65c69fa4c4d9f21bc43c840671566
-/demo.ipynb
+wget https://bitbucket.org/gsudmlab/mvtsdata_toolkit/downloads/demo.ipynb
 jupyter notebook
 ```
 ----

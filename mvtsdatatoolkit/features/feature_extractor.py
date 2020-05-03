@@ -4,7 +4,6 @@ import sys
 from os import path, walk
 from mvtsdatatoolkit import utils
 from mvtsdatatoolkit.features import extractor_utils
-import CONSTANTS as CONST
 from mvtsdatatoolkit.configs.config_reader import ConfigReader
 
 

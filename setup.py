@@ -4,7 +4,7 @@ import CONSTANTS as CONST
 
 # ------------ VARIABLES ------------
 readme_fname = 'README.md'
-requirement_fname = 'requirements.txt'
+requirement_fname = 'requirements_setup.txt'
 
 readme_path = os.path.join(CONST.ROOT, readme_fname)
 requirement_path = os.path.join(CONST.ROOT, requirement_fname)
@@ -23,7 +23,7 @@ pckges = find_packages(exclude=['tests.*', 'tests', 'docs.*', 'docs'])
 # ------------- SETUP ---------------
 setup(
     name='mvtsdatatoolkit',
-    version='0.2.3',
+    version='0.2.4',
     author='Azim Ahmadzadeh, Kankana Sinha',
     author_email='aahmadzadeh1@cs.gsu.edu',  #  ksinha1106@gmail.com
     url='https://bitbucket.org/gsudmlab/mvtsdata_toolkit/src/master',
@@ -34,7 +34,8 @@ setup(
     long_description_content_type='text/markdown',
     packages=pckges,
     package_data={
-        '.': ['requirements.txt'],
+        '.': ['requirements.txt',
+              'requirements_setup.txt'],
         'mvtsdatatoolkit.configs': ['datasets_configs.yml',
                                     'demo_configs.yml',
                                     'test_configs.yml']},

@@ -26,7 +26,8 @@ Release workflow:
             B.5.4. `sphinx-apidoc -o . .. ../tests ../CONSTANTS.py ../setup.py`
             B.5.5. `make html` (and check out at the html files generated and stored at
             `mvtsdatatoolkit/sphinx/_build/html`
-        B.6. install the project: `python setup.py sdist bdist_wheel` (to generate the binary files)
+        B.6. install the project: `python setup.py sdist bdist_wheel` (to generate the binary files.
+        Note that wheel must be installed; pip install wheel)
         B.7. verify the pip-installable package locally:
             B.7.1. create a directory, say `test_mvts`, and cd into it.
             B.7.2. create a virtual environment inside `test_mvts` (call it `venv`).
@@ -51,5 +52,7 @@ Release workflow:
 Notes:
     * We consider the 'dev' branch as our main development branch.
     * We consider the 'master' branch as our release branch.
+    * While all dependencies are listed in `requirements.txt`, the direct dependencies needed for
+    installing this package are listed in `requirements_setup.txt`.
     * Project documentation are rsynced with `http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/`
 ---------------------------------------------------------------------------------------------------
