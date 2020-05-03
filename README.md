@@ -1,11 +1,11 @@
-## MVTS Data Toolkit v0.2.5
+## MVTS Data Toolkit v0.2.6
 ### A Toolkit for Pre-processing Multivariate Time Series Data
 
 * **Title:** MVTS Data Toolkit: A Toolkit for Pre-processing Multivariate Time Series Data
 * **Journal:** SoftwareX Journal [>](https://www.journals.elsevier.com/softwarex) (Elsevier) -- [*under-review*]
 * **Authors:** Azim Ahmadzadeh [>](https://www.azim-a.com/), Kankana Sinha [>](https://www.linkedin.com/in/kankana-sinha-4b4b13131/), Berkay Aydin [>](https://grid.cs.gsu.edu/~baydin2/), Rafal A. Angryk [>](https://grid.cs.gsu.edu/~rangryk/)
 * **Demo Author:** Azim Ahmadzadeh
-* **Last Modified:** Apr 24, 2020
+* **Last Modified:** May 03, 2020
 
 ![MVTS_Date_Toolkit Icon](https://bitbucket.org/gsudmlab/mvtsdata_toolkit/raw/c8f7e0edcfd899c93d9356d52b7ed8c6b500de04/__icon/MVTS_Data_Toolkit_icon2.png)
 
@@ -38,28 +38,26 @@ oversampling remedies for balancing the class-imbalance datasets.
 
 ----
 [![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://opensource.org/licenses/MIT)
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.5-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.6-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 [![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
 ----
  
 #### Requirements
-*  Python 3.6
+*  Python >= 3.6
 *  For a list of all required packages, see [requirements.txt](./requirements.txt).
 
 ----
 #### Try it online
 Click on the badge below to try the demo provided in the notebook `demo.ipynb`, online:
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvtsdata_toolkit%2Fsrc%2Fmaster/master?filepath=demo.ipynb)
-
-
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/git/https%3A%2F%2Fbitbucket.org%2Fgsudmlab%2Fmvtsdata_toolkit%2Fsrc%2Fmaster/master?filepath=.%2Fdemo.ipynb)
 ----
 #### Install it from PyPI
 You can install this package, directly from Python Package Index (PyPI), using `pip` as follows:
 
 ```pip install mvtsdatatoolkit```
 
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.5-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.6-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 
 ----
 #### See Documentation
@@ -359,7 +357,10 @@ needed for generating the pip-installble version of this package.
 ----
 #### Citation
 
-Currently, this package is under review in [SoftwareX journal](https://www.journals.elsevier.com/softwarex). If you are interested in using this, I can share the manuscrip with you. Till it is published, it can be cited as follows:
+Currently, this package is under review in
+[SoftwareX journal](https://www.journals.elsevier.com/softwarex).
+If you are interested in using this, I can share the manuscript with
+you. Till it is published, it can be cited as follows:
 
 ```
 @article{ahmadzadeh2020mvts,
