@@ -1,4 +1,4 @@
-## MVTS Data Toolkit v0.2.4
+## MVTS Data Toolkit v0.2.5
 ### A Toolkit for Pre-processing Multivariate Time Series Data
 
 * **Title:** MVTS Data Toolkit: A Toolkit for Pre-processing Multivariate Time Series Data
@@ -38,7 +38,7 @@ oversampling remedies for balancing the class-imbalance datasets.
 
 ----
 [![PyPI license](https://img.shields.io/pypi/l/ansicolortags.svg??style=flat-square&logo=appveyor)](https://opensource.org/licenses/MIT)
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.4-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.5-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 [![PyPI license](https://img.shields.io/badge/Doc-Sphinx-blue??style=flat-square&logo=appveyor)](http://dmlab.cs.gsu.edu/docs/mvtsdata_toolkit/)
 ----
  
@@ -59,7 +59,7 @@ You can install this package, directly from Python Package Index (PyPI), using `
 
 ```pip install mvtsdatatoolkit```
 
-[![PyPI license](https://img.shields.io/badge/PyPI-0.2.4-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
+[![PyPI license](https://img.shields.io/badge/PyPI-0.2.5-orange??style=flat-square&logo=appveyor)](https://pypi.org/project/mvtsdatatoolkit/)
 
 ----
 #### See Documentation
