@@ -51,7 +51,7 @@ python-dateutil==2.8.0
 python-slugify==4.0.0
 pytz==2019.1
 pyudorandom==1.0.0
-PyYAML==5.1.2
+PyYAML==5.4
 pyyml==0.0.2
 pyzmq==18.1.0
 qtconsole==4.5.5
